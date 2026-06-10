@@ -1,73 +1,56 @@
-# React + TypeScript + Vite
+# Stockia
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Stockia es una aplicacion web en desarrollo creada con React, TypeScript y Vite. El objetivo del proyecto es construir una interfaz para gestionar y visualizar productos, con login, navegacion entre paginas y un catalogo visual.
 
-Currently, two official plugins are available:
+## Que tenemos
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Proyecto configurado con React, TypeScript y Vite.
+- Sistema de rutas con `react-router-dom`.
+- Pagina de login inicial.
+- Ruta para dashboard.
+- Ruta para usuarios.
+- Ruta para productos.
+- Navbar basico en la pagina de productos.
+- Primera card de producto con imagen, titulo, descripcion y boton.
+- Estilos globales iniciales para login, navbar y productos.
 
-## React Compiler
+## Que estamos construyendo
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Una interfaz de productos tipo catalogo.
+- Cards cuadradas para mostrar imagen, nombre, informacion y acciones.
+- Un navbar con marca, buscador y boton de busqueda.
 
-## Expanding the ESLint configuration
+## Que falta
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Ajustar la cuadrilla de productos para que muestre varias cards por fila.
+- Unificar los nombres de clases entre el HTML y el CSS.
+- Mejorar el diseno responsive para celular y escritorio.
+- Agregar mas productos de ejemplo.
+- Conectar los botones a acciones reales.
+- Definir si las imagenes vendran de internet, de `public` o de `src/assets`.
+- Corregir textos temporales como `Card Title` y descripciones de prueba.
+- Revisar estilos finales de colores, tamanos y espaciados.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Como ejecutar el proyecto
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Instalar dependencias:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Iniciar el servidor de desarrollo:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
+
+Crear una version de produccion:
+
+```bash
+npm run build
+```
+
+## Estado del proyecto
+
+El proyecto esta en etapa inicial. Actualmente se esta trabajando en la pagina de productos y en la organizacion visual del catalogo.
