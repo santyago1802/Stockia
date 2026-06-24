@@ -1,6 +1,6 @@
 # Stockia
 
-Stockia es una aplicacion web en desarrollo creada con React, TypeScript y Vite. El objetivo del proyecto es construir una interfaz para gestionar y visualizar productos, con login, navegacion entre paginas y un catalogo visual.
+Stockia es una aplicacion web en desarrollo creada con React, TypeScript, Vite y tiene una base de datos con el sistema de gestion de postgreSQL. El objetivo del proyecto es construir una interfaz para gestionar y visualizar productos, con login, navegacion entre paginas y un catalogo visual.
 
 ## Que tenemos
 
