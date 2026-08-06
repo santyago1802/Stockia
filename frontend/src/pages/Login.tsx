@@ -1,19 +1,20 @@
+import { type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
-import Button from "../components/ui/Button";
 
 function Login() {
-  const navigate = useNavigate();
+const navigate = useNavigate();
 
-  const handleLogin = () => {
-    navigate("/dashboard");
-  };
+const handleLogin = (event: FormEvent<HTMLFormElement>) => {
+event.preventDefault();
+navigate("/dashboard");
+};
 
-  return (
+return (
     <>
     <div className="login-page">
         <div className="wrapper">
-            <form action="">
+            <form onSubmit={handleLogin}>
                 <h1>Login</h1>
 
             <div className="input-box">
