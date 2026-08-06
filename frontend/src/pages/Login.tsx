@@ -7,7 +7,7 @@ const navigate = useNavigate();
 
 const handleLogin = (event: FormEvent<HTMLFormElement>) => {
 event.preventDefault();
-navigate("/dashboard");
+navigate("/Productos");
 };
 
 return (
