@@ -67,6 +67,13 @@ body {
     text-align: center;
     margin-bottom: 10px;
 }
+.wrapper .logo {
+    display: block;
+    width: 180px;
+    height: auto;
+    margin: 0 auto 25px;
+}
+
 .wrapper .input-box {
     position: relative;
     margin: 10px 0;

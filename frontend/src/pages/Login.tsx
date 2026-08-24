@@ -1,5 +1,6 @@
 import { type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import logoStockia from "../assets/LOGO-Stockia.png";
 
 
 function Login() {
@@ -15,8 +16,7 @@ return (
     <div className="login-page">
         <div className="wrapper">
             <form onSubmit={handleLogin}>
-                <h1>Login</h1>
-
+                <img src={logoStockia} alt="Logo Stockia" className="logo" />
             <div className="input-box">
                 <select id="tipo-doc" name="tipo-doc" required>
                     <option value="">Tipo de documento</option>
@@ -29,22 +29,19 @@ return (
             </div>
 
                 <div className="input-box">
-                    <input type="text" placeholder="Username" required />
+                    <input type="text" placeholder="Usuario" required />
                     <i className='bx bxs-user'></i>
                 </div>
 
                 <div className="input-box">
-                    <input type="password" placeholder="Password" required />
+                    <input type="password" placeholder="Contraseña" required />
                     <i className='bx bxs-lock-alt'></i>
                 </div>
                 <div className="forgot">
-                    <a href="#">Forgot Password?</a>
+                    <a href="#">Olvidate tu contraseña?</a>
                 </div>
-                <button type="submit" className="btn">Login</button>
+                <button type="submit" className="btn">Entrar</button>
 
-                <div className="register-link">
-                    <p>Don't have an account? <a href="#">Register</a></p>
-                </div>
             </form>
         </div>
     </div>
