@@ -246,6 +246,120 @@ app.post("/api/prestamos", async (req, res) => {
   }
 });
 
+// Consultar préstamos
+app.get("/api/prestamos", async (_req, res) => {
+  try {
+    const resultado = await pool.query(`
+      SELECT
+        p.id_prestamo,
+        p.id_usuario,
+        u.nombre_usuario,
+        p.fecha_prestamo,
+        p.estado,
+        dp.id_material,
+        m.nombre_material,
+        dp.cantidad
+      FROM prestamo p
+      INNER JOIN usuario u
+        ON p.id_usuario = u.id_usuario
+      INNER JOIN detalle_prestamo dp
+        ON p.id_prestamo = dp.id_prestamo
+      INNER JOIN material m
+        ON dp.id_material = m.id_material
+      ORDER BY p.id_prestamo DESC
+    `);
+
+    res.json(resultado.rows);
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      mensaje: "No se pudieron consultar los préstamos",
+    });
+  }
+});
+
+// Devolver un préstamo
+app.put("/api/prestamos/:id/devolver", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await pool.query("BEGIN");
+
+    // Buscar el préstamo
+    const prestamo = await pool.query(
+    `SELECT estado, id_usuario
+    FROM prestamo
+    WHERE id_prestamo = $1`,
+  [id]
+);
+
+    if (prestamo.rows.length === 0) {
+      await pool.query("ROLLBACK");
+      return res.status(404).json({
+        mensaje: "Préstamo no encontrado",
+      });
+    }
+
+    // Evitar devolver un préstamo que ya fue devuelto
+    if (prestamo.rows[0].estado === "devuelto") {
+      await pool.query("ROLLBACK");
+      return res.status(400).json({
+        mensaje: "Este préstamo ya fue devuelto",
+      });
+    }
+
+    // Obtener material y cantidad del préstamo
+    const detalle = await pool.query(
+      `SELECT id_material, cantidad
+       FROM detalle_prestamo
+       WHERE id_prestamo = $1`,
+      [id]
+    );
+
+    // Registrar la entrada del material
+    for (const item of detalle.rows) {
+      await pool.query(
+        `INSERT INTO movimiento
+        (id_prestamo, id_material, cantidad, observacion, id_usuario, id_tipo_movimiento)
+        VALUES ($1, $2, $3, $4, $5, $6)`,
+        [
+          id,
+          item.id_material,
+          item.cantidad,
+          "Entrada por devolución",
+          prestamo.rows[0].id_usuario,
+          1,
+        ]
+      );
+    }
+
+    // Cambiar el estado del préstamo
+    await pool.query(
+      `UPDATE prestamo
+       SET estado = 'devuelto',
+           fecha_devolucion = CURRENT_TIMESTAMP
+       WHERE id_prestamo = $1`,
+      [id]
+    );
+
+    await pool.query("COMMIT");
+
+    res.json({
+      mensaje: "Préstamo devuelto correctamente",
+    });
+  } catch (error) {
+    await pool.query("ROLLBACK");
+
+    console.error(error);
+
+    res.status(500).json({
+      mensaje: "Error al devolver el préstamo",
+      error: error.message,
+    });
+  }
+});
+
 app.listen(process.env.PORT, () => {
   console.log(
     `Backend activo en http://localhost:${process.env.PORT}`

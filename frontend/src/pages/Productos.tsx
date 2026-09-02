@@ -106,7 +106,7 @@ const solicitarMaterial = async () => {
         {materialSeleccionado && ( 
             //Solo muestra este formulario si el usuario seleccionó un material
   <div className="solicitud-box">
-    <h2>Solicitar material</h2>
+    <h2>Solicitar</h2>
 
     <p>
       <strong>{materialSeleccionado.nombre_material}</strong>
