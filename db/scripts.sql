@@ -48,7 +48,8 @@ CREATE TABLE detalle_proveedor (
     id_proveedor INTEGER REFERENCES proveedor(id_proveedor) NOT NULL,
     fecha_compra TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     stock_minimo INTEGER CHECK (stock_minimo >= 0) NOT NULL,
-    cantidad INTEGER CHECK (cantidad >= 0) NOT NULL
+    cantidad INTEGER CHECK (cantidad >= 0) NOT NULL,
+    CONSTRAINT uq_material_proveedor UNIQUE (id_material, id_proveedor)
 );
 
 
@@ -63,25 +64,69 @@ CREATE TABLE prestamo (
 CREATE TABLE detalle_prestamo (
     id_prestamo INTEGER REFERENCES prestamo(id_prestamo) NOT NULL,
     id_material INTEGER REFERENCES material(id_material) NOT NULL,
-    cantidad INTEGER CHECK (cantidad > 0) NOT NULL
+    cantidad INTEGER CHECK (cantidad > 0) NOT NULL,
+    PRIMARY KEY (id_prestamo, id_material)
 );
+
+CREATE TABLE tipo_movimiento (
+    id_tipo_movimiento INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    tipo_movimiento VARCHAR(10) UNIQUE NOT NULL,
+    CHECK (tipo_movimiento IN ('entrada', 'salida'))
+);
+
+INSERT INTO tipo_movimiento (tipo_movimiento)
+VALUES
+('entrada'),
+('salida');
 
 CREATE TABLE movimiento (
     id_movimiento INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_prestamo INTEGER REFERENCES prestamo(id_prestamo),
     id_material INTEGER REFERENCES material(id_material) NOT NULL,
-    cantidad INTEGER
-        CHECK (cantidad > 0) NOT NULL,
+    cantidad INTEGER CHECK (cantidad > 0) NOT NULL,
     observacion TEXT,
     fecha_movimiento TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    id_usuario INTEGER REFERENCES usuario(id_usuario) NOT NULL
+    id_usuario INTEGER REFERENCES usuario(id_usuario) NOT NULL,
+    id_tipo_movimiento INTEGER REFERENCES tipo_movimiento(id_tipo_movimiento) NOT NULL
 );
 
-CREATE TABLE tipo_movimiento (
-    id_tipo_movimiento INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    tipo_movimiento VARCHAR(10) 
-        CHECK (tipo_movimiento IN ('entrada', 'salida')) NOT NULL
-);
+CREATE OR REPLACE FUNCTION actualizar_stock_movimiento()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+
+    IF NEW.id_tipo_movimiento = 1 THEN
+
+        UPDATE detalle_proveedor
+        SET cantidad = cantidad + NEW.cantidad
+        WHERE id_material = NEW.id_material;
+
+    ELSIF NEW.id_tipo_movimiento = 2 THEN
+
+        IF EXISTS (
+            SELECT 1
+            FROM detalle_proveedor
+            WHERE id_material = NEW.id_material
+            AND cantidad < NEW.cantidad
+        ) THEN
+            RAISE EXCEPTION 'No hay suficiente stock disponible para realizar la salida';
+        END IF;
+
+        UPDATE detalle_proveedor
+        SET cantidad = cantidad - NEW.cantidad
+        WHERE id_material = NEW.id_material;
+
+    END IF;
+
+    RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER trigger_actualizar_stock
+AFTER INSERT ON movimiento
+FOR EACH ROW
+EXECUTE FUNCTION actualizar_stock_movimiento();
 
 INSERT INTO usuario (nombre_usuario, apellido_usuario, documento_usuario, correo_usuario, contrasena_hash, rol)
 VALUES
@@ -113,31 +158,36 @@ VALUES
 
 INSERT INTO proveedor (nombre_proveedor, telefono_proveedor, correo_proveedor)
 VALUES
-('Proveedor F', '100000006','proveedorf@gmail.com'),
-('Proveedor G', '100000007','proveedorg@gmail.com'),
-('Proveedor H', '100000008','proveedorh@gmail.com'),
-('Proveedor I', '100000009','proveedori@gmail.com'),
-('Proveedor J', '100000010','proveedorj@gmail.com'),
-('Proveedor K', '100000011','proveedork@gmail.com'),
-('Proveedor L', '100000012','proveedorl@gmail.com'),
-('Proveedor M', '100000013','proveedorm@gmail.com'),
-('Proveedor N', '100000014','proveedorn@gmail.com'),
-('Proveedor O', '100000015','proveedoro@gmail.com'),
-('Proveedor P', '100000016','proveedorp@gmail.com'),
-('Proveedor Q', '100000017','proveedorq@gmail.com'),
-('Proveedor R', '100000018','proveedorr@gmail.com'),
-('Proveedor S', '100000019','proveedors@gmail.com'),
-('Proveedor T', '100000020','proveedort@gmail.com'),
-('Proveedor U', '100000021','proveedoru@gmail.com'),
-('Proveedor V', '100000022','proveedorv@gmail.com'),
-('Proveedor W', '100000023','proveedorw@gmail.com'),
-('Proveedor X', '100000024','proveedorx@gmail.com'),
-('Proveedor Y', '100000025','proveedory@gmail.com'),
-('Proveedor Z', '100000026','proveedorz@gmail.com'),
-('Proveedor AA', '100000027','proveedoraa@gmail.com'),
-('Proveedor AB', '100000028','proveedorab@gmail.com'),
-('Proveedor AC', '100000029','proveedorac@gmail.com'),
-('Proveedor AD', '100000030','proveedorad@gmail.com');
+('Proveedor A', '123456789', 'proveedorA@gmail.com'),
+('Proveedor B', '987654321', 'proveedorB@gmail.com'),
+('Proveedor C', '555555555', 'proveedorC@gmail.com'),
+('Proveedor D', '444444444', 'proveedorD@gmail.com'),
+('Proveedor E', '333333333', 'proveedorE@gmail.com'),
+('Proveedor F', '100000006', 'proveedorf@gmail.com'),
+('Proveedor G', '100000007', 'proveedorg@gmail.com'),
+('Proveedor H', '100000008', 'proveedorh@gmail.com'),
+('Proveedor I', '100000009', 'proveedori@gmail.com'),
+('Proveedor J', '100000010', 'proveedorj@gmail.com'),
+('Proveedor K', '100000011', 'proveedork@gmail.com'),
+('Proveedor L', '100000012', 'proveedorl@gmail.com'),
+('Proveedor M', '100000013', 'proveedorm@gmail.com'),
+('Proveedor N', '100000014', 'proveedorn@gmail.com'),
+('Proveedor O', '100000015', 'proveedoro@gmail.com'),
+('Proveedor P', '100000016', 'proveedorp@gmail.com'),
+('Proveedor Q', '100000017', 'proveedorq@gmail.com'),
+('Proveedor R', '100000018', 'proveedorr@gmail.com'),
+('Proveedor S', '100000019', 'proveedors@gmail.com'),
+('Proveedor T', '100000020', 'proveedort@gmail.com'),
+('Proveedor U', '100000021', 'proveedoru@gmail.com'),
+('Proveedor V', '100000022', 'proveedorv@gmail.com'),
+('Proveedor W', '100000023', 'proveedorw@gmail.com'),
+('Proveedor X', '100000024', 'proveedorx@gmail.com'),
+('Proveedor Y', '100000025', 'proveedory@gmail.com'),
+('Proveedor Z', '100000026', 'proveedorz@gmail.com'),
+('Proveedor AA', '100000027', 'proveedoraa@gmail.com'),
+('Proveedor AB', '100000028', 'proveedorab@gmail.com'),
+('Proveedor AC', '100000029', 'proveedorac@gmail.com'),
+('Proveedor AD', '100000030', 'proveedorad@gmail.com');
 
 INSERT INTO material (nombre_material, descripcion_material, id_categoria)
 VALUES
@@ -205,106 +255,64 @@ VALUES
 (29, 29, DEFAULT, 8, 48),
 (30, 30, DEFAULT, 7, 11);
 
-INSERT INTO prestamo (id_usuario, fecha_prestamo, fecha_devolucion, estado)
+INSERT INTO prestamo (
+    id_usuario,
+    fecha_prestamo,
+    fecha_devolucion,
+    estado
+)
 VALUES
-(1, DEFAULT, CURRENT_TIMESTAMP, 'devuelto'),
-(2, DEFAULT, CURRENT_TIMESTAMP, 'devuelto'),
-(3, DEFAULT, NULL, 'pendiente'),
-(4, DEFAULT, CURRENT_TIMESTAMP, 'devuelto'),
-(5, DEFAULT, CURRENT_TIMESTAMP, 'devuelto'),
+(2, DEFAULT, NULL, 'pendiente'),
+(4, DEFAULT, NULL, 'pendiente'),
 (6, DEFAULT, NULL, 'pendiente'),
-(7, DEFAULT, CURRENT_TIMESTAMP, 'devuelto'),
-(8, DEFAULT, CURRENT_TIMESTAMP, 'devuelto'),
-(9, DEFAULT, NULL, 'pendiente'),
-(10, DEFAULT, CURRENT_TIMESTAMP, 'devuelto'),
-(11, DEFAULT, CURRENT_TIMESTAMP, 'devuelto'),
+(8, DEFAULT, NULL, 'pendiente'),
+(10, DEFAULT, NULL, 'pendiente'),
 (12, DEFAULT, NULL, 'pendiente'),
-(13, DEFAULT, CURRENT_TIMESTAMP, 'devuelto'),
-(14, DEFAULT, CURRENT_TIMESTAMP, 'devuelto'),
-(15, DEFAULT, NULL, 'pendiente'),
-(16, DEFAULT, CURRENT_TIMESTAMP, 'devuelto'),
-(17, DEFAULT, CURRENT_TIMESTAMP, 'devuelto'),
+(14, DEFAULT, NULL, 'pendiente'),
+(16, DEFAULT, NULL, 'pendiente'),
 (18, DEFAULT, NULL, 'pendiente'),
-(19, DEFAULT, CURRENT_TIMESTAMP, 'devuelto'),
-(20, DEFAULT, CURRENT_TIMESTAMP, 'devuelto'),
-(21, DEFAULT, NULL, 'pendiente'),
-(22, DEFAULT, CURRENT_TIMESTAMP, 'devuelto'),
-(23, DEFAULT, CURRENT_TIMESTAMP, 'devuelto'),
-(24, DEFAULT, NULL, 'pendiente'),
-(25, DEFAULT, CURRENT_TIMESTAMP, 'devuelto'),
-(26, DEFAULT, CURRENT_TIMESTAMP, 'devuelto'),
-(27, DEFAULT, NULL, 'pendiente'),
-(28, DEFAULT, CURRENT_TIMESTAMP, 'devuelto'),
-(29, DEFAULT, CURRENT_TIMESTAMP, 'devuelto'),
-(30, DEFAULT, NULL, 'pendiente');
+(20, DEFAULT, NULL, 'pendiente'),
+(22, DEFAULT, NULL, 'pendiente'),
+(24, DEFAULT, NULL, 'pendiente');
 
-INSERT INTO detalle_prestamo (id_prestamo, id_material, cantidad)
+INSERT INTO detalle_prestamo (
+    id_prestamo,
+    id_material,
+    cantidad
+)
 VALUES
-(1, 1, 1),
+(1, 1, 2),
 (2, 2, 4),
 (3, 3, 3),
 (4, 4, 2),
-(5, 5, 2),
+(5, 5, 5),
 (6, 6, 1),
 (7, 7, 3),
-(8, 8, 1),
+(8, 8, 2),
 (9, 9, 3),
-(10, 10, 5),
-(11, 11, 2),
-(12, 12, 5),
-(13, 13, 2),
-(14, 14, 3),
-(15, 15, 4),
-(16, 16, 4),
-(17, 17, 4),
-(18, 18, 4),
-(19, 19, 5),
-(20, 20, 4),
-(21, 21, 1),
-(22, 22, 1),
-(23, 23, 1),
-(24, 24, 4),
-(25, 25, 3),
-(26, 26, 1),
-(27, 27, 1),
-(28, 28, 1),
-(29, 29, 2),
-(30, 30, 2);
+(10, 10, 2),
+(11, 11, 1),
+(12, 12, 4);
 
-INSERT INTO tipo_movimiento (tipo_movimiento)
+INSERT INTO movimiento (
+    id_prestamo,
+    id_material,
+    cantidad,
+    observacion,
+    fecha_movimiento,
+    id_usuario,
+    id_tipo_movimiento
+)
 VALUES
-('entrada'),
-('salida');
-
-INSERT INTO movimiento (id_prestamo, id_material, cantidad, observacion, fecha_movimiento, id_usuario)
-VALUES
-(NULL, 1, 9, 'Movimiento de prueba 1', DEFAULT, 1),
-(2, 2, 8, 'Movimiento de prueba 2', DEFAULT, 2),
-(NULL, 3, 2, 'Movimiento de prueba 3', DEFAULT, 3),
-(4, 4, 8, 'Movimiento de prueba 4', DEFAULT, 4),
-(NULL, 5, 3, 'Movimiento de prueba 5', DEFAULT, 5),
-(6, 6, 17, 'Movimiento de prueba 6', DEFAULT, 6),
-(NULL, 7, 12, 'Movimiento de prueba 7', DEFAULT, 7),
-(8, 8, 7, 'Movimiento de prueba 8', DEFAULT, 8),
-(NULL, 9, 12, 'Movimiento de prueba 9', DEFAULT, 9),
-(10, 10, 5, 'Movimiento de prueba 10', DEFAULT, 10),
-(NULL, 11, 1, 'Movimiento de prueba 11', DEFAULT, 11),
-(12, 12, 10, 'Movimiento de prueba 12', DEFAULT, 12),
-(NULL, 13, 2, 'Movimiento de prueba 13', DEFAULT, 13),
-(14, 14, 12, 'Movimiento de prueba 14', DEFAULT, 14),
-(NULL, 15, 17, 'Movimiento de prueba 15', DEFAULT, 15),
-(16, 16, 1, 'Movimiento de prueba 16', DEFAULT, 16),
-(NULL, 17, 18, 'Movimiento de prueba 17', DEFAULT, 17),
-(18, 18, 17, 'Movimiento de prueba 18', DEFAULT, 18),
-(NULL, 19, 19, 'Movimiento de prueba 19', DEFAULT, 19),
-(20, 20, 5, 'Movimiento de prueba 20', DEFAULT, 20),
-(NULL, 21, 8, 'Movimiento de prueba 21', DEFAULT, 21),
-(22, 22, 11, 'Movimiento de prueba 22', DEFAULT, 22),
-(NULL, 23, 14, 'Movimiento de prueba 23', DEFAULT, 23),
-(24, 24, 17, 'Movimiento de prueba 24', DEFAULT, 24),
-(NULL, 25, 12, 'Movimiento de prueba 25', DEFAULT, 25),
-(26, 26, 19, 'Movimiento de prueba 26', DEFAULT, 26),
-(NULL, 27, 7, 'Movimiento de prueba 27', DEFAULT, 27),
-(28, 28, 16, 'Movimiento de prueba 28', DEFAULT, 28),
-(NULL, 29, 20, 'Movimiento de prueba 29', DEFAULT, 29),
-(30, 30, 16, 'Movimiento de prueba 30', DEFAULT, 30);
+(1, 1, 2, 'Salida por préstamo', DEFAULT, 2, 2),
+(2, 2, 4, 'Salida por préstamo', DEFAULT, 4, 2),
+(3, 3, 3, 'Salida por préstamo', DEFAULT, 6, 2),
+(4, 4, 2, 'Salida por préstamo', DEFAULT, 8, 2),
+(5, 5, 5, 'Salida por préstamo', DEFAULT, 10, 2),
+(6, 6, 1, 'Salida por préstamo', DEFAULT, 12, 2),
+(7, 7, 3, 'Salida por préstamo', DEFAULT, 14, 2),
+(8, 8, 2, 'Salida por préstamo', DEFAULT, 16, 2),
+(9, 9, 3, 'Salida por préstamo', DEFAULT, 18, 2),
+(10, 10, 2, 'Salida por préstamo', DEFAULT, 20, 2),
+(11, 11, 1, 'Salida por préstamo', DEFAULT, 22, 2),
+(12, 12, 4, 'Salida por préstamo', DEFAULT, 24, 2);
