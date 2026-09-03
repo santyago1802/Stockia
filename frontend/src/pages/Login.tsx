@@ -1,6 +1,6 @@
 import { type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import logoStockia from "../assets/Stockia Logo.jpeg";
+import logoStockia from "../assets/Stockia Logo.png";
 
 
 function Login() {
@@ -45,7 +45,11 @@ const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     localStorage.setItem("token", datos.token);
     localStorage.setItem("usuario", JSON.stringify(datos.usuario));
 
-    navigate("/productos"); //lleva al usuario a la página de productos
+    if (datos.usuario.rol === "Coordinador") {
+  navigate("/dashboard");
+} else {
+  navigate("/productos");
+} //lleva al usuario a la página de productos
   } catch (error) {
     console.error(error);
     alert("No se pudo conectar con el servidor");

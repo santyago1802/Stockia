@@ -67,6 +67,12 @@ body {
     margin: 0 auto 25px;
 }
 
+.navbar .logo {
+    width: 140px;
+    height: auto;
+    margin-left: 25px;
+}
+
 .wrapper .input-box {
     position: relative;
     margin: 10px 0;
@@ -182,11 +188,63 @@ body {
 
 .navbar {
     background: #26ff96;
-    padding: 20px 40px;
+    padding: 15px 25px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    
+    gap: 20px;
+}
+
+.navbar .logo {
+    width: 140px;
+    height: auto;
+    margin-left: 10px;
+}
+
+.menu-button {
+    background: none;
+    border: none;
+    font-size: 30px;
+    cursor: pointer;
+    color: #000;
+}
+
+.menu-lateral {
+    position: absolute;
+    top: 80px;
+    left: 0;
+    width: 230px;
+    min-height: 300px;
+    background: white;
+    box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.2);
+    padding: 25px;
+    z-index: 1000;
+    box-sizing: border-box;
+}
+
+.menu-lateral h3 {
+    margin-top: 10px;
+    margin-bottom: 25px;
+}
+
+.menu-lateral a {
+    display: block;
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
+    padding: 15px 10px;
+    border-radius: 10px;
+}
+
+.menu-lateral a:hover {
+    background: #26ff96;
+}
+
+.cerrar-menu {
+    float: right;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
 }
 .navbar-container {
     display: flex;
@@ -211,8 +269,27 @@ body {
 .products-section {
     padding: 40px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
+    color: black;
+}
+
+.products-section h1 {
+    text-align: center;
+    margin-bottom: 40px;
+    color: black;
+}
+
+.products-section h2 {
+    text-align: center;
+    margin-bottom: 40px;
+    color: black;
+}
+
+.products-section p {
+    text-align: center;
+    margin-bottom: 40px;
+    color: black;
 }
 
 
@@ -263,8 +340,7 @@ body {
 }
 
 /* =========================
-   Ventana de solicitud
-========================= */
+   Ventana de solicitud/* */
 
 .solicitud-box {
     position: fixed;
@@ -339,3 +415,104 @@ body {
     background: red;
     color: black;
 }
+
+.prestamos-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.prestamo-item {
+    padding: 20px;
+    border: 2px solid #948e8e;
+    border-radius: 15px;
+    background: white;
+}
+
+.prestamo-item p {
+    margin: 8px 0;
+}
+
+.prestamo-item button {
+    margin-top: 10px;
+}
+
+.prestamos-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.prestamo-item {
+    padding: 20px;
+    border: 2px solid #948e8e;
+    border-radius: 15px;
+    background: white;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.prestamo-item p {
+    margin: 8px 0;
+}
+
+.prestamo-item button {
+    margin-top: 10px;
+}
+
+
+/*Alertas de solicitud*/
+.alertas-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  width: 100%;
+  max-width: 900px;
+  margin: 20px 0 40px;
+}
+
+.alerta-item {
+  padding: 20px;
+  border: 2px solid #948e8e;
+  border-radius: 15px;
+  background: white;
+  box-sizing: border-box;
+}
+
+.alerta-item p {
+  margin: 8px 0;
+}
+
+.prestamo-item .btn-primary {
+  display: block;
+  margin: 10px auto 0;
+  background: #26ff96;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.busqueda-materiales {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 30px;
+}
+
+.busqueda-materiales input {
+  width: 100%;
+  padding: 14px 20px;
+  border: 2px solid #000;
+  border-radius: 25px;
+  font-size: 16px;
+  box-sizing: border-box;
+  outline: none;
+}
+
+
+

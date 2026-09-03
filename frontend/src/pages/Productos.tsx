@@ -15,6 +15,7 @@ function Productos() {
   //Guardamos los materiales
   //materiales será la lista que recibimos desde PostgreSQL.
   const [cargando, setCargando] = useState(true);
+  const [busqueda, setBusqueda] = useState("");
   const [cantidad, setCantidad] = useState(1); //Cantidad: guarda cuántas unidades quiere solicitar
   const [materialSeleccionado, setMaterialSeleccionado] = //materialSeleccionado: guarda que producto escogio
   useState<Material | null>(null); 
@@ -98,11 +99,26 @@ const solicitarMaterial = async () => {
     return <p>Cargando materiales...</p>;
   }
 
+  const materialesFiltrados = materiales.filter((material) =>
+  material.nombre_material
+    .toLowerCase()
+    .includes(busqueda.toLowerCase())
+);
+
   return (
     <div>
       <Navbar />
 
       <div className="products-section">
+      <div className="busqueda-materiales">
+        <input
+          type="text"
+          placeholder="🔍 Buscar material..."
+          value={busqueda}
+          onChange={(event) => setBusqueda(event.target.value)}
+        />
+      </div>
+
         {materialSeleccionado && ( 
             //Solo muestra este formulario si el usuario seleccionó un material
   <div className="solicitud-box">
@@ -150,7 +166,7 @@ const solicitarMaterial = async () => {
 )}
         <div className="card-grid">
 
-          {materiales.map((material) => ( //map recorre los 30 materiales
+          {materialesFiltrados.map((material) => ( //map recorre los 30 materiales
             <Card
               key={material.id_material}
               title={material.nombre_material}
