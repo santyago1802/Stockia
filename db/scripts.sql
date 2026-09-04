@@ -42,6 +42,7 @@ CREATE TABLE material (
     descripcion_material TEXT,
     id_categoria INTEGER REFERENCES categoria(id_categoria) NOT NULL
 );
+
 CREATE TABLE detalle_proveedor (
     id_detalle_proveedor INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_material INTEGER REFERENCES material(id_material) NOT NULL,
@@ -51,7 +52,6 @@ CREATE TABLE detalle_proveedor (
     cantidad INTEGER CHECK (cantidad >= 0) NOT NULL,
     CONSTRAINT uq_material_proveedor UNIQUE (id_material, id_proveedor)
 );
-
 
 CREATE TABLE prestamo (
     id_prestamo INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

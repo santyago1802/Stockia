@@ -136,24 +136,26 @@ app.post("/api/login", async (req, res) => {
 });
 
 // Consultar materiales e inventario
-app.get("/api/materiales", async (_req, res) => { //crea una nueva dirección de nuestra API que es los materiales
+app.get("/api/materiales", async (_req, res) => {
   try {
     const resultado = await pool.query(`
       SELECT
         m.id_material,
         m.nombre_material,
         m.descripcion_material,
+        m.id_categoria,
+        c.nombre_categoria,
         dp.cantidad AS stock_actual,
         dp.stock_minimo
-      FROM material m 
+      FROM material m
+      INNER JOIN categoria c
+        ON m.id_categoria = c.id_categoria
       INNER JOIN detalle_proveedor dp
         ON m.id_material = dp.id_material
-      ORDER BY m.id_material
-    `); // FROM material m 
-    //hace una consulta a SQL
-    //con join se obtiene todo lo que necesita la pantalla
+      ORDER BY c.nombre_categoria, m.nombre_material
+    `);
 
-    res.json(resultado.rows); //manda esos datos al frontend en formato JSON
+    res.json(resultado.rows);
   } catch (error) {
     console.error(error);
 
@@ -357,6 +359,149 @@ app.put("/api/prestamos/:id/devolver", async (req, res) => {
       mensaje: "Error al devolver el préstamo",
       error: error.message,
     });
+  }
+});
+
+app.post("/api/materiales", async (req, res) => {
+  const {
+    nombre_material,
+    descripcion_material,
+    id_categoria,
+    id_proveedor,
+    stock_minimo,
+    cantidad,
+  } = req.body;
+
+  const cliente = await pool.connect();
+
+  try {
+    await cliente.query("BEGIN");
+
+    const resultadoMaterial = await cliente.query(
+      `INSERT INTO material
+        (nombre_material, descripcion_material, id_categoria)
+       VALUES ($1, $2, $3)
+       RETURNING id_material`,
+      [nombre_material, descripcion_material, id_categoria]
+    );
+
+    const id_material = resultadoMaterial.rows[0].id_material;
+
+    await cliente.query(
+      `INSERT INTO detalle_proveedor
+        (id_material, id_proveedor, stock_minimo, cantidad)
+       VALUES ($1, $2, $3, $4)`,
+      [id_material, id_proveedor, stock_minimo, cantidad]
+    );
+
+    await cliente.query("COMMIT");
+
+    res.status(201).json({
+      mensaje: "Material registrado correctamente",
+      id_material,
+    });
+  } catch (error) {
+    await cliente.query("ROLLBACK");
+
+    console.error("Error al registrar material:", error);
+
+    res.status(500).json({
+      mensaje: "No se pudo registrar el material",
+    });
+  } finally {
+    cliente.release();
+  }
+});
+
+app.get("/api/categorias", async (req, res) => {
+  try {
+    const resultado = await pool.query(
+      "SELECT id_categoria, nombre_categoria FROM categoria ORDER BY nombre_categoria"
+    );
+
+    res.json(resultado.rows);
+  } catch (error) {
+    console.error("Error al obtener categorías:", error);
+    res.status(500).json({
+      mensaje: "No se pudieron obtener las categorías",
+    });
+  }
+});
+
+
+app.get("/api/proveedores", async (req, res) => {
+  try {
+    const resultado = await pool.query(
+      "SELECT id_proveedor, nombre_proveedor FROM proveedor ORDER BY nombre_proveedor"
+    );
+
+    res.json(resultado.rows);
+  } catch (error) {
+    console.error("Error al obtener proveedores:", error);
+    res.status(500).json({
+      mensaje: "No se pudieron obtener los proveedores",
+    });
+  }
+});
+
+// Editar material
+app.put("/api/materiales/:id", async (req, res) => {
+  const { id } = req.params;
+  const {
+    nombre_material,
+    descripcion_material,
+    id_categoria,
+    stock_minimo,
+  } = req.body;
+
+  const cliente = await pool.connect();
+
+  try {
+    await cliente.query("BEGIN");
+
+    // Actualizar información del material
+    await cliente.query(
+      `
+      UPDATE material
+      SET
+        nombre_material = $1,
+        descripcion_material = $2,
+        id_categoria = $3
+      WHERE id_material = $4
+      `,
+      [
+        nombre_material,
+        descripcion_material,
+        id_categoria,
+        id,
+      ]
+    );
+
+    // Actualizar stock mínimo
+    await cliente.query(
+      `
+      UPDATE detalle_proveedor
+      SET stock_minimo = $1
+      WHERE id_material = $2
+      `,
+      [stock_minimo, id]
+    );
+
+    await cliente.query("COMMIT");
+
+    res.json({
+      mensaje: "Material actualizado correctamente",
+    });
+  } catch (error) {
+    await cliente.query("ROLLBACK");
+
+    console.error("Error al editar material:", error);
+
+    res.status(500).json({
+      mensaje: "No se pudo actualizar el material",
+    });
+  } finally {
+    cliente.release();
   }
 });
 

@@ -54,7 +54,7 @@ function Homepages() {
   }, []);
 
   if (cargando) {
-    return <p>Cargando Dashboard...</p>;
+    return <p>Cargando Resumen de inventario...</p>;
   }
 
   const materialesConStockBajo = materiales.filter(
@@ -66,7 +66,7 @@ function Homepages() {
       <Navbar />
 
       <main className="products-section">
-        <h1>Dashboard</h1>
+        <h1>Resumen de inventario</h1>
 
         <h2>⚠️ Alertas de stock</h2>
 

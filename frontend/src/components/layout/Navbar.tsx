@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import logoStockia from "../../assets/Stockia Logo.png";
 
 function Navbar() {
-  const [menuAbierto, setMenuAbierto] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const usuarioGuardado = localStorage.getItem("usuario");
 
@@ -14,65 +14,49 @@ function Navbar() {
     rol = usuario.rol;
   }
 
+  const cerrarSesion = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("usuario");
+
+  navigate("/");
+  };
   return (
-    <>
-      <nav className="navbar">
+    <nav className="navbar">
+      <img
+        src={logoStockia}
+        alt="Logo Stockia"
+        className="logo"
+      />
 
+      <div className="navbar-links">
+        
+        {rol === "Coordinador" && (
+          <>
+            {location.pathname !== "/dashboard" && (
+              <Link to="/dashboard">Resumen de inventario</Link>
+            )}
+
+            {location.pathname !== "/usuarios" && (
+              <Link to="/usuarios">Usuarios</Link>
+            )}
+          </>
+        )}
+
+        {location.pathname !== "/productos" && (
+          <Link to="/productos">Materiales</Link>
+        )}
+        {rol === "Instructor" && 
+          location.pathname !== "/devoluciones" && (
+            <Link to="/devoluciones">Devoluciones</Link>
+          )}
         <button
-          className="menu-button"
-          onClick={() => setMenuAbierto(!menuAbierto)}
+          className="btn-logout"
+          onClick={cerrarSesion}
         >
-          ☰
+        Cerrar sesión
         </button>
-
-        <img
-          src={logoStockia}
-          alt="Logo Stockia"
-          className="logo"
-        />
-
-      </nav>
-
-      {menuAbierto && (
-        <aside className="menu-lateral">
-
-          <button
-            className="cerrar-menu"
-            onClick={() => setMenuAbierto(false)}
-          >
-            ✕
-          </button>
-
-          <h3>Menú</h3>
-
-          {rol === "Coordinador" && (
-            <>
-              <Link to="/dashboard" onClick={() => setMenuAbierto(false)}>
-                Dashboard
-              </Link>
-
-              <Link to="/usuarios" onClick={() => setMenuAbierto(false)}>
-                Usuarios
-              </Link>
-            </>
-          )}
-
-          <Link to="/productos" onClick={() => setMenuAbierto(false)}>
-            Materiales
-          </Link>
-
-          {rol === "Instructor" && (
-            <Link
-              to="/devoluciones"
-              onClick={() => setMenuAbierto(false)}
-            >
-              Devoluciones
-            </Link>
-          )}
-
-        </aside>
-      )}
-    </>
+      </div>
+    </nav>
   );
 }
 

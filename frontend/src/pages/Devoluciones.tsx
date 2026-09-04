@@ -15,6 +15,9 @@ interface Prestamo {
 function Devoluciones() {
   const [prestamos, setPrestamos] = useState<Prestamo[]>([]);
   const [cargando, setCargando] = useState(true);
+  const [mensaje, setMensaje] = useState("");
+  const [tipoMensaje, setTipoMensaje] = useState<"exito" | "error">("exito");
+  const [prestamoADevolver, setPrestamoADevolver] = useState<number | null>(null);
 
   const obtenerPrestamos = async () => {
     try {
@@ -62,16 +65,19 @@ function Devoluciones() {
       const datos = await respuesta.json();
 
       if (!respuesta.ok) {
-        alert(datos.mensaje);
+        setMensaje(datos.mensaje);
+        setTipoMensaje("error");
         return;
       }
 
-      alert("Préstamo devuelto correctamente");
+      setMensaje("Préstamo devuelto correctamente");
+      setTipoMensaje("exito");
 
       obtenerPrestamos();
     } catch (error) {
       console.error("Error al devolver préstamo:", error);
-      alert("No se pudo devolver el préstamo");
+      setMensaje("No se pudo devolver el préstamo");
+      setTipoMensaje("error");
     }
   };
 
@@ -82,7 +88,54 @@ function Devoluciones() {
   return (
     <div>
       <Navbar />
+      {prestamoADevolver !== null && (
+  <div className="mensaje-overlay">
+    <div className="mensaje-box">
+      <h2>Confirmar devolución</h2>
 
+      <p>
+        ¿Estás seguro de que quieres devolver este préstamo?
+      </p>
+
+      <div className="botones-confirmacion">
+        <button
+          className="btn-confirmar"
+          onClick={() => {
+            devolverPrestamo(prestamoADevolver);
+            setPrestamoADevolver(null);
+          }}
+        >
+          Confirmar
+        </button>
+
+        <button
+          className="btn-cancelar"
+          onClick={() => setPrestamoADevolver(null)}
+        >
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+        {mensaje && (
+  <div className="mensaje-overlay">
+    <div className={`mensaje-box ${tipoMensaje}`}>
+      <h2>
+        {tipoMensaje === "exito" ? "✓ ¡Listo!" : "⚠️ Error"}
+      </h2>
+
+      <p>{mensaje}</p>
+
+      <button
+        onClick={() => setMensaje("")}
+        className="btn-mensaje"
+      >
+        Aceptar
+      </button>
+    </div>
+  </div>
+)}
       <main className="products-section">
         <h1>Mis devoluciones</h1>
 
@@ -113,7 +166,7 @@ function Devoluciones() {
                 <button
                   className="btn btn-primary"
                   onClick={() =>
-                    devolverPrestamo(prestamo.id_prestamo)
+                  setPrestamoADevolver(prestamo.id_prestamo)
                   }
                 >
                   Devolver
