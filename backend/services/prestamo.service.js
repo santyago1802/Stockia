@@ -1,12 +1,12 @@
 const prestamoModel = require("../models/prestamo.model");
 
 // Registrar préstamo
-const crearPrestamo = async (
+const crearPrestamo = (
   id_usuario,
   id_material,
   cantidad
 ) => {
-  return await prestamoModel.crearPrestamo(
+  return prestamoModel.crearPrestamo(
     id_usuario,
     id_material,
     cantidad
@@ -14,13 +14,16 @@ const crearPrestamo = async (
 };
 
 // Consultar préstamos
-const obtenerPrestamos = async () => {
-  return await prestamoModel.obtenerPrestamos();
+const obtenerPrestamos = () => {
+  return prestamoModel.obtenerPrestamos();
 };
 
 // Devolver préstamo
-const devolverPrestamo = async (id) => {
-  return await prestamoModel.devolverPrestamo(id);
+const devolverPrestamo = (id, id_usuario) => {
+  return prestamoModel.devolverPrestamo(
+    id,
+    id_usuario
+  );
 };
 
 module.exports = {

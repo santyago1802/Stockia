@@ -17,12 +17,21 @@ function Devoluciones() {
   const [cargando, setCargando] = useState(true);
   const [mensaje, setMensaje] = useState("");
   const [tipoMensaje, setTipoMensaje] = useState<"exito" | "error">("exito");
-  const [prestamoADevolver, setPrestamoADevolver] = useState<number | null>(null);
+  const [prestamoADevolver, setPrestamoADevolver] = useState<number | null>(
+    null
+  );
 
   const obtenerPrestamos = async () => {
     try {
+      const token = localStorage.getItem("token");
+
       const respuesta = await fetch(
-        "http://localhost:3000/api/prestamos"
+        "http://localhost:3000/api/prestamos",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       const datos = await respuesta.json();
@@ -55,10 +64,15 @@ function Devoluciones() {
 
   const devolverPrestamo = async (idPrestamo: number) => {
     try {
+      const token = localStorage.getItem("token");
+
       const respuesta = await fetch(
         `http://localhost:3000/api/prestamos/${idPrestamo}/devolver`,
         {
           method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
@@ -88,54 +102,57 @@ function Devoluciones() {
   return (
     <div>
       <Navbar />
+
       {prestamoADevolver !== null && (
-  <div className="mensaje-overlay">
-    <div className="mensaje-box">
-      <h2>Confirmar devolución</h2>
+        <div className="mensaje-overlay">
+          <div className="mensaje-box">
+            <h2>Confirmar devolución</h2>
 
-      <p>
-        ¿Estás seguro de que quieres devolver este préstamo?
-      </p>
+            <p>
+              ¿Estás seguro de que quieres devolver este préstamo?
+            </p>
 
-      <div className="botones-confirmacion">
-        <button
-          className="btn-confirmar"
-          onClick={() => {
-            devolverPrestamo(prestamoADevolver);
-            setPrestamoADevolver(null);
-          }}
-        >
-          Confirmar
-        </button>
+            <div className="botones-confirmacion">
+              <button
+                className="btn-confirmar"
+                onClick={() => {
+                  devolverPrestamo(prestamoADevolver);
+                  setPrestamoADevolver(null);
+                }}
+              >
+                Confirmar
+              </button>
 
-        <button
-          className="btn-cancelar"
-          onClick={() => setPrestamoADevolver(null)}
-        >
-          Cancelar
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-        {mensaje && (
-  <div className="mensaje-overlay">
-    <div className={`mensaje-box ${tipoMensaje}`}>
-      <h2>
-        {tipoMensaje === "exito" ? "✓ ¡Listo!" : "⚠️ Error"}
-      </h2>
+              <button
+                className="btn-cancelar"
+                onClick={() => setPrestamoADevolver(null)}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-      <p>{mensaje}</p>
+      {mensaje && (
+        <div className="mensaje-overlay">
+          <div className={`mensaje-box ${tipoMensaje}`}>
+            <h2>
+              {tipoMensaje === "exito" ? "✓ ¡Listo!" : "⚠️ Error"}
+            </h2>
 
-      <button
-        onClick={() => setMensaje("")}
-        className="btn-mensaje"
-      >
-        Aceptar
-      </button>
-    </div>
-  </div>
-)}
+            <p>{mensaje}</p>
+
+            <button
+              onClick={() => setMensaje("")}
+              className="btn-mensaje"
+            >
+              Aceptar
+            </button>
+          </div>
+        </div>
+      )}
+
       <main className="products-section">
         <h1>Mis devoluciones</h1>
 
@@ -166,7 +183,7 @@ function Devoluciones() {
                 <button
                   className="btn btn-primary"
                   onClick={() =>
-                  setPrestamoADevolver(prestamo.id_prestamo)
+                    setPrestamoADevolver(prestamo.id_prestamo)
                   }
                 >
                   Devolver

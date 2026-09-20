@@ -65,8 +65,15 @@ function Productos() {
   useEffect(() => {
     const obtenerMateriales = async () => {
       try {
+        const token = localStorage.getItem("token");
+
         const respuesta = await fetch(
-          "http://localhost:3000/api/materiales"
+          "http://localhost:3000/api/materiales",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
 
         const datos = await respuesta.json();
@@ -86,8 +93,15 @@ function Productos() {
   useEffect(() => {
     const obtenerDatosFormulario = async () => {
       try {
+        const token = localStorage.getItem("token");
+
         const respuestaCategorias = await fetch(
-          "http://localhost:3000/api/categorias"
+          "http://localhost:3000/api/categorias",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
 
         const datosCategorias = await respuestaCategorias.json();
@@ -95,7 +109,12 @@ function Productos() {
         setCategorias(datosCategorias);
 
         const respuestaProveedores = await fetch(
-          "http://localhost:3000/api/proveedores"
+          "http://localhost:3000/api/proveedores",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
 
         const datosProveedores = await respuestaProveedores.json();
@@ -129,12 +148,15 @@ function Productos() {
     const usuario = JSON.parse(usuarioGuardado);
 
     try {
+      const token = localStorage.getItem("token");
+
       const respuesta = await fetch(
         "http://localhost:3000/api/prestamos",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             id_usuario: usuario.id_usuario,
@@ -159,8 +181,15 @@ function Productos() {
       setCantidad(1);
 
       // Actualizar materiales
+      const tokenActualizado = localStorage.getItem("token");
+
       const materialesActualizados = await fetch(
-        "http://localhost:3000/api/materiales"
+        "http://localhost:3000/api/materiales",
+        {
+          headers: {
+            Authorization: `Bearer ${tokenActualizado}`,
+          },
+        }
       );
 
       const nuevosDatos = await materialesActualizados.json();
@@ -177,12 +206,15 @@ function Productos() {
   // Registrar material
   const registrarMaterial = async () => {
     try {
+      const token = localStorage.getItem("token");
+
       const respuesta = await fetch(
         "http://localhost:3000/api/materiales",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             nombre_material: nuevoMaterial.nombre_material,
@@ -220,7 +252,12 @@ function Productos() {
 
       // Actualizar lista de materiales
       const respuestaMateriales = await fetch(
-        "http://localhost:3000/api/materiales"
+        "http://localhost:3000/api/materiales",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       const materialesActualizados =
@@ -242,12 +279,15 @@ function Productos() {
     }
 
     try {
+      const token = localStorage.getItem("token");
+
       const respuesta = await fetch(
         `http://localhost:3000/api/materiales/${materialEditando.id_material}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             nombre_material:
@@ -275,7 +315,12 @@ function Productos() {
 
       // Actualizar lista de materiales
       const respuestaMateriales = await fetch(
-        "http://localhost:3000/api/materiales"
+        "http://localhost:3000/api/materiales",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       const materialesActualizados =
@@ -406,7 +451,7 @@ function Productos() {
               onClick={() => setMostrarRegistro(true)}
             >
               + Registrar material
-        </button>
+            </button>
           );
         })()}
 

@@ -1,5 +1,8 @@
 const express = require("express");
 
+const verificarToken = require("../middleware/auth.middleware");
+const verificarRol = require("../middleware/rol.middleware");
+
 const {
   obtenerMateriales,
   crearMaterial,
@@ -9,12 +12,25 @@ const {
 const router = express.Router();
 
 // GET /api/materiales
-router.get("/", obtenerMateriales);
+// Coordinador e Instructor pueden consultar materiales
+router.get("/", verificarToken, obtenerMateriales);
 
 // POST /api/materiales
-router.post("/", crearMaterial);
+// Solo Coordinador puede registrar materiales
+router.post(
+  "/",
+  verificarToken,
+  verificarRol("Coordinador"),
+  crearMaterial
+);
 
 // PUT /api/materiales/:id
-router.put("/:id", actualizarMaterial);
+// Solo Coordinador puede editar materiales
+router.put(
+  "/:id",
+  verificarToken,
+  verificarRol("Coordinador"),
+  actualizarMaterial
+);
 
 module.exports = router;

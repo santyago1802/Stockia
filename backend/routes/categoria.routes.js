@@ -1,5 +1,7 @@
 const express = require("express");
 
+const verificarToken = require("../middleware/auth.middleware");
+
 const {
   obtenerCategorias,
 } = require("../controllers/categoria.controller");
@@ -7,6 +9,6 @@ const {
 const router = express.Router();
 
 // GET /api/categorias
-router.get("/", obtenerCategorias);
+router.get("/", verificarToken, obtenerCategorias);
 
 module.exports = router;

@@ -27,8 +27,15 @@ function Homepages() {
 
   const obtenerDatos = async () => {
     try {
+      const token = localStorage.getItem("token");
+
       const respuestaMateriales = await fetch(
-        "http://localhost:3000/api/materiales"
+        "http://localhost:3000/api/materiales",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       const datosMateriales = await respuestaMateriales.json();
@@ -36,7 +43,12 @@ function Homepages() {
       setMateriales(datosMateriales);
 
       const respuestaPrestamos = await fetch(
-        "http://localhost:3000/api/prestamos"
+        "http://localhost:3000/api/prestamos",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       const datosPrestamos = await respuestaPrestamos.json();
@@ -100,7 +112,7 @@ function Homepages() {
           </div>
         )}
 
-        <h2> Préstamos realizados</h2>
+        <h2>Préstamos realizados</h2>
 
         {prestamos.length === 0 ? (
           <p>No hay préstamos registrados.</p>

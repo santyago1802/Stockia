@@ -20,7 +20,7 @@ interface Material {
   stock_minimo: number;
 }
 
-function Devoluciones() {
+function Dashboard() {
   const [prestamos, setPrestamos] = useState<Prestamo[]>([]);
   const [cargando, setCargando] = useState(true);
   const [materiales, setMateriales] = useState<Material[]>([]);

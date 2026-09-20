@@ -15,8 +15,15 @@ function Users() {
   useEffect(() => {
     const obtenerUsuarios = async () => {
       try {
+        const token = localStorage.getItem("token");
+
         const respuesta = await fetch(
-          "http://localhost:3000/api/usuarios"
+          "http://localhost:3000/api/usuarios",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
 
         const datos = await respuesta.json();

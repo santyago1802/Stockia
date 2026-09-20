@@ -1,12 +1,12 @@
 const materialModel = require("../models/material.model");
 
 // Obtener materiales
-const obtenerMateriales = async () => {
-  return await materialModel.obtenerMateriales();
+const obtenerMateriales = () => {
+  return materialModel.obtenerMateriales();
 };
 
 // Crear material
-const crearMaterial = async (
+const crearMaterial = (
   nombre_material,
   descripcion_material,
   id_categoria,
@@ -14,7 +14,7 @@ const crearMaterial = async (
   stock_minimo,
   cantidad
 ) => {
-  return await materialModel.crearMaterial(
+  return materialModel.crearMaterial(
     nombre_material,
     descripcion_material,
     id_categoria,
@@ -25,14 +25,14 @@ const crearMaterial = async (
 };
 
 // Actualizar material
-const actualizarMaterial = async (
+const actualizarMaterial = (
   id,
   nombre_material,
   descripcion_material,
   id_categoria,
   stock_minimo
 ) => {
-  return await materialModel.actualizarMaterial(
+  return materialModel.actualizarMaterial(
     id,
     nombre_material,
     descripcion_material,

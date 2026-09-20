@@ -1,5 +1,7 @@
 const express = require("express");
 
+const verificarToken = require("../middleware/auth.middleware");
+
 const {
   obtenerProveedores,
 } = require("../controllers/proveedor.controller");
@@ -7,6 +9,6 @@ const {
 const router = express.Router();
 
 // GET /api/proveedores
-router.get("/", obtenerProveedores);
+router.get("/", verificarToken, obtenerProveedores);
 
 module.exports = router;

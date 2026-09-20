@@ -1,8 +1,8 @@
 const categoriaModel = require("../models/categoria.model");
 
 // Obtener categorías
-const obtenerCategorias = async () => {
-  return await categoriaModel.obtenerCategorias();
+const obtenerCategorias = () => {
+  return categoriaModel.obtenerCategorias();
 };
 
 module.exports = {

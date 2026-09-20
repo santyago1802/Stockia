@@ -3,22 +3,29 @@ const prestamoService = require("../services/prestamo.service");
 // Registrar préstamo
 const crearPrestamo = async (req, res) => {
   try {
-    const {
-      id_usuario,
-      id_material,
-      cantidad,
-    } = req.body;
+    const { id_material, cantidad } = req.body;
 
-    if (!id_usuario || !id_material || !cantidad) {
+    // El usuario se obtiene del JWT, no del frontend
+    const id_usuario = req.usuario.id_usuario;
+
+    // Validar material
+    if (!Number.isInteger(Number(id_material)) || Number(id_material) <= 0) {
       return res.status(400).json({
-        mensaje: "Usuario, material y cantidad son obligatorios",
+        mensaje: "El material seleccionado no es válido",
+      });
+    }
+
+    // Validar cantidad
+    if (!Number.isInteger(Number(cantidad)) || Number(cantidad) <= 0) {
+      return res.status(400).json({
+        mensaje: "La cantidad debe ser un número entero mayor que 0",
       });
     }
 
     const id_prestamo = await prestamoService.crearPrestamo(
       id_usuario,
-      id_material,
-      cantidad
+      Number(id_material),
+      Number(cantidad)
     );
 
     res.status(201).json({
@@ -28,8 +35,8 @@ const crearPrestamo = async (req, res) => {
   } catch (error) {
     console.error("Error al registrar préstamo:", error);
 
-    res.status(500).json({
-      mensaje: error.message,
+    res.status(error.status || 500).json({
+      mensaje: error.message || "No se pudo registrar el préstamo",
     });
   }
 };
@@ -43,8 +50,8 @@ const obtenerPrestamos = async (req, res) => {
   } catch (error) {
     console.error("Error al obtener préstamos:", error);
 
-    res.status(500).json({
-      mensaje: "No se pudieron consultar los préstamos",
+    res.status(error.status || 500).json({
+      mensaje: error.message || "No se pudieron consultar los préstamos",
     });
   }
 };
@@ -53,8 +60,19 @@ const obtenerPrestamos = async (req, res) => {
 const devolverPrestamo = async (req, res) => {
   try {
     const { id } = req.params;
+    const id_usuario = req.usuario.id_usuario;
 
-    await prestamoService.devolverPrestamo(id);
+    // Validar ID del préstamo
+    if (!Number.isInteger(Number(id)) || Number(id) <= 0) {
+      return res.status(400).json({
+        mensaje: "El ID del préstamo no es válido",
+      });
+    }
+
+    await prestamoService.devolverPrestamo(
+      Number(id),
+      id_usuario
+    );
 
     res.json({
       mensaje: "Préstamo devuelto correctamente",
