@@ -2,15 +2,29 @@ require("dotenv").config();
  
 const express = require("express");
 const cors = require("cors");
+<<<<<<< HEAD
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
  
 const pool = require("./db/pool"); // conexión configurada en pool.js
  
+=======
+
+const pool = require("./db/pool");
+
+const materialRoutes = require("./routes/material.routes");
+const prestamoRoutes = require("./routes/prestamo.routes");
+const usuarioRoutes = require("./routes/usuario.routes");
+const authRoutes = require("./routes/auth.routes");
+const categoriaRoutes = require("./routes/categoria.routes");
+const proveedorRoutes = require("./routes/proveedor.routes");
+
+>>>>>>> 181ad4fd44cb6aa238767c958e803ab33edd4130
 const app = express();
  
 app.use(cors());
 app.use(express.json());
+<<<<<<< HEAD
  
 // Middleware de autenticación (BUG-004)
 function verificarToken(req, res, next) {
@@ -34,6 +48,17 @@ app.use("/api/usuarios", verificarToken);
 app.use("/api/materiales", verificarToken);
 app.use("/api/prestamos", verificarToken);
  
+=======
+
+// Rutas de la aplicación
+app.use("/api/materiales", materialRoutes);
+app.use("/api/prestamos", prestamoRoutes);
+app.use("/api/usuarios", usuarioRoutes);
+app.use("/api/login", authRoutes);
+app.use("/api/categorias", categoriaRoutes);
+app.use("/api/proveedores", proveedorRoutes);
+
+>>>>>>> 181ad4fd44cb6aa238767c958e803ab33edd4130
 // Comprobar conexión con PostgreSQL
 app.get("/api/health", async (_req, res) => {
   try {
@@ -50,6 +75,7 @@ app.get("/api/health", async (_req, res) => {
     });
   }
 });
+<<<<<<< HEAD
  
 // Consultar usuarios
 app.get("/api/usuarios", async (_req, res) => {
@@ -376,3 +402,12 @@ app.put("/api/prestamos/:id/devolver", async (req, res) => {
 });
  
 module.exports = app;
+=======
+
+// Iniciar servidor
+app.listen(process.env.PORT, () => {
+  console.log(
+    `Backend activo en http://localhost:${process.env.PORT}`
+  );
+});
+>>>>>>> 181ad4fd44cb6aa238767c958e803ab33edd4130
