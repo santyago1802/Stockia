@@ -1,0 +1,45 @@
+
+/* =================================
+   STOCKIA - DASHBOARD
+   Alertas del inventario
+================================= */
+
+/* Distribución de las alertas */
+.alertas-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+
+  width: 100%;
+  max-width: 900px;
+  margin: 20px auto 40px;
+
+  justify-items: center;
+}
+
+/* Tarjeta individual de alerta */
+.alerta-item {
+  width: 100%;
+  max-width: 440px;
+  padding: 20px;
+
+  border: 2px solid #948e8e;
+  border-radius: 15px;
+
+  background: var(--color-white);
+  box-sizing: border-box;
+}
+
+/* Cuando solamente existe una alerta */
+.alerta-item:only-child {
+  grid-column: 1 / -1;
+  justify-self: center;
+
+  width: 100%;
+  max-width: 440px;
+}
+
+/* Separación de los textos */
+.alerta-item p {
+  margin: 8px 0;
+}

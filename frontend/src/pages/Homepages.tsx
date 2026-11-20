@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/layout/Navbar";
+import "../styles/dashboard.css";
 
 interface Material {
   id_material: number;

@@ -1,0 +1,170 @@
+
+/* =================================
+   STOCKIA - CATÁLOGO DE MATERIALES
+================================= */
+
+/* Contenedor del catálogo */
+.products-section {
+  width: 100%;
+  padding: 40px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  color: var(--color-black);
+}
+
+/* Buscador de materiales */
+.busqueda-materiales {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 30px;
+}
+
+.busqueda-materiales input {
+  width: 100%;
+  padding: 14px 20px 14px 50px;
+
+  border: 2px solid var(--color-black);
+  border-radius: 25px;
+
+  font-size: 16px;
+  box-sizing: border-box;
+  outline: none;
+
+  background: var(--color-white);
+  color: var(--color-black);
+}
+
+.busqueda-materiales input::placeholder {
+  color: #777;
+}
+
+.icono-busqueda {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  font-size: 18px;
+  pointer-events: none;
+}
+
+/* Secciones de categorías */
+.categoria-section {
+  width: 100%;
+  max-width: 1200px;
+  margin: 40px auto;
+}
+
+.categoria-titulo {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+
+  color: var(--color-black);
+  border-bottom: 3px solid var(--color-primary);
+
+  text-align: left;
+  font-size: 24px;
+}
+
+/* Distribución de tarjetas */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  justify-items: stretch;
+}
+
+/* Tarjeta individual */
+.card {
+  width: 100%;
+  max-width: 330px;
+  margin: 0 auto 20px;
+  padding: 20px;
+
+  background: var(--color-white);
+  border-radius: var(--radius-large);
+
+  overflow: hidden;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* Cuando solo existe una tarjeta */
+.card-grid .card:only-child {
+  grid-column: 1 / -1;
+  justify-self: center;
+}
+
+/* Contenido de las tarjetas */
+.card-body {
+  width: 100%;
+  padding: 10px;
+
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* Textos de los materiales */
+.card-body .card-text {
+  margin: 8px 0;
+  color: var(--color-text);
+}
+
+/* Botones de las tarjetas */
+.card-body button {
+  display: block;
+  margin: 15px auto 0;
+  padding: 10px 25px;
+
+  background: var(--color-primary);
+  color: var(--color-black);
+
+  border: none;
+  border-radius: 20px;
+
+  cursor: pointer;
+  font-weight: bold;
+  transition: opacity 0.3s ease;
+}
+
+.card-body button:hover {
+  opacity: 0.8;
+}
+
+/* Botón registrar material */
+.btn-registrar-material {
+  display: block;
+  width: 220px;
+  margin: 25px auto 30px;
+  padding: 12px 20px;
+
+  background: var(--color-primary);
+  color: var(--color-black);
+
+  border: none;
+  border-radius: 20px;
+
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+}
+
+/* Botón editar material */
+.card-body .btn-editar {
+  background: rgb(255, 153, 0);
+  color: var(--color-black);
+}
+
+.card-body .btn-editar:hover {
+  opacity: 0.8;
+}

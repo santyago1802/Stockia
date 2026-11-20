@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Card from "../components/ui/Card";
 import Navbar from "../components/layout/Navbar";
+import "../styles/catalogo.css";
 
 interface Material {
   id_material: number;
