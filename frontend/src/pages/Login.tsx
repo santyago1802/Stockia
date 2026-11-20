@@ -1,6 +1,7 @@
 import { type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import logoStockia from "../assets/Stockia Logo.png";
+import "../styles/login.css";
 
 
 function Login() {

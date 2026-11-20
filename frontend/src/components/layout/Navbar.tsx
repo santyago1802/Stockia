@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logoStockia from "../../assets/Stockia Logo.png";
+import "../../styles/navbar.css";
 
 function Navbar() {
   const location = useLocation();
