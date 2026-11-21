@@ -20,6 +20,22 @@ const obtenerUsuarioPorDocumento = async (documento) => {
   return resultado.rows[0];
 };
 
+// Actualizar contraseña hasheada por documento
+const actualizarContrasenaPorDocumento = async (documento, nuevaContrasenaHash) => {
+  const resultado = await pool.query(
+    `
+    UPDATE usuario
+    SET contrasena_hash = $1
+    WHERE documento_usuario = $2
+    RETURNING id_usuario, documento_usuario
+    `,
+    [nuevaContrasenaHash, documento]
+  );
+
+  return resultado.rows[0];
+};
+
 module.exports = {
   obtenerUsuarioPorDocumento,
+  actualizarContrasenaPorDocumento,
 };

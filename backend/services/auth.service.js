@@ -46,6 +46,36 @@ const iniciarSesion = async (documento, contrasena) => {
   };
 };
 
+// Recuperar / restablecer contraseña
+const recuperarPassword = async (documento, nuevaContrasena) => {
+  const usuario = await authModel.obtenerUsuarioPorDocumento(documento);
+
+  if (!usuario) {
+    const error = new Error("No se encontró un usuario con ese documento");
+    error.status = 404;
+    throw error;
+  }
+
+  const rondasSalt = 10;
+  const nuevaContrasenaHash = await bcrypt.hash(nuevaContrasena, rondasSalt);
+
+  const actualizado = await authModel.actualizarContrasenaPorDocumento(
+    documento,
+    nuevaContrasenaHash
+  );
+
+  if (!actualizado) {
+    const error = new Error("No se pudo actualizar la contraseña");
+    error.status = 500;
+    throw error;
+  }
+
+  return {
+    documento: actualizado.documento_usuario,
+  };
+};
+
 module.exports = {
   iniciarSesion,
+  recuperarPassword,
 };

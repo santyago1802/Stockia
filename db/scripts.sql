@@ -1,18 +1,24 @@
 \set QUIET on
--- create database de Stockia
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- ==========================================================
+-- CREDENCIALES DE PRUEBA (SOLO DESARROLLO)
+-- Usuario 1 -> Documento: 100000006 | Clave: Coordinador2026!
+-- Usuario 2 -> Documento: 100000007 | Clave: Instructor2026!
+-- ==========================================================
+
 CREATE TABLE categoria (
     id_categoria INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nombre_categoria VARCHAR(100) UNIQUE NOT NULL
 );
 
-INSERT INTO categoria (nombre_categoria) 
+INSERT INTO categoria (nombre_categoria)
 VALUES
 ('Herramientas'),
 ('Material electrico'),
 ('Tornilleria'),
 ('Elementos de seguridad'),
 ('Material de mantenimiento');
-
 
 CREATE TABLE proveedor (
     id_proveedor INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -22,7 +28,7 @@ CREATE TABLE proveedor (
 );
 
 CREATE TYPE tipo_rol AS ENUM (
-    'Coordinador', 
+    'Coordinador',
     'Instructor'
 );
 
@@ -34,6 +40,33 @@ CREATE TABLE usuario (
     correo_usuario VARCHAR(100) UNIQUE NOT NULL,
     contrasena_hash VARCHAR(100) NOT NULL,
     rol tipo_rol NOT NULL
+);
+
+-- Solo 2 usuarios con contraseñas conocidas y hasheadas con bcrypt (pgcrypto)
+INSERT INTO usuario (
+    nombre_usuario,
+    apellido_usuario,
+    documento_usuario,
+    correo_usuario,
+    contrasena_hash,
+    rol
+)
+VALUES
+(
+    'Pedro',
+    'Coordinador',
+    '100000006',
+    'coordinador@stockia.local',
+    crypt('Coordinador2026!', gen_salt('bf', 10)),
+    'Coordinador'
+),
+(
+    'Sofia',
+    'Instructor',
+    '100000007',
+    'instructor@stockia.local',
+    crypt('Instructor2026!', gen_salt('bf', 10)),
+    'Instructor'
 );
 
 CREATE TABLE material (
@@ -95,15 +128,12 @@ RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $$
 BEGIN
-
     IF NEW.id_tipo_movimiento = 1 THEN
-
         UPDATE detalle_proveedor
         SET cantidad = cantidad + NEW.cantidad
         WHERE id_material = NEW.id_material;
 
     ELSIF NEW.id_tipo_movimiento = 2 THEN
-
         IF EXISTS (
             SELECT 1
             FROM detalle_proveedor
@@ -116,7 +146,6 @@ BEGIN
         UPDATE detalle_proveedor
         SET cantidad = cantidad - NEW.cantidad
         WHERE id_material = NEW.id_material;
-
     END IF;
 
     RETURN NEW;
@@ -127,34 +156,6 @@ CREATE TRIGGER trigger_actualizar_stock
 AFTER INSERT ON movimiento
 FOR EACH ROW
 EXECUTE FUNCTION actualizar_stock_movimiento();
-
-INSERT INTO usuario (nombre_usuario, apellido_usuario, documento_usuario, correo_usuario, contrasena_hash, rol)
-VALUES
-('Pedro', 'Apellido6', '100000006', 'USUARIO6@GMAIL.COM', 'hashed_password6', 'Coordinador'),
-('Sofia', 'Apellido7', '100000007', 'USUARIO7@GMAIL.COM', 'hashed_password7', 'Instructor'),
-('Andres', 'Apellido8', '100000008', 'USUARIO8@GMAIL.COM', 'hashed_password8', 'Coordinador'),
-('Laura', 'Apellido9', '100000009', 'USUARIO9@GMAIL.COM', 'hashed_password9', 'Instructor'),
-('Diego', 'Apellido10', '100000010', 'USUARIO10@GMAIL.COM', 'hashed_password10', 'Coordinador'),
-('Camila', 'Apellido11', '100000011', 'USUARIO11@GMAIL.COM', 'hashed_password11', 'Instructor'),
-('Sergio', 'Apellido12', '100000012', 'USUARIO12@GMAIL.COM', 'hashed_password12', 'Coordinador'),
-('Valentina', 'Apellido13', '100000013', 'USUARIO13@GMAIL.COM', 'hashed_password13', 'Instructor'),
-('Oscar', 'Apellido14', '100000014', 'USUARIO14@GMAIL.COM', 'hashed_password14', 'Coordinador'),
-('Paola', 'Apellido15', '100000015', 'USUARIO15@GMAIL.COM', 'hashed_password15', 'Instructor'),
-('Fernando', 'Apellido16', '100000016', 'USUARIO16@GMAIL.COM', 'hashed_password16', 'Coordinador'),
-('Daniela', 'Apellido17', '100000017', 'USUARIO17@GMAIL.COM', 'hashed_password17', 'Instructor'),
-('Ricardo', 'Apellido18', '100000018', 'USUARIO18@GMAIL.COM', 'hashed_password18', 'Coordinador'),
-('Natalia', 'Apellido19', '100000019', 'USUARIO19@GMAIL.COM', 'hashed_password19', 'Instructor'),
-('Miguel', 'Apellido20', '100000020', 'USUARIO20@GMAIL.COM', 'hashed_password20', 'Coordinador'),
-('Carolina', 'Apellido21', '100000021', 'USUARIO21@GMAIL.COM', 'hashed_password21', 'Instructor'),
-('Jorge', 'Apellido22', '100000022', 'USUARIO22@GMAIL.COM', 'hashed_password22', 'Coordinador'),
-('Adriana', 'Apellido23', '100000023', 'USUARIO23@GMAIL.COM', 'hashed_password23', 'Instructor'),
-('Felipe', 'Apellido24', '100000024', 'USUARIO24@GMAIL.COM', 'hashed_password24', 'Coordinador'),
-('Alejandra', 'Apellido25', '100000025', 'USUARIO25@GMAIL.COM', 'hashed_password25', 'Instructor'),
-('Ivan', 'Apellido26', '100000026', 'USUARIO26@GMAIL.COM', 'hashed_password26', 'Coordinador'),
-('Monica', 'Apellido27', '100000027', 'USUARIO27@GMAIL.COM', 'hashed_password27', 'Instructor'),
-('Gustavo', 'Apellido28', '100000028', 'USUARIO28@GMAIL.COM', 'hashed_password28', 'Coordinador'),
-('Patricia', 'Apellido29', '100000029', 'USUARIO29@GMAIL.COM', 'hashed_password29', 'Instructor'),
-('Julian', 'Apellido30', '100000030', 'USUARIO30@GMAIL.COM', 'hashed_password30', 'Coordinador');
 
 INSERT INTO proveedor (nombre_proveedor, telefono_proveedor, correo_proveedor)
 VALUES
@@ -255,6 +256,7 @@ VALUES
 (29, 29, DEFAULT, 8, 48),
 (30, 30, DEFAULT, 7, 11);
 
+-- Usamos id_usuario 1 y 2 porque son los únicos 2 usuarios creados arriba
 INSERT INTO prestamo (
     id_usuario,
     fecha_prestamo,
@@ -262,18 +264,12 @@ INSERT INTO prestamo (
     estado
 )
 VALUES
+(1, DEFAULT, NULL, 'pendiente'),
 (2, DEFAULT, NULL, 'pendiente'),
-(4, DEFAULT, NULL, 'pendiente'),
-(6, DEFAULT, NULL, 'pendiente'),
-(8, DEFAULT, NULL, 'pendiente'),
-(10, DEFAULT, NULL, 'pendiente'),
-(12, DEFAULT, NULL, 'pendiente'),
-(14, DEFAULT, NULL, 'pendiente'),
-(16, DEFAULT, NULL, 'pendiente'),
-(18, DEFAULT, NULL, 'pendiente'),
-(20, DEFAULT, NULL, 'pendiente'),
-(22, DEFAULT, NULL, 'pendiente'),
-(24, DEFAULT, NULL, 'pendiente');
+(1, DEFAULT, NULL, 'pendiente'),
+(2, DEFAULT, NULL, 'pendiente'),
+(1, DEFAULT, NULL, 'pendiente'),
+(2, DEFAULT, NULL, 'pendiente');
 
 INSERT INTO detalle_prestamo (
     id_prestamo,
@@ -286,13 +282,7 @@ VALUES
 (3, 3, 3),
 (4, 4, 2),
 (5, 5, 5),
-(6, 6, 1),
-(7, 7, 3),
-(8, 8, 2),
-(9, 9, 3),
-(10, 10, 2),
-(11, 11, 1),
-(12, 12, 4);
+(6, 6, 1);
 
 INSERT INTO movimiento (
     id_prestamo,
@@ -304,15 +294,9 @@ INSERT INTO movimiento (
     id_tipo_movimiento
 )
 VALUES
-(1, 1, 2, 'Salida por préstamo', DEFAULT, 2, 2),
-(2, 2, 4, 'Salida por préstamo', DEFAULT, 4, 2),
-(3, 3, 3, 'Salida por préstamo', DEFAULT, 6, 2),
-(4, 4, 2, 'Salida por préstamo', DEFAULT, 8, 2),
-(5, 5, 5, 'Salida por préstamo', DEFAULT, 10, 2),
-(6, 6, 1, 'Salida por préstamo', DEFAULT, 12, 2),
-(7, 7, 3, 'Salida por préstamo', DEFAULT, 14, 2),
-(8, 8, 2, 'Salida por préstamo', DEFAULT, 16, 2),
-(9, 9, 3, 'Salida por préstamo', DEFAULT, 18, 2),
-(10, 10, 2, 'Salida por préstamo', DEFAULT, 20, 2),
-(11, 11, 1, 'Salida por préstamo', DEFAULT, 22, 2),
-(12, 12, 4, 'Salida por préstamo', DEFAULT, 24, 2);
+(1, 1, 2, 'Salida por préstamo', DEFAULT, 1, 2),
+(2, 2, 4, 'Salida por préstamo', DEFAULT, 2, 2),
+(3, 3, 3, 'Salida por préstamo', DEFAULT, 1, 2),
+(4, 4, 2, 'Salida por préstamo', DEFAULT, 2, 2),
+(5, 5, 5, 'Salida por préstamo', DEFAULT, 1, 2),
+(6, 6, 1, 'Salida por préstamo', DEFAULT, 2, 2);

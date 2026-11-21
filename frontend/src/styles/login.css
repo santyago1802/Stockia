@@ -1,4 +1,3 @@
-
 /* =================================
    STOCKIA - LOGIN REDISEÑADO
 ================================= */
@@ -309,6 +308,20 @@
   text-decoration: underline;
 }
 
+.login-card .forgot .forgot-link-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #426c89;
+  font-size: 11px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.login-card .forgot .forgot-link-btn:hover {
+  text-decoration: underline;
+}
+
 /* Botón ingresar */
 .login-submit {
   width: 100%;
@@ -329,6 +342,67 @@
 
 .login-submit:hover {
   background: #005729;
+}
+
+/* Modal de recuperación de contraseña */
+.recuperar-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(17, 24, 39, 0.55);
+}
+
+.recuperar-modal {
+  width: 100%;
+  max-width: 380px;
+  padding: 28px;
+  background: var(--color-white, #ffffff);
+  border: 1px solid #dce3da;
+  border-radius: 20px;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+}
+
+.recuperar-modal h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+  text-align: center;
+}
+
+.recuperar-desc {
+  margin: 0 0 20px;
+  font-size: 12px;
+  color: #606b70;
+  text-align: center;
+}
+
+.recuperar-acciones {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.recuperar-cancelar {
+  width: 100%;
+  height: 38px;
+  background: transparent;
+  color: #34443a;
+  border: 1px solid #cbd8c9;
+  border-radius: 25px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.recuperar-cancelar:hover {
+  background: #f3f6f4;
 }
 
 /* Pie de página */
@@ -392,4 +466,3 @@
   -webkit-text-fill-color: #26352c;
   transition: background-color 5000s ease-in-out 0s;
 }
-

@@ -57,3 +57,35 @@
   cursor: pointer;
   font-weight: bold;
 }
+
+/* Contenedor de pestañas para separar préstamos pendientes y devueltos */
+.prestamos-tabs {
+  display: flex; /* Alinea los botones en fila horizontal. */
+  gap: 12px; /* Separación entre el botón de Pendientes y el de Devueltos. */
+  margin-top: 15px; /* Separa las pestañas del título de la sección. */
+}
+
+/* Botón base de cada estado de préstamo */
+.prestamo-tab {
+  padding: 10px 18px; /* Espaciado interno cómodo para hacer clic. */
+  border: 2px solid var(--color-primary); /* Borde usando el color principal de Stockia. */
+  border-radius: 20px; /* Bordes redondeados coherentes con tus botones. */
+  background: var(--color-white); /* Fondo blanco cuando la pestaña no está seleccionada. */
+  color: var(--color-black); /* Texto negro para buena legibilidad. */
+  font-weight: bold; /* Negrita para destacar la opción. */
+  cursor: pointer; /* Cambia el cursor a manito. */
+}
+
+/* Pestaña activa actualmente */
+.prestamo-tab.activa {
+  background: var(--color-primary); /* Rellena con el color principal al estar activa. */
+  color: var(--color-black); /* Mantiene el texto en negro sobre el color principal. */
+}
+
+/* Mensaje cuando no hay préstamos en el estado seleccionado */
+.prestamos-vacio {
+  margin-top: 28px; /* Separa el mensaje hacia abajo respecto a los botones de Pendientes y Devueltos. */
+  font-size: 20px; /* Agranda el texto (puedes subirlo a 22px o 24px si lo quieres aún más grande). */
+  font-weight: 600; /* Le da un poco más de peso visual para que se lea claro. */
+  color: var(--color-black); /* Mantiene buen contraste sobre el fondo de la página. */
+}
