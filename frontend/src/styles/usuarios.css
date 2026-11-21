@@ -1,0 +1,60 @@
+
+/* =================================
+   STOCKIA - MÓDULO DE USUARIOS
+================================= */
+
+/* Contenedor principal */
+.users-section {
+  width: 100%;
+  padding: 40px;
+
+  text-align: center;
+  color: var(--color-black);
+}
+
+/* Título */
+.users-section h1 {
+  margin-bottom: 30px;
+  color: var(--color-black);
+  position: relative;
+  top: -25px;
+}
+
+/* Tabla */
+.users-section table {
+  width: 80%;
+  max-width: 900px;
+  margin: 0 auto;
+
+  border-collapse: collapse;
+  background: var(--color-white);
+
+  border-radius: 15px;
+  overflow: hidden;
+
+  box-shadow: var(--shadow-card);
+}
+
+/* Celdas */
+.users-section th,
+.users-section td {
+  padding: 15px 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Encabezados */
+.users-section th {
+  background: var(--color-primary);
+  color: var(--color-black);
+  font-weight: bold;
+}
+
+/* Última fila */
+.users-section tr:last-child td {
+  border-bottom: none;
+}
+
+/* Efecto al pasar el cursor */
+.users-section tbody tr:hover {
+  background: #f2f2f2;
+}

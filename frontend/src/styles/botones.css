@@ -1,0 +1,41 @@
+
+/* =================================
+   STOCKIA - BOTONES GENERALES
+================================= */
+
+/* Botón general */
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+
+  border: none;
+  border-radius: 20px;
+
+  font-weight: bold;
+  cursor: pointer;
+
+  transition: opacity 0.3s ease;
+}
+
+/* Botón principal */
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-black);
+}
+
+/* Botón cancelar */
+.btn-cancelar {
+  background: var(--color-black);
+  color: var(--color-white);
+}
+
+/* Efecto al pasar el cursor */
+.btn:hover {
+  opacity: 0.8;
+}
+
+/* Botón deshabilitado */
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -1,139 +1,395 @@
 
 /* =================================
-   STOCKIA - INICIO DE SESIÓN
+   STOCKIA - LOGIN REDISEÑADO
 ================================= */
 
-/* Fondo y distribución */
+/* Página principal */
+.login-page,
+.login-page * {
+  font-family: "Inter", sans-serif !important;
+}
+
+.login-page .bx {
+  font-family: "boxicons" !important;
+}
+
+
 .login-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  width: 100%;
+  min-height: 100vh;
+  padding: 25px 5% 20px;
+
+  background: #f7f8ff;
+  color: #111827;
+  box-sizing: border-box;
+}
+
+/* Encabezado */
+.login-header {
+  position: absolute;
+  top: 25px;
+  right: 5%;
+}
+
+.login-location {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+
+  border: 1px solid #dce2d9;
+  border-radius: 20px;
+
+  color: #59645d;
+  font-size: 11px;
+  background: #ffffff;
+}
+
+.location-dot {
+  width: 7px;
+  height: 7px;
+  background: #00813e;
+  border-radius: 50%;
+}
+
+/* Marca */
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 145px;
+  height: 48px;
+  padding: 0;
+
+  overflow: hidden;
+  background: #006b32;
+  border-radius: 10px;
+}
+
+.brand-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.brand-name {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.sena-tag {
+  padding: 4px 9px;
+
+  background: #dcefe3;
+  color: #08783b;
+
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+/* Ubicación */
+.login-location {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  padding: 7px 12px;
+
+  border: 1px solid #dce2d9;
+  border-radius: 20px;
+
+  color: #59645d;
+  font-size: 11px;
+}
+
+.location-dot {
+  width: 7px;
+  height: 7px;
+
+  background: #00813e;
+  border-radius: 50%;
+}
+
+/* Área central */
+.login-main {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+
+  flex: 1;
   width: 100%;
-  position: fixed;
-  top: 0;
-  left: 0;
-  background: radial-gradient(
-    circle at center,
-    #e8e6e6,
-    #ffffff
-  );
+  padding: 35px 0;
 }
 
-/* Contenedor del formulario */
-.login-page .wrapper {
-  width: 420px;
-  max-width: 90%;
+/* Tarjeta */
+.login-card {
+  width: 368px;
+  max-width: 100%;
+
+  padding: 32px;
+
   background: var(--color-white);
-  border: none;
-  backdrop-filter: blur(10px);
-  border-radius: var(--radius-large);
-  padding: 40px;
-  color: var(--color-black);
+  border: 1px solid #dce3da;
+  border-radius: 20px;
+
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+
+  box-sizing: border-box;
 }
+
+/* Identificador SENA - Stockia */
+.login-badge {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: fit-content;
+  margin: 0 auto 14px;
+
+  background: transparent;
+  padding: 0;
+}
+
+.login-badge-logo {
+  display: block;
+  width: 150px;
+  height: auto;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.login-badge strong {
+  font-size: 15px;
+  font-style: italic;
+}
+
 
 /* Título */
-.login-page .wrapper h1 {
-  font-size: 36px;
+.login-card h1 {
+  margin: 0;
+
+  color: #111827;
   text-align: center;
-  margin-bottom: 10px;
-  color: var(--color-black);
+  font-size: 23px;
+  font-weight: 700;
 }
 
-/* Logo */
-.login-page .wrapper .logo {
+.login-subtitle {
+  margin: 5px 0 28px;
+
+  color: #606b70;
+  text-align: center;
+  font-size: 12px;
+}
+
+/* Campos */
+.login-field {
+  width: 100%;
+  margin-bottom: 14px;
+}
+
+.login-field label {
   display: block;
-  width: 180px;
-  height: auto;
-  margin: 0 auto 25px;
+  margin: 0 0 5px 7px;
+
+  color: #202820;
+  font-size: 11px;
+  font-weight: 600;
 }
 
-/* Contenedores de campos */
-.login-page .input-box {
+.login-input-wrapper {
   position: relative;
   width: 100%;
-  height: 50px;
-  margin: 30px 0;
+  height: 40px;
 }
 
-/* Campos de texto */
-.login-page .input-box input {
+/* Inputs y selector */
+.login-input-wrapper input,
+.login-input-wrapper select {
   width: 100%;
   height: 100%;
-  background: transparent;
-  border: 2px solid #e8e6e6;
+  background: #ffffff;
+
+  padding: 0 38px 0 13px;
+
+  background: white;
+  border: 1px solid #cbd8c9;
+  border-radius: 25px;
+
+  color: #26352c;
+  font-size: 12px;
+
   outline: none;
-  border-radius: 40px;
-  font-size: 16px;
-  color: var(--color-black);
-  padding: 20px 45px 20px 20px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Texto de ayuda */
-.login-page .input-box input::placeholder {
-  color: var(--color-black);
+.login-input-wrapper input::placeholder {
+  color: #89938e;
 }
 
-/* Autocompletado del navegador */
-.login-page .input-box input:-webkit-autofill,
-.login-page .input-box input:-webkit-autofill:hover,
-.login-page .input-box input:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 1000px white inset;
-  -webkit-text-fill-color: black;
-  transition: background-color 5000s ease-in-out 0s;
-}
-
-/* Selector de tipo de documento */
-.login-page .input-box select {
-  width: 100%;
-  height: 100%;
-  background: transparent;
-  border: 2px solid #e8e6e6;
-  border-radius: 40px;
-  outline: none;
-  font-size: 16px;
-  color: var(--color-black);
-  padding: 0 20px;
+.login-input-wrapper select {
   appearance: none;
+  cursor: pointer;
+
+  padding-right: 38px;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2326352c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+}
+.login-input-wrapper input:focus,
+.login-input-wrapper select:focus {
+  border-color: #0A4D25;
+  box-shadow: 0 0 0 3px rgba(0, 129, 62, 0.09);
+}
+
+/* Iconos */
+.login-input-wrapper > i {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #34443a;
+  pointer-events: none;
+}
+
+/* Mostrar u ocultar contraseña */
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 3px;
+  transform: translateY(-50%);
+
+  background: transparent;
+  border: none;
+
+  color: #34443a;
   cursor: pointer;
 }
 
-/* Iconos de los campos */
-.login-page .input-box i {
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 20px;
+.password-toggle i {
+  font-size: 17px;
 }
 
-/* Recuperación de contraseña */
-.login-page .forgot {
+/* Recuperar contraseña */
+.login-card .forgot {
+  margin: 17px 0 20px;
   text-align: center;
-  margin: -15px 0 15px;
 }
 
-.login-page .forgot a {
-  color: var(--color-black);
+.login-card .forgot a {
+  color: #426c89;
+  font-size: 11px;
   text-decoration: none;
-  font-size: 14.5px;
 }
 
-.login-page .forgot a:hover {
+.login-card .forgot a:hover {
   text-decoration: underline;
 }
 
-/* Botón de ingreso */
-.login-page .wrapper .btn {
+/* Botón ingresar */
+.login-submit {
   width: 100%;
-  height: 50px;
-  background: var(--color-primary);
+  height: 40px;
+
+  background: #0A4D25;
+  color: white;
+
   border: none;
-  outline: none;
-  border-radius: 40px;
-  box-shadow: 0 0 250px rgb(0, 0, 0, 0.1);
+  border-radius: 25px;
+
+  font-size: 12px;
+  font-weight: bold;
+
   cursor: pointer;
-  font-size: 16px;
-  color: var(--color-black);
-  font-weight: 600;
+  transition: background 0.2s ease;
 }
+
+.login-submit:hover {
+  background: #005729;
+}
+
+/* Pie de página */
+.login-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+
+  width: 100%;
+  padding-top: 15px;
+
+  border-top: 1px solid #e0e5e8;
+
+  color: #64717c;
+  font-size: 10px;
+}
+
+/* Adaptación para celulares */
+@media (max-width: 600px) {
+  .login-page {
+    padding: 18px 20px;
+  }
+
+  .login-header {
+    align-items: flex-start;
+  }
+
+  .login-location {
+    font-size: 9px;
+    padding: 6px 8px;
+  }
+
+  .login-card {
+    width: 100%;
+    max-width: 368px;
+    padding: 28px 23px;
+  }
+
+  .login-footer {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 360px) {
+  .login-location {
+    display: none;
+  }
+
+  .login-card h1 {
+    font-size: 21px;
+  }
+}
+
+.login-input-wrapper input:-webkit-autofill,
+.login-input-wrapper input:-webkit-autofill:hover,
+.login-input-wrapper input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+  -webkit-text-fill-color: #26352c;
+  transition: background-color 5000s ease-in-out 0s;
+}
+

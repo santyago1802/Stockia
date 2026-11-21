@@ -1,0 +1,59 @@
+
+/* =================================
+   STOCKIA - PRÉSTAMOS
+================================= */
+
+/* Distribución de préstamos */
+.prestamos-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+
+  width: 80%;
+  margin-top: 20px;
+}
+
+/* Tarjeta de préstamo */
+.prestamo-item {
+  width: 100%;
+  padding: 20px;
+
+  border: 2px solid #948e8e;
+  border-radius: 15px;
+
+  background: var(--color-white);
+  box-sizing: border-box;
+}
+
+/* Cuando existe un solo préstamo */
+.prestamo-item:only-child {
+  grid-column: 1 / -1;
+  justify-self: center;
+  max-width: 440px;
+}
+
+/* Separación de textos */
+.prestamo-item p {
+  margin: 8px 0;
+}
+
+/* Botones dentro de préstamos */
+.prestamo-item button {
+  margin-top: 10px;
+}
+
+/* Botón de acción principal */
+.prestamo-item .btn-primary {
+  display: block;
+  margin: 10px auto 0;
+  padding: 10px 20px;
+
+  background: var(--color-primary);
+  color: var(--color-black);
+
+  border: none;
+  border-radius: 20px;
+
+  cursor: pointer;
+  font-weight: bold;
+}

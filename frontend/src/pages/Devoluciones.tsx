@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/layout/Navbar";
+import "../styles/prestamos.css";
+import "../styles/modales.css";
 
 interface Prestamo {
   id_prestamo: number;

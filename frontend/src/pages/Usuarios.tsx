@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/layout/Navbar";
+import "../styles/usuarios.css";
 
 interface Usuario {
   id_usuario: number;
