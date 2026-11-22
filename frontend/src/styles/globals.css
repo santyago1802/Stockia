@@ -60,3 +60,506 @@ body {
   width: 100%;
   min-height: 100vh;
 }
+
+/* =========================
+   FORMULARIOS DE SOLICITUD
+========================= */
+
+.solicitud-box input:focus,
+.solicitud-box select:focus {
+  border-color: #26ff96;
+}
+
+.solicitud-box button {
+  width: 100%;
+  height: 48px;
+  margin: 0;
+  padding: 0 12px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  box-sizing: border-box;
+}
+
+.solicitud-box {
+  box-shadow:
+    0 0 0 100vmax rgba(0, 0, 0, 0.35),
+    0 10px 35px rgba(0, 0, 0, 0.3);
+}
+
+.solicitud-box input[type="number"] {
+  color-scheme: light;
+}
+
+.solicitud-box .btn-primary:hover {
+  opacity: 0.8;
+}
+
+.solicitud-box .btn:not(.btn-primary):hover {
+  opacity: 0.8;
+}
+
+/* =========================
+   PRÉSTAMOS
+========================= */
+
+.prestamo-item {
+  padding: 20px;
+  border: 2px solid #948e8e;
+  border-radius: 15px;
+  background: white;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.prestamo-item p {
+  margin: 8px 0;
+}
+
+.prestamo-item button {
+  margin-top: 10px;
+}
+
+.prestamos-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  width: 80%;
+  margin-top: 20px;
+}
+
+.prestamo-item:only-child {
+  grid-column: 1 / -1;
+  justify-self: center;
+  max-width: 440px;
+}
+
+/* =========================
+   ALERTAS DE SOLICITUD
+========================= */
+
+.alertas-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  width: 100%;
+  max-width: 900px;
+  margin: 20px auto 40px;
+  justify-items: center;
+}
+
+.alerta-item {
+  width: 100%;
+  max-width: 440px;
+  padding: 20px;
+  border: 2px solid #948e8e;
+  border-radius: 15px;
+  background: white;
+  box-sizing: border-box;
+}
+
+.alerta-item:only-child {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: 100%;
+  max-width: 440px;
+}
+
+.alerta-item p {
+  margin: 8px 0;
+}
+
+.prestamo-item .btn-primary {
+  display: block;
+  margin: 10px auto 0;
+  background: #26ff96;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* =========================
+   BÚSQUEDA DE MATERIALES
+========================= */
+
+.busqueda-materiales {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 30px;
+}
+
+.busqueda-materiales input {
+  width: 100%;
+  padding: 14px 20px 14px 50px;
+  border: 2px solid #000;
+  border-radius: 25px;
+  font-size: 16px;
+  box-sizing: border-box;
+  outline: none;
+  background: white;
+  color: black;
+}
+
+.busqueda-materiales input::placeholder {
+  color: #777;
+}
+
+.icono-busqueda {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  pointer-events: none;
+}
+
+/* =========================
+   TABLA DE USUARIOS
+========================= */
+
+.users-section {
+  padding: 40px;
+  text-align: center;
+  color: black;
+}
+
+.users-section h1 {
+  margin-bottom: 30px;
+  color: black;
+  position: relative;
+  top: -25px;
+}
+
+.users-section table {
+  width: 80%;
+  max-width: 900px;
+  margin: 0 auto;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.users-section th,
+.users-section td {
+  padding: 15px 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.users-section th {
+  background: #26ff96;
+  color: #000;
+  font-weight: bold;
+}
+
+.users-section tr:last-child td {
+  border-bottom: none;
+}
+
+.users-section tbody tr:hover {
+  background: #f2f2f2;
+}
+
+/* =========================
+   BOTÓN CERRAR SESIÓN
+========================= */
+
+.btn-logout {
+  background: #000;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-logout:hover {
+  opacity: 0.8;
+}
+
+/* =========================
+   MENSAJES DE STOCKIA
+========================= */
+
+.mensaje-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.mensaje-box {
+  width: 380px;
+  padding: 30px;
+  background: white;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.3);
+}
+
+.mensaje-box h2 {
+  margin-bottom: 15px;
+  color: black;
+}
+
+.mensaje-box p {
+  margin-bottom: 25px;
+  color: black;
+}
+
+.btn-mensaje {
+  padding: 10px 25px;
+  background: #26ff96;
+  color: black;
+  border: none;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-mensaje:hover {
+  opacity: 0.8;
+}
+
+/* =========================
+   BOTONES DE CONFIRMACIÓN
+========================= */
+
+.botones-confirmacion {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.btn-confirmar,
+.btn-cancelar {
+  padding: 10px 25px;
+  border: none;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-confirmar {
+  background: #26ff96;
+  color: black;
+}
+
+.btn-cancelar {
+  background: red;
+  color: black;
+}
+
+.btn-confirmar:hover,
+.btn-cancelar:hover {
+  opacity: 0.8;
+}
+
+/* =========================
+   CATEGORÍAS
+========================= */
+
+.categoria-section {
+  width: 100%;
+  max-width: 1200px;
+  margin: 40px auto;
+}
+
+.categoria-titulo {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  color: black;
+  border-bottom: 3px solid #26ff96;
+  text-align: left;
+  font-size: 24px;
+}
+
+/* =========================
+   REGISTRAR MATERIAL
+========================= */
+
+.btn-registrar-material {
+  display: block;
+  width: 220px;
+  margin: 25px auto 30px;
+  padding: 12px 20px;
+  background: #26ff96;
+  color: black;
+  border: none;
+  border-radius: 20px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+}
+
+/* =========================
+   EDITAR MATERIAL
+========================= */
+
+.card-body .btn-editar {
+  background: rgb(255, 153, 0);
+  color: black;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.card-body .btn-editar:hover {
+  opacity: 0.8;
+}
+
+/* =========================
+   BOTONES DE SOLICITUD
+========================= */
+
+.solicitud-box .btn-cancelar {
+  background: red;
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.solicitud-box .btn-cancelar:hover {
+  opacity: 0.8;
+}
+
+.solicitud-box .btn-primary {
+  width: 100%;
+  margin: 0;
+  padding: 11px 20px;
+  background: #26ff96;
+  color: black;
+  border: none;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.solicitud-box .btn-cancelar {
+  width: 100%;
+  margin: 0;
+  padding: 11px 20px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.solicitud-box .btn-primary:hover,
+.solicitud-box .btn-cancelar:hover {
+  opacity: 0.8;
+}
+
+/* =========================
+   BARRA DE FILTROS - PRODUCTOS
+========================= */
+
+.barra-filtros {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 15px;
+  width: 100%;
+  max-width: 1200px;
+  padding: 20px;
+  margin: 25px auto;
+  background: white;
+  border: 1px solid #e1e8e3;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+}
+
+.filtro-grupo {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 150px;
+  gap: 7px;
+}
+
+.filtro-grupo label {
+  color: #315443;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.filtro-grupo input,
+.filtro-grupo select {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px;
+  border: 1px solid #d6e2d9;
+  border-radius: 7px;
+  background: white;
+  color: #333;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.filtro-grupo input:focus,
+.filtro-grupo select:focus {
+  border-color: #0a4d25;
+  box-shadow: 0 0 0 2px rgba(10, 77, 37, 0.1);
+}
+
+.btn-limpiar-filtros {
+  min-height: 42px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 7px;
+  background: #0a4d25;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-limpiar-filtros:hover {
+  background: #063819;
+}
+
+.resultado-filtros {
+  width: 100%;
+  margin: 10px 0 20px;
+  color: #647568;
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .barra-filtros {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filtro-grupo {
+    width: 100%;
+  }
+
+  .btn-limpiar-filtros {
+    width: 100%;
+  }
+}

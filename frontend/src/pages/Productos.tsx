@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import Card from "../components/ui/Card";
 import Navbar from "../components/layout/Navbar";
@@ -26,27 +27,34 @@ interface Proveedor {
 }
 
 function Productos() {
+  // ==========================================
+  // 1. ESTADOS
+  // ==========================================
+
   const [materiales, setMateriales] = useState<Material[]>([]);
   const [cargando, setCargando] = useState(true);
-  const [busqueda, setBusqueda] = useState("");
 
-  // Estados para solicitar material
+  // Filtros
+  const [busqueda, setBusqueda] = useState("");
+  const [categoriaSeleccionada, setCategoriaSeleccionada] =
+    useState<number | "todas">("todas");
+  const [disponibilidad, setDisponibilidad] = useState("todas");
+  const [estadoStock, setEstadoStock] = useState("todos");
+  const [ordenamiento, setOrdenamiento] = useState("az");
+
+  // Préstamos
   const [cantidad, setCantidad] = useState(1);
   const [materialSeleccionado, setMaterialSeleccionado] =
     useState<Material | null>(null);
+  const [confirmarPrestamo, setConfirmarPrestamo] = useState(false);
 
-  // Estados para mensajes
+  // Mensajes
   const [mensaje, setMensaje] = useState("");
   const [tipoMensaje, setTipoMensaje] =
     useState<"exito" | "error">("exito");
 
-  // Confirmación del préstamo
-  const [confirmarPrestamo, setConfirmarPrestamo] = useState(false);
-
-  // Estados para registrar material
+  // Registro y edición
   const [mostrarRegistro, setMostrarRegistro] = useState(false);
-
-  // Estado para editar material
   const [materialEditando, setMaterialEditando] =
     useState<Material | null>(null);
 
@@ -54,7 +62,7 @@ function Productos() {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [proveedores, setProveedores] = useState<Proveedor[]>([]);
 
-  // Datos del nuevo material
+  // Formulario de nuevo material
   const [nuevoMaterial, setNuevoMaterial] = useState({
     nombre_material: "",
     descripcion_material: "",
@@ -64,7 +72,10 @@ function Productos() {
     cantidad: 0,
   });
 
-  // Obtener materiales
+  // ==========================================
+  // 2. OBTENER MATERIALES
+  // ==========================================
+
   useEffect(() => {
     const obtenerMateriales = async () => {
       try {
@@ -79,8 +90,11 @@ function Productos() {
           }
         );
 
-        const datos = await respuesta.json();
+        if (!respuesta.ok) {
+          throw new Error("No se pudieron obtener los materiales");
+        }
 
+        const datos = await respuesta.json();
         setMateriales(datos);
       } catch (error) {
         console.error("Error al obtener materiales:", error);
@@ -92,7 +106,10 @@ function Productos() {
     obtenerMateriales();
   }, []);
 
-  // Obtener categorías y proveedores
+  // ==========================================
+  // 3. OBTENER CATEGORÍAS Y PROVEEDORES
+  // ==========================================
+
   useEffect(() => {
     const obtenerDatosFormulario = async () => {
       try {
@@ -107,8 +124,11 @@ function Productos() {
           }
         );
 
-        const datosCategorias = await respuestaCategorias.json();
+        if (!respuestaCategorias.ok) {
+          throw new Error("No se pudieron obtener las categorías");
+        }
 
+        const datosCategorias = await respuestaCategorias.json();
         setCategorias(datosCategorias);
 
         const respuestaProveedores = await fetch(
@@ -120,8 +140,11 @@ function Productos() {
           }
         );
 
-        const datosProveedores = await respuestaProveedores.json();
+        if (!respuestaProveedores.ok) {
+          throw new Error("No se pudieron obtener los proveedores");
+        }
 
+        const datosProveedores = await respuestaProveedores.json();
         setProveedores(datosProveedores);
       } catch (error) {
         console.error(
@@ -134,11 +157,12 @@ function Productos() {
     obtenerDatosFormulario();
   }, []);
 
-  // Solicitar material
+  // ==========================================
+  // 4. SOLICITAR MATERIAL
+  // ==========================================
+
   const solicitarMaterial = async () => {
-    if (!materialSeleccionado) {
-      return;
-    }
+    if (!materialSeleccionado) return;
 
     const usuarioGuardado = localStorage.getItem("usuario");
 
@@ -148,9 +172,8 @@ function Productos() {
       return;
     }
 
-    const usuario = JSON.parse(usuarioGuardado);
-
     try {
+      const usuario = JSON.parse(usuarioGuardado);
       const token = localStorage.getItem("token");
 
       const respuesta = await fetch(
@@ -172,41 +195,41 @@ function Productos() {
       const datos = await respuesta.json();
 
       if (!respuesta.ok) {
-        setMensaje(datos.mensaje);
+        setMensaje(datos.mensaje || "No se pudo registrar el préstamo");
         setTipoMensaje("error");
         return;
       }
 
       setMensaje("Préstamo registrado correctamente");
       setTipoMensaje("exito");
-
       setMaterialSeleccionado(null);
       setCantidad(1);
 
       // Actualizar materiales
-      const tokenActualizado = localStorage.getItem("token");
-
-      const materialesActualizados = await fetch(
+      const respuestaMateriales = await fetch(
         "http://localhost:3000/api/materiales",
         {
           headers: {
-            Authorization: `Bearer ${tokenActualizado}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
-      const nuevosDatos = await materialesActualizados.json();
-
-      setMateriales(nuevosDatos);
+      if (respuestaMateriales.ok) {
+        const nuevosDatos = await respuestaMateriales.json();
+        setMateriales(nuevosDatos);
+      }
     } catch (error) {
-      console.error(error);
-
+      console.error("Error al solicitar material:", error);
       setMensaje("No se pudo registrar el préstamo");
       setTipoMensaje("error");
     }
   };
 
-  // Registrar material
+  // ==========================================
+  // 5. REGISTRAR MATERIAL
+  // ==========================================
+
   const registrarMaterial = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -221,8 +244,7 @@ function Productos() {
           },
           body: JSON.stringify({
             nombre_material: nuevoMaterial.nombre_material,
-            descripcion_material:
-              nuevoMaterial.descripcion_material,
+            descripcion_material: nuevoMaterial.descripcion_material,
             id_categoria: Number(nuevoMaterial.id_categoria),
             id_proveedor: Number(nuevoMaterial.id_proveedor),
             stock_minimo: nuevoMaterial.stock_minimo,
@@ -234,14 +256,13 @@ function Productos() {
       const datos = await respuesta.json();
 
       if (!respuesta.ok) {
-        setMensaje(datos.mensaje);
+        setMensaje(datos.mensaje || "No se pudo registrar el material");
         setTipoMensaje("error");
         return;
       }
 
       setMensaje("Material registrado correctamente");
       setTipoMensaje("exito");
-
       setMostrarRegistro(false);
 
       setNuevoMaterial({
@@ -253,7 +274,7 @@ function Productos() {
         cantidad: 0,
       });
 
-      // Actualizar lista de materiales
+      // Actualizar catálogo
       const respuestaMateriales = await fetch(
         "http://localhost:3000/api/materiales",
         {
@@ -263,23 +284,25 @@ function Productos() {
         }
       );
 
-      const materialesActualizados =
-        await respuestaMateriales.json();
+      if (respuestaMateriales.ok) {
+        const materialesActualizados =
+          await respuestaMateriales.json();
 
-      setMateriales(materialesActualizados);
+        setMateriales(materialesActualizados);
+      }
     } catch (error) {
-      console.error(error);
-
+      console.error("Error al registrar material:", error);
       setMensaje("No se pudo registrar el material");
       setTipoMensaje("error");
     }
   };
 
-  // Editar material
+  // ==========================================
+  // 6. EDITAR MATERIAL
+  // ==========================================
+
   const editarMaterial = async () => {
-    if (!materialEditando) {
-      return;
-    }
+    if (!materialEditando) return;
 
     try {
       const token = localStorage.getItem("token");
@@ -293,10 +316,8 @@ function Productos() {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            nombre_material:
-              materialEditando.nombre_material,
-            descripcion_material:
-              materialEditando.descripcion_material,
+            nombre_material: materialEditando.nombre_material,
+            descripcion_material: materialEditando.descripcion_material,
             id_categoria: materialEditando.id_categoria,
             stock_minimo: materialEditando.stock_minimo,
           }),
@@ -306,17 +327,16 @@ function Productos() {
       const datos = await respuesta.json();
 
       if (!respuesta.ok) {
-        setMensaje(datos.mensaje);
+        setMensaje(datos.mensaje || "No se pudo actualizar el material");
         setTipoMensaje("error");
         return;
       }
 
       setMensaje("Material actualizado correctamente");
       setTipoMensaje("exito");
-
       setMaterialEditando(null);
 
-      // Actualizar lista de materiales
+      // Actualizar catálogo
       const respuestaMateriales = await fetch(
         "http://localhost:3000/api/materiales",
         {
@@ -326,137 +346,176 @@ function Productos() {
         }
       );
 
-      const materialesActualizados =
-        await respuestaMateriales.json();
+      if (respuestaMateriales.ok) {
+        const materialesActualizados =
+          await respuestaMateriales.json();
 
-      setMateriales(materialesActualizados);
+        setMateriales(materialesActualizados);
+      }
     } catch (error) {
-      console.error(error);
-
+      console.error("Error al editar material:", error);
       setMensaje("No se pudo actualizar el material");
       setTipoMensaje("error");
     }
   };
 
+  // ==========================================
+  // 7. CARGA Y FILTROS
+  // ==========================================
+
   if (cargando) {
     return <p>Cargando materiales...</p>;
   }
 
-  // Filtrar materiales por búsqueda
-  const materialesFiltrados = materiales.filter((material) =>
-    material.nombre_material
-      .toLowerCase()
-      .includes(busqueda.toLowerCase())
-  );
+  // Aplicar todos los filtros
+  const materialesFiltrados = materiales
+    .filter((material) => {
+      const coincideBusqueda = material.nombre_material
+        .toLowerCase()
+        .includes(busqueda.toLowerCase());
+
+      const coincideCategoria =
+        categoriaSeleccionada === "todas" ||
+        material.id_categoria === categoriaSeleccionada;
+
+      const coincideDisponibilidad =
+        disponibilidad === "todas" ||
+        (disponibilidad === "disponible" &&
+          material.stock_actual > 0) ||
+        (disponibilidad === "agotado" &&
+          material.stock_actual === 0);
+
+      const coincideStock =
+        estadoStock === "todos" ||
+        (estadoStock === "bajo" &&
+          material.stock_actual > 0 &&
+          material.stock_actual <= material.stock_minimo) ||
+        (estadoStock === "normal" &&
+          material.stock_actual > material.stock_minimo) ||
+        (estadoStock === "agotado" &&
+          material.stock_actual === 0);
+
+      return (
+        coincideBusqueda &&
+        coincideCategoria &&
+        coincideDisponibilidad &&
+        coincideStock
+      );
+    })
+    .sort((a, b) => {
+      switch (ordenamiento) {
+        case "az":
+          return a.nombre_material.localeCompare(b.nombre_material);
+
+        case "za":
+          return b.nombre_material.localeCompare(a.nombre_material);
+
+        case "mayor":
+          return b.stock_actual - a.stock_actual;
+
+        case "menor":
+          return a.stock_actual - b.stock_actual;
+
+        default:
+          return 0;
+      }
+    });
 
   // Agrupar materiales por categoría
-  const materialesPorCategoria =
-    materialesFiltrados.reduce(
-      (categorias, material) => {
-        if (!categorias[material.nombre_categoria]) {
-          categorias[material.nombre_categoria] = [];
-        }
+  const materialesPorCategoria = materialesFiltrados.reduce(
+    (resultado, material) => {
+      if (!resultado[material.nombre_categoria]) {
+        resultado[material.nombre_categoria] = [];
+      }
 
-        categorias[material.nombre_categoria].push(material);
+      resultado[material.nombre_categoria].push(material);
+      return resultado;
+    },
+    {} as Record<string, Material[]>
+  );
 
-        return categorias;
-      },
-      {} as Record<string, Material[]>
-    );
+  // Identificar al Coordinador
+  const usuarioGuardado = localStorage.getItem("usuario");
+
+  const esCoordinador = usuarioGuardado
+    ? JSON.parse(usuarioGuardado).rol === "Coordinador"
+    : false;
+
+  // ==========================================
+  // 8. INTERFAZ
+  // ==========================================
 
   return (
     <div>
       <Navbar />
 
-      {/* Confirmación del préstamo */}
-      {confirmarPrestamo && (
-        <div className="mensaje-overlay">
-          <div className="mensaje-box">
-            <h2>Confirmar préstamo</h2>
+      <div className="products-section">
 
-            <p>
-              ¿Estás seguro de que quieres solicitar{" "}
-              <strong>{cantidad}</strong> unidad(es) de{" "}
-              <strong>
-                {materialSeleccionado?.nombre_material}
-              </strong>
-              ?
-            </p>
+        {/* Confirmación del préstamo */}
+        {confirmarPrestamo && (
+          <div className="mensaje-overlay">
+            <div className="mensaje-box">
+              <h2>Confirmar préstamo</h2>
 
-            <div className="botones-confirmacion">
+              <p>
+                ¿Estás seguro de que quieres solicitar{" "}
+                <strong>{cantidad}</strong> unidad(es) de{" "}
+                <strong>
+                  {materialSeleccionado?.nombre_material}
+                </strong>?
+              </p>
+
+              <div className="botones-confirmacion">
+                <button
+                  className="btn-confirmar"
+                  onClick={() => {
+                    setConfirmarPrestamo(false);
+                    solicitarMaterial();
+                  }}
+                >
+                  Confirmar
+                </button>
+
+                <button
+                  className="btn-cancelar"
+                  onClick={() => setConfirmarPrestamo(false)}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Mensaje de resultado */}
+        {mensaje && (
+          <div className="mensaje-overlay">
+            <div className={`mensaje-box ${tipoMensaje}`}>
+              <h2>
+                {tipoMensaje === "exito" ? "✓ ¡Listo!" : "⚠️ Error"}
+              </h2>
+
+              <p>{mensaje}</p>
+
               <button
-                className="btn-confirmar"
-                onClick={() => {
-                  setConfirmarPrestamo(false);
-                  solicitarMaterial();
-                }}
+                onClick={() => setMensaje("")}
+                className="btn-mensaje"
               >
-                Confirmar
-              </button>
-
-              <button
-                className="btn-cancelar"
-                onClick={() =>
-                  setConfirmarPrestamo(false)
-                }
-              >
-                Cancelar
+                Aceptar
               </button>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Mensaje de resultado */}
-      {mensaje && (
-        <div className="mensaje-overlay">
-          <div
-            className={`mensaje-box ${tipoMensaje}`}
-          >
-            <h2>
-              {tipoMensaje === "exito"
-                ? "✓ ¡Listo!"
-                : "⚠️ Error"}
-            </h2>
-
-            <p>{mensaje}</p>
-
-            <button
-              onClick={() => setMensaje("")}
-              className="btn-mensaje"
-            >
-              Aceptar
-            </button>
-          </div>
-        </div>
-      )}
-
-      <div className="products-section">
+        )}
 
         {/* Botón registrar material */}
-        {(() => {
-          const usuarioGuardado =
-            localStorage.getItem("usuario");
-
-          if (!usuarioGuardado) {
-            return null;
-          }
-
-          const usuario = JSON.parse(usuarioGuardado);
-
-          if (usuario.rol !== "Coordinador") {
-            return null;
-          }
-
-          return (
-            <button
-              className="btn btn-primary btn-registrar-material"
-              onClick={() => setMostrarRegistro(true)}
-            >
-              + Registrar material
-            </button>
-          );
-        })()}
+        {esCoordinador && (
+          <button
+            className="btn btn-primary btn-registrar-material"
+            onClick={() => setMostrarRegistro(true)}
+          >
+            + Registrar material
+          </button>
+        )}
 
         {/* Formulario para registrar material */}
         {mostrarRegistro && (
@@ -471,8 +530,7 @@ function Productos() {
                 onChange={(event) =>
                   setNuevoMaterial({
                     ...nuevoMaterial,
-                    nombre_material:
-                      event.target.value,
+                    nombre_material: event.target.value,
                   })
                 }
               />
@@ -482,14 +540,11 @@ function Productos() {
               Descripción:
               <input
                 type="text"
-                value={
-                  nuevoMaterial.descripcion_material
-                }
+                value={nuevoMaterial.descripcion_material}
                 onChange={(event) =>
                   setNuevoMaterial({
                     ...nuevoMaterial,
-                    descripcion_material:
-                      event.target.value,
+                    descripcion_material: event.target.value,
                   })
                 }
               />
@@ -502,14 +557,11 @@ function Productos() {
                 onChange={(event) =>
                   setNuevoMaterial({
                     ...nuevoMaterial,
-                    id_categoria:
-                      event.target.value,
+                    id_categoria: event.target.value,
                   })
                 }
               >
-                <option value="">
-                  Seleccionar categoría
-                </option>
+                <option value="">Seleccionar categoría</option>
 
                 {categorias.map((categoria) => (
                   <option
@@ -529,14 +581,11 @@ function Productos() {
                 onChange={(event) =>
                   setNuevoMaterial({
                     ...nuevoMaterial,
-                    id_proveedor:
-                      event.target.value,
+                    id_proveedor: event.target.value,
                   })
                 }
               >
-                <option value="">
-                  Seleccionar proveedor
-                </option>
+                <option value="">Seleccionar proveedor</option>
 
                 {proveedores.map((proveedor) => (
                   <option
@@ -558,9 +607,7 @@ function Productos() {
                 onChange={(event) =>
                   setNuevoMaterial({
                     ...nuevoMaterial,
-                    cantidad: Number(
-                      event.target.value
-                    ),
+                    cantidad: Number(event.target.value),
                   })
                 }
               />
@@ -575,9 +622,7 @@ function Productos() {
                 onChange={(event) =>
                   setNuevoMaterial({
                     ...nuevoMaterial,
-                    stock_minimo: Number(
-                      event.target.value
-                    ),
+                    stock_minimo: Number(event.target.value),
                   })
                 }
               />
@@ -592,9 +637,7 @@ function Productos() {
 
             <button
               className="btn btn-cancelar"
-              onClick={() =>
-                setMostrarRegistro(false)
-              }
+              onClick={() => setMostrarRegistro(false)}
             >
               Cancelar
             </button>
@@ -610,14 +653,11 @@ function Productos() {
               Nombre:
               <input
                 type="text"
-                value={
-                  materialEditando.nombre_material
-                }
+                value={materialEditando.nombre_material}
                 onChange={(event) =>
                   setMaterialEditando({
                     ...materialEditando,
-                    nombre_material:
-                      event.target.value,
+                    nombre_material: event.target.value,
                   })
                 }
               />
@@ -627,14 +667,11 @@ function Productos() {
               Descripción:
               <input
                 type="text"
-                value={
-                  materialEditando.descripcion_material
-                }
+                value={materialEditando.descripcion_material}
                 onChange={(event) =>
                   setMaterialEditando({
                     ...materialEditando,
-                    descripcion_material:
-                      event.target.value,
+                    descripcion_material: event.target.value,
                   })
                 }
               />
@@ -647,15 +684,11 @@ function Productos() {
                 onChange={(event) =>
                   setMaterialEditando({
                     ...materialEditando,
-                    id_categoria: Number(
-                      event.target.value
-                    ),
+                    id_categoria: Number(event.target.value),
                   })
                 }
               >
-                <option value="">
-                  Seleccionar categoría
-                </option>
+                <option value="">Seleccionar categoría</option>
 
                 {categorias.map((categoria) => (
                   <option
@@ -677,9 +710,7 @@ function Productos() {
                 onChange={(event) =>
                   setMaterialEditando({
                     ...materialEditando,
-                    stock_minimo: Number(
-                      event.target.value
-                    ),
+                    stock_minimo: Number(event.target.value),
                   })
                 }
               />
@@ -694,30 +725,123 @@ function Productos() {
 
             <button
               className="btn btn-cancelar"
-              onClick={() =>
-                setMaterialEditando(null)
-              }
+              onClick={() => setMaterialEditando(null)}
             >
               Cancelar
             </button>
           </div>
         )}
 
-        {/* Buscador */}
-        <div className="busqueda-materiales">
-          <span className="icono-busqueda">
-            🔍
-          </span>
+        {/* ==================================
+            BARRA ÚNICA DE FILTROS
+        ================================== */}
 
-          <input
-            type="text"
-            placeholder="Buscar material..."
-            value={busqueda}
-            onChange={(event) =>
-              setBusqueda(event.target.value)
-            }
-          />
+        <div className="barra-filtros">
+
+          <div className="filtro-grupo">
+            <label>Buscar material</label>
+
+            <input
+              type="text"
+              placeholder="Buscar por nombre..."
+              value={busqueda}
+              onChange={(event) => setBusqueda(event.target.value)}
+            />
+          </div>
+
+          <div className="filtro-grupo">
+            <label>Categoría</label>
+
+            <select
+              value={categoriaSeleccionada}
+              onChange={(event) =>
+                setCategoriaSeleccionada(
+                  event.target.value === "todas"
+                    ? "todas"
+                    : Number(event.target.value)
+                )
+              }
+            >
+              <option value="todas">Todas las categorías</option>
+
+              {categorias.map((categoria) => (
+                <option
+                  key={categoria.id_categoria}
+                  value={categoria.id_categoria}
+                >
+                  {categoria.nombre_categoria}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="filtro-grupo">
+            <label>Disponibilidad</label>
+
+            <select
+              value={disponibilidad}
+              onChange={(event) =>
+                setDisponibilidad(event.target.value)
+              }
+            >
+              <option value="todas">Todas</option>
+              <option value="disponible">Disponible</option>
+              <option value="agotado">Sin existencias</option>
+            </select>
+          </div>
+
+          <div className="filtro-grupo">
+            <label>Estado del stock</label>
+
+            <select
+              value={estadoStock}
+              onChange={(event) =>
+                setEstadoStock(event.target.value)
+              }
+            >
+              <option value="todos">Todos</option>
+              <option value="bajo">Stock bajo</option>
+              <option value="normal">Stock normal</option>
+              <option value="agotado">Agotado</option>
+            </select>
+          </div>
+
+          <div className="filtro-grupo">
+            <label>Ordenar por</label>
+
+            <select
+              value={ordenamiento}
+              onChange={(event) =>
+                setOrdenamiento(event.target.value)
+              }
+            >
+              <option value="az">Nombre A-Z</option>
+              <option value="za">Nombre Z-A</option>
+              <option value="mayor">Mayor stock</option>
+              <option value="menor">Menor stock</option>
+            </select>
+          </div>
+
+          <button
+            type="button"
+            className="btn-limpiar-filtros"
+            onClick={() => {
+              setBusqueda("");
+              setCategoriaSeleccionada("todas");
+              setDisponibilidad("todas");
+              setEstadoStock("todos");
+              setOrdenamiento("az");
+            }}
+          >
+            Limpiar filtros
+          </button>
+
         </div>
+
+        {/* Cantidad de resultados */}
+        <p className="resultado-filtros">
+          Se encontraron {materialesFiltrados.length} materiales
+        </p>
 
         {/* Solicitar material */}
         {materialSeleccionado && (
@@ -725,38 +849,41 @@ function Productos() {
             <h2>Solicitar</h2>
 
             <p>
-              <strong>
-                {materialSeleccionado.nombre_material}
-              </strong>
+              <strong>{materialSeleccionado.nombre_material}</strong>
             </p>
 
             <p>
-              Stock disponible:{" "}
-              {materialSeleccionado.stock_actual}
+              Stock disponible: {materialSeleccionado.stock_actual}
             </p>
 
             <label>
               Cantidad:
+
               <input
                 type="number"
                 min="1"
-                max={
-                  materialSeleccionado.stock_actual
-                }
+                max={materialSeleccionado.stock_actual}
                 value={cantidad}
                 onChange={(event) =>
-                  setCantidad(
-                    Number(event.target.value)
-                  )
+                  setCantidad(Number(event.target.value))
                 }
               />
             </label>
 
             <button
               className="btn btn-primary"
-              onClick={() =>
-                setConfirmarPrestamo(true)
-              }
+              onClick={() => {
+                if (
+                  cantidad < 1 ||
+                  cantidad > materialSeleccionado.stock_actual
+                ) {
+                  setMensaje("La cantidad solicitada no es válida");
+                  setTipoMensaje("error");
+                  return;
+                }
+
+                setConfirmarPrestamo(true);
+              }}
             >
               Confirmar préstamo
             </button>
@@ -773,116 +900,88 @@ function Productos() {
           </div>
         )}
 
-        {/* Materiales agrupados por categoría */}
-        <div>
-          {Object.entries(
-            materialesPorCategoria
-          ).map(
-            ([categoria, materialesCategoria]) => (
-              <section
-                key={categoria}
-                className="categoria-section"
-              >
-                <h2 className="categoria-titulo">
-                  {categoria}
-                </h2>
+        {/* ==================================
+            CATÁLOGO AGRUPADO POR CATEGORÍA
+        ================================== */}
 
-                <div className="card-grid">
-                  {materialesCategoria.map(
-                    (material) => (
+        <div>
+          {materialesFiltrados.length === 0 ? (
+            <p className="catalogo-sin-resultados">
+              No se encontraron materiales para los filtros seleccionados.
+            </p>
+          ) : (
+            Object.entries(materialesPorCategoria).map(
+              ([categoria, materialesCategoria]) => (
+                <section
+                  key={categoria}
+                  className="categoria-section"
+                >
+                  <h2 className="categoria-titulo">
+                    {categoria}
+                  </h2>
+
+                  <div className="card-grid">
+                    {materialesCategoria.map((material) => (
                       <Card
                         key={material.id_material}
-                        title={
-                          material.nombre_material
-                        }
+                        title={material.nombre_material}
                       >
                         <div className="card-body">
 
                           <p className="card-text">
-                            {
-                              material.descripcion_material
-                            }
+                            {material.descripcion_material}
                           </p>
 
                           <p className="card-text">
-                            <strong>
-                              Stock actual:
-                            </strong>{" "}
-                            {
-                              material.stock_actual
-                            }
+                            <strong>Stock actual:</strong>{" "}
+                            {material.stock_actual}
                           </p>
 
                           <p className="card-text">
-                            <strong>
-                              Stock mínimo:
-                            </strong>{" "}
-                            {
-                              material.stock_minimo
-                            }
+                            <strong>Stock mínimo:</strong>{" "}
+                            {material.stock_minimo}
                           </p>
 
-                          {material.stock_actual <=
-                            material.stock_minimo && (
+                          {material.stock_actual === 0 && (
                             <p className="card-text">
-                              ⚠️ Stock bajo
+                              Sin existencias
                             </p>
                           )}
 
+                          {material.stock_actual > 0 &&
+                            material.stock_actual <= material.stock_minimo && (
+                              <p className="card-text">
+                                Stock bajo
+                              </p>
+                            )}
+
                           <button
                             className="btn btn-primary"
+                            disabled={material.stock_actual <= 0}
                             onClick={() =>
-                              setMaterialSeleccionado(
-                                material
-                              )
+                              setMaterialSeleccionado(material)
                             }
                           >
                             Solicitar
                           </button>
 
-                          {/* Botón editar para Coordinador */}
-                          {(() => {
-                            const usuarioGuardado =
-                              localStorage.getItem(
-                                "usuario"
-                              );
-
-                            if (!usuarioGuardado) {
-                              return null;
-                            }
-
-                            const usuario =
-                              JSON.parse(
-                                usuarioGuardado
-                              );
-
-                            if (
-                              usuario.rol !==
-                              "Coordinador"
-                            ) {
-                              return null;
-                            }
-
-                            return (
-                              <button
-                                className="btn btn-editar"
-                                onClick={() =>
-                                  setMaterialEditando({
-                                    ...material,
-                                  })
-                                }
-                              >
-                                Editar
-                              </button>
-                            );
-                          })()}
+                          {esCoordinador && (
+                            <button
+                              className="btn btn-editar"
+                              onClick={() =>
+                                setMaterialEditando({ ...material })
+                              }
+                            >
+                              Editar
+                            </button>
+                          )}
 
                         </div>
                       </Card>
-                    )
-                  )}
-                </div>
-              </section>
+                    ))}
+                  </div>
+                </section>
+              )
             )
           )}
         </div>
