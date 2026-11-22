@@ -168,3 +168,27 @@
 .card-body .btn-editar:hover {
   opacity: 0.8;
 }
+
+/* Contenedor de acciones superiores del catálogo */
+.acciones-catalogo {
+  display: flex; /* Alinea los botones en fila. */
+  flex-wrap: wrap; /* Permite que bajen limpiamente en pantallas pequeñas. */
+  align-items: center; /* Centra verticalmente los botones. */
+  gap: 12px; /* Separación entre botones. */
+  margin-bottom: 16px; /* Separa de la barra de filtros. */
+}
+
+/* Botón de exportar a Excel */
+.btn-exportar-excel {
+  padding: 10px 18px; /* Espaciado interno cómodo. */
+  background: #0A4D25; /* Verde institucional coherente con Stockia. */
+  color: #ffffff; /* Texto blanco de alto contraste. */
+  border: none; /* Sin borde extra. */
+  border-radius: 20px; /* Bordes redondeados. */
+  font-weight: 600; /* Seminegrita. */
+  cursor: pointer; /* Cursor de mano. */
+}
+
+.btn-exportar-excel:hover {
+  background: #005729; /* Oscurece ligeramente al pasar el cursor. */
+}

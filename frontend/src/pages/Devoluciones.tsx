@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"; // Importa hooks de React para efectos secundarios y manejo de estado.
 import Navbar from "../components/layout/Navbar"; // Importa la barra de navegación superior.
+import { exportarAExcel } from "../utils/exportacion_excel"; // Importa la utilidad reutilizable para generar archivos .xlsx.
 import "../styles/prestamos.css"; // Importa los estilos de la grilla y tarjetas de préstamos.
 import "../styles/modales.css"; // Importa los estilos de los modales de confirmación y mensajes.
 
@@ -113,6 +114,34 @@ function Devoluciones() { // Declara el componente funcional Devoluciones.
   const prestamosMostrados = // Selecciona qué grupo mostrar según la vista elegida ("pendiente" o "devuelto").
     vistaEstado === "pendiente" ? prestamosPendientes : prestamosDevueltos; // Operador ternario para alternar entre ambos grupos.
 
+  const handleExportarExcel = () => { // Exporta únicamente los préstamos de la pestaña activa (pendientes o devueltos).
+    if (prestamosMostrados.length === 0) { // Si no hay registros en la pestaña actual...
+      setMensaje( // ...muestra un modal informativo de error.
+        vistaEstado === "pendiente"
+          ? "No hay préstamos pendientes para exportar."
+          : "No hay préstamos devueltos para exportar."
+      );
+      setTipoMensaje("error"); // Marca el modal como error.
+      return; // Detiene la exportación.
+    }
+
+    const filasExcel = prestamosMostrados.map((prestamo) => ({ // Formatea cada préstamo con encabezados legibles en español.
+      ID: prestamo.id_prestamo, // Identificador del préstamo.
+      Material: prestamo.nombre_material, // Nombre del material prestado.
+      Cantidad: prestamo.cantidad, // Unidades prestadas.
+      Estado: prestamo.estado, // Estado actual ("pendiente" o "devuelto").
+      "Fecha préstamo": prestamo.fecha_prestamo, // Fecha de registro del préstamo.
+      Usuario: prestamo.nombre_usuario, // Nombre del usuario asociado.
+    }));
+
+    const etiquetaEstado = vistaEstado === "pendiente" ? "pendientes" : "devueltos"; // Etiqueta para diferenciar el archivo descargado.
+    exportarAExcel( // Llama a la utilidad genérica de exportación.
+      filasExcel, // Datos formateados del grupo consultado.
+      `stockia_prestamos_${etiquetaEstado}`, // Nombre del archivo .xlsx según la pestaña activa.
+      vistaEstado === "pendiente" ? "Préstamos pendientes" : "Préstamos devueltos" // Nombre de la hoja dentro del libro.
+    );
+  };
+
   if (cargando) { // Mientras cargando sea true...
     return <p>Cargando devoluciones...</p>; // ...muestra un mensaje provisional de carga.
   }
@@ -172,7 +201,17 @@ function Devoluciones() { // Declara el componente funcional Devoluciones.
       )}
 
       <main className="products-section"> {/* Contenido principal de la página. */}
-        <h1>Mis devoluciones</h1> {/* Título principal de la sección. */}
+        <div className="prestamos-encabezado"> {/* Contenedor de título y botón de exportar. */}
+          <h1>Mis devoluciones</h1> {/* Título principal de la sección. */}
+
+          <button // Botón para exportar los préstamos de la pestaña actual a Excel.
+            type="button" // Evita envío accidental de formulario.
+            className="btn-exportar-prestamos" // Clase de estilo para el botón de Excel.
+            onClick={handleExportarExcel} // Dispara la exportación de prestamosMostrados.
+          >
+            Exportar a Excel
+          </button>
+        </div>
 
         <div className="prestamos-tabs" role="tablist" aria-label="Separación de préstamos"> {/* Contenedor de pestañas para separar préstamos. */}
           <button // Botón para ver únicamente préstamos pendientes.
