@@ -1,45 +1,864 @@
 
-/* =================================
-   STOCKIA - DASHBOARD
-   Alertas del inventario
-================================= */
+/* =========================================
+   STOCKIA - DASHBOARD RESPONSIVE
+========================================= */
 
-/* Distribución de las alertas */
-.alertas-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-
+.products-section.dashboard-section {
   width: 100%;
-  max-width: 900px;
-  margin: 20px auto 40px;
-
-  justify-items: center;
-}
-
-/* Tarjeta individual de alerta */
-.alerta-item {
-  width: 100%;
-  max-width: 440px;
-  padding: 20px;
-
-  border: 2px solid #948e8e;
-  border-radius: 15px;
-
-  background: var(--color-white);
+  max-width: none;
+  min-height: calc(100vh - 62px);
+  margin: 0;
+  padding: 20px 26px 30px;
+  background: linear-gradient(115deg, #f3f6f8, #eeedff);
+  text-align: left;
   box-sizing: border-box;
 }
 
-/* Cuando solamente existe una alerta */
-.alerta-item:only-child {
-  grid-column: 1 / -1;
-  justify-self: center;
+/* TITULOS */
 
-  width: 100%;
-  max-width: 440px;
+.products-section.dashboard-section h1,
+.products-section.dashboard-section h2,
+.products-section.dashboard-section h3 {
+  color: #102f40;
 }
 
-/* Separación de los textos */
-.alerta-item p {
-  margin: 8px 0;
+.products-section.dashboard-section h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 750;
+}
+
+.products-section.dashboard-section h2 {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.products-section.dashboard-section h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ENCABEZADO */
+
+.dashboard-encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.dashboard-saludo {
+  margin: 0 0 5px;
+  color: #31516b;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.btn-registrar-movimiento {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 25px;
+  background: #00552f;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-registrar-movimiento:hover {
+  background: #087343;
+}
+
+/* TITULOS DE SECCIONES */
+
+.dashboard-seccion-titulo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 14px;
+}
+
+.dashboard-alertas .dashboard-seccion-titulo {
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.contador-alertas {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 20px;
+  background: #fff1c9;
+  color: #8b5700;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* ALERTAS */
+
+.dashboard-alertas {
+  width: 100%;
+  margin: 0 0 24px;
+}
+
+.dashboard-section .alertas-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 270px));
+  justify-content: start;
+  align-items: stretch;
+  gap: 14px;
+  width: 100%;
+  margin: 15px 0 22px;
+}
+
+.dashboard-section .alerta-item {
+  width: 100%;
+  min-width: 0;
+  min-height: 155px;
+  padding: 14px;
+  background: #fff;
+  border: 1px solid #dce5ed;
+  border-radius: 13px;
+  box-shadow: 0 3px 10px rgba(20, 45, 65, 0.06);
+  box-sizing: border-box;
+}
+
+.alerta-encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.alerta-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  background: #fff2cc;
+  font-size: 15px;
+}
+
+.alerta-estado {
+  padding: 5px 9px;
+  border-radius: 20px;
+  background: #fff0c5;
+  color: #9a5b00;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.dashboard-section .alerta-item h3 {
+  margin: 0 0 3px;
+  color: #102f40;
+  font-size: 14px;
+}
+
+.alerta-datos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 12px 0;
+  padding: 10px;
+  background: #f7f9fb;
+  border: 1px solid #e1e8ef;
+  border-radius: 9px;
+}
+
+.alerta-datos p {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+}
+
+.alerta-datos strong {
+  color: #52677b;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.alerta-datos span {
+  color: #9a5b00;
+  font-size: 16px;
+  font-weight: 750;
+}
+
+.alerta-pie {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.alerta-mensaje {
+  margin: 0;
+  color: #31516b;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.btn-reponer {
+  flex-shrink: 0;
+  padding: 7px 13px;
+  border: 1px solid #dce5ed;
+  border-radius: 20px;
+  background: #fff;
+  color: #073b2e;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-reponer:hover {
+  background: #e7f4ec;
+  border-color: #087343;
+}
+
+.dashboard-vacio {
+  margin: 15px 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* PRESTAMOS */
+
+.dashboard-prestamos {
+  width: 100%;
+  margin: 24px 0 30px;
+}
+
+/* GRID RESPONSIVE DE PRESTAMOS */
+
+.dashboard-section .prestamos-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 270px));
+  justify-content: start;
+  align-items: stretch;
+  gap: 14px;
+  width: 100%;
+  margin: 15px 0 18px;
+}
+
+/* TARJETAS DE PRESTAMOS */
+
+.dashboard-section .prestamo-item {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  min-height: 153px;
+  padding: 13px;
+  background: #fff;
+  border: 1px solid #dce5ed;
+  border-radius: 13px;
+  box-shadow: 0 3px 10px rgba(20, 45, 65, 0.06);
+  box-sizing: border-box;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-section .prestamo-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(20, 45, 65, 0.10);
+}
+
+.prestamo-encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.prestamo-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+
+  border-radius: 50%;
+
+  background: #e6f4ec;
+  color: #087343;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ETIQUETA DE ESTADO */
+.prestamo-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  border-radius: 20px;
+  background: #eef2f7;
+  color: #28506d;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* PUNTO DE ESTADO */
+.prestamo-estado .estado-punto {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #d97706;
+}
+
+/* PENDIENTE: SOLO EL PUNTO NARANJA */
+.prestamo-estado.pendiente .estado-punto {
+  background: #d97706;
+}
+
+/* PUNTO VERDE PARA DEVUELTOS */
+.prestamo-estado.devuelto .estado-punto {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  min-width: 6px;
+  border-radius: 50%;
+  background-color: #16a765;
+}
+
+.dashboard-section .prestamo-item p {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin: 5px 0;
+  padding: 4px 0;
+  border-bottom: 1px solid #edf0f3;
+  color: #263746;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.dashboard-section .prestamo-item p strong {
+  color: #52677b;
+  font-weight: 500;
+}
+
+.dashboard-section .prestamo-item p:last-of-type {
+  border-bottom: none;
+}
+
+.btn-ver-detalle {
+  align-self: flex-end;
+  margin-top: auto;
+  padding: 7px 13px;
+  border: 1px solid #dce5ed;
+  border-radius: 20px;
+  background: #fff;
+  color: #073b2e;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-ver-detalle:hover {
+  background: #e7f4ec;
+}
+
+.btn-ver-todos,
+.btn-cargar-mas {
+  border: none;
+  background: transparent;
+  color: #00643c;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-ver-todos {
+  padding: 5px 9px;
+}
+
+.btn-cargar-mas {
+  display: block;
+  margin: 10px 0 20px auto;
+  padding: 8px 13px;
+}
+
+.btn-ver-todos:hover,
+.btn-cargar-mas:hover {
+  text-decoration: underline;
+}
+
+.prestamo-devolucion-confirmada {
+  display: inline-block;
+  margin-top: auto;
+  padding-top: 7px;
+  color: #087343;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* MODAL DE REPOSICION */
+
+.dashboard-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 30, 40, 0.55);
+  box-sizing: border-box;
+}
+
+.dashboard-modal {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+}
+
+.dashboard-modal-cerrar {
+  position: absolute;
+  top: 12px;
+  right: 15px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+.modal-icono-reponer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 45px;
+  margin-bottom: 12px;
+  border-radius: 13px;
+  background: #e6f4ec;
+  font-size: 22px;
+}
+
+.dashboard-modal h2 {
+  margin: 0 0 8px;
+  color: #102f40;
+  font-size: 22px;
+}
+
+.modal-material-nombre {
+  margin: 0 0 18px;
+  color: #52677b;
+  font-size: 14px;
+}
+
+.modal-stock-actual,
+.modal-stock-final {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: 9px;
+  background: #f2f6f8;
+  color: #52677b;
+  font-size: 13px;
+}
+
+.modal-stock-actual strong,
+.modal-stock-final strong {
+  color: #102f40;
+  font-size: 17px;
+}
+
+.dashboard-modal label {
+  display: block;
+  margin: 15px 0 7px;
+  color: #263746;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.dashboard-modal input,
+.dashboard-modal textarea {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #dce5ed;
+  border-radius: 9px;
+  outline: none;
+  background: #fff;
+  color: #263746;
+  font: inherit;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.dashboard-modal input:focus,
+.dashboard-modal textarea:focus {
+  border-color: #087343;
+  box-shadow: 0 0 0 3px rgba(8, 115, 67, 0.10);
+}
+
+.dashboard-modal textarea {
+  resize: vertical;
+}
+
+.modal-stock-final {
+  background: #e8f5ed;
+}
+
+.modal-botones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.btn-modal-cancelar,
+.btn-modal-confirmar {
+  padding: 10px 15px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-modal-cancelar {
+  border: 1px solid #dce5ed;
+  background: #fff;
+  color: #263746;
+}
+
+.btn-modal-confirmar {
+  border: none;
+  background: #00552f;
+  color: #fff;
+}
+
+.btn-modal-confirmar:hover {
+  background: #087343;
+}
+
+.btn-modal-cancelar:disabled,
+.btn-modal-confirmar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* MENSAJES */
+
+.dashboard-mensaje {
+  width: 100%;
+  max-width: 390px;
+  padding: 28px;
+  border-radius: 17px;
+  background: #fff;
+  text-align: center;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+  box-sizing: border-box;
+}
+
+.dashboard-mensaje h2 {
+  margin: 0 0 12px;
+  color: #102f40;
+  font-size: 22px;
+}
+
+.dashboard-mensaje p {
+  margin: 0 0 20px;
+  color: #52677b;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.dashboard-mensaje.error h2 {
+  color: #b45309;
+}
+
+.dashboard-mensaje button {
+  padding: 9px 22px;
+  border: none;
+  border-radius: 20px;
+  background: #00552f;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* =========================================
+   TABLET: DOS COLUMNAS
+========================================= */
+
+@media (max-width: 900px) {
+  .products-section.dashboard-section {
+    padding: 20px;
+  }
+
+  .dashboard-section .prestamos-grid,
+  .dashboard-section .alertas-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 554px;
+  }
+}
+
+/* =========================================
+   CELULAR: UNA COLUMNA
+========================================= */
+
+@media (max-width: 600px) {
+  .products-section.dashboard-section {
+    padding: 18px 14px 28px;
+  }
+
+  .dashboard-encabezado {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .products-section.dashboard-section h1 {
+    font-size: 24px;
+  }
+
+  .products-section.dashboard-section h2 {
+    font-size: 19px;
+  }
+
+  .btn-registrar-movimiento {
+    width: 100%;
+  }
+
+  .dashboard-section .alertas-grid,
+  .dashboard-section .prestamos-grid {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 100%;
+  }
+
+  .dashboard-section .alerta-item,
+  .dashboard-section .prestamo-item {
+    width: 100%;
+    max-width: none;
+  }
+
+  .dashboard-section .prestamo-item p {
+    overflow-wrap: anywhere;
+  }
+
+  .dashboard-seccion-titulo {
+    flex-wrap: wrap;
+  }
+
+  .dashboard-modal {
+    padding: 23px 18px;
+  }
+}
+
+/* CELULARES MUY PEQUEÑOS */
+
+@media (max-width: 380px) {
+  .products-section.dashboard-section {
+    padding: 15px 10px 25px;
+  }
+
+  .products-section.dashboard-section h1 {
+    font-size: 21px;
+  }
+
+  .products-section.dashboard-section h2 {
+    font-size: 17px;
+  }
+
+  .dashboard-section .prestamo-item,
+  .dashboard-section .alerta-item {
+    padding: 12px;
+  }
+
+  .alerta-datos {
+    gap: 6px;
+  }
+}
+
+
+/* TARJETAS DE ALERTAS */
+.dashboard-section .alertas-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  width: 100%;
+  margin: 15px 0 22px;
+}
+
+/* TARJETAS DE PRÉSTAMOS */
+.dashboard-section .prestamos-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  width: 100%;
+  margin: 15px 0 18px;
+}
+
+/* TABLET */
+@media (max-width: 900px) {
+  .dashboard-section .alertas-grid,
+  .dashboard-section .prestamos-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* CELULAR */
+@media (max-width: 600px) {
+  .dashboard-section .alertas-grid,
+  .dashboard-section .prestamos-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.dashboard-alertas h2 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.dashboard-alertas h2 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.dashboard-alertas h2 .icono-alerta-titulo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-size: 20px;
+  margin: 0;
+  position: relative;
+  top: -1px;
+  color: #c47b16;
+}
+
+
+/* =========================================
+   TITULO DE PRESTAMOS PENDIENTES
+========================================= */
+
+.dashboard-section .titulo-prestamos {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin: 0 0 14px;
+
+  color: #102f40;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.dashboard-section .icono-prestamos {
+  display: inline-block;
+  flex-shrink: 0;
+
+  width: 22px;
+  height: 22px;
+
+  color: #087343;
+  vertical-align: middle;
+}
+
+
+/* =========================================
+   INFORMACIÓN DE PRÉSTAMOS PENDIENTES
+========================================= */
+
+.dashboard-pendientes-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+
+  width: 100%;
+  padding: 8px 0 16px;
+
+  color: #52677b;
+  font-size: 11px;
+  box-sizing: border-box;
+}
+
+.dashboard-pendientes-info .btn-cargar-mas {
+  margin: 0;
+  padding: 5px 8px;
+
+  color: #00643c;
+  font-size: 11px;
+  font-weight: 700;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+/* =========================================
+   PIE DE PÁGINA
+========================================= */
+
+.dashboard-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+
+  width: 100%;
+  margin-top: 8px;
+  padding: 16px 0;
+
+  border-top: 1px solid #dce5ed;
+
+  color: #52677b;
+  font-size: 10px;
+  box-sizing: border-box;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 600px) {
+  .dashboard-pendientes-info {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .dashboard-footer {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
 }

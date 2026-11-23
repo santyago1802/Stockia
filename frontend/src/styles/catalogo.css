@@ -1,194 +1,548 @@
 
-/* =================================
+/* =========================================
    STOCKIA - CATÁLOGO DE MATERIALES
-================================= */
+   Diseño de referencia
+========================================= */
 
-/* Contenedor del catálogo */
+/* CONTENEDOR PRINCIPAL */
 .products-section {
   width: 100%;
-  padding: 40px;
+  min-height: calc(100vh - 62px);
+  padding: 24px 26px 55px;
 
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
 
-  color: var(--color-black);
-}
+  background: #f3f6fa;
+  color: #17334a;
 
-/* Buscador de materiales */
-.busqueda-materiales {
-  position: relative;
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto 30px;
-}
-
-.busqueda-materiales input {
-  width: 100%;
-  padding: 14px 20px 14px 50px;
-
-  border: 2px solid var(--color-black);
-  border-radius: 25px;
-
-  font-size: 16px;
   box-sizing: border-box;
+}
+
+/* =========================================
+   ACCIONES SUPERIORES
+========================================= */
+
+.acciones-catalogo {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+
+  width: 100%;
+  margin: 10px 0 20px;
+}
+
+.btn-registrar-material {
+  order: 2;
+  width: auto;
+  margin: 0;
+  padding: 10px 18px;
+
+  background: #075b35 !important;
+  color: #ffffff !important;
+
+  border: none;
+  border-radius: 22px;
+
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.btn-registrar-material:hover {
+  background: #064329 !important;
+}
+
+.btn-exportar-excel {
+  order: 1;
+  padding: 10px 17px;
+
+  background: #ffffff;
+  color: #17334a;
+
+  border: 1px solid #dce5ed;
+  border-radius: 22px;
+
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+
+  box-shadow: 0 1px 3px rgba(20, 45, 65, 0.04);
+}
+
+.btn-exportar-excel:hover {
+  background: #edf5f0;
+}
+
+/* =========================================
+   BARRA DE FILTROS
+========================================= */
+
+.barra-filtros {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+
+  width: 100%;
+  padding: 16px;
+
+  background: #ffffff;
+  border: 1px solid #dce5ed;
+  border-radius: 13px;
+
+  box-shadow: 0 2px 5px rgba(20, 45, 65, 0.04);
+  box-sizing: border-box;
+}
+
+.filtro-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.filtro-grupo label {
+  color: #263f59;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.filtro-grupo input,
+.filtro-grupo select {
+  width: 100%;
+  height: 35px;
+  padding: 0 12px;
+
+  background: #f8fafc;
+  color: #334b63;
+
+  border: 1px solid #dce5ed;
+  border-radius: 20px;
+
+  font-family: inherit;
+  font-size: 11px;
+
   outline: none;
-
-  background: var(--color-white);
-  color: var(--color-black);
+  box-sizing: border-box;
 }
 
-.busqueda-materiales input::placeholder {
-  color: #777;
+.filtro-grupo input:focus,
+.filtro-grupo select:focus {
+  border-color: #0b8050;
+  box-shadow: 0 0 0 2px rgba(11, 128, 80, 0.09);
 }
 
-.icono-busqueda {
-  position: absolute;
-  left: 18px;
-  top: 50%;
-  transform: translateY(-50%);
-
-  font-size: 18px;
-  pointer-events: none;
+.filtro-grupo input::placeholder {
+  color: #8291a3;
 }
 
-/* Secciones de categorías */
+/* =========================================
+   CONTADOR Y LIMPIAR FILTROS
+   AMBOS EN LA MISMA FILA
+========================================= */
+
+.filtros-footer {
+  grid-column: 1 / -1;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 38px;
+
+  padding-top: 10px;
+
+  border-top: 1px solid #e5eaf0;
+  box-sizing: border-box;
+}
+
+/* Contador a la izquierda */
+.filtros-footer .resultado-filtros {
+  flex: 1;
+  min-width: 0;
+
+  margin: 0;
+  padding: 0;
+
+  color: #536b83;
+  font-size: 11px;
+  text-align: left;
+}
+
+/* Botón Limpiar filtros a la derecha */
+.filtros-footer .btn-limpiar-filtros {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  flex: 0 0 auto;
+  width: auto;
+  min-width: max-content;
+
+  margin: 0;
+  padding: 5px 4px;
+
+  background: transparent;
+  color: #536b83;
+
+  border: none;
+  border-radius: 5px;
+
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 400;
+
+  text-align: right;
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+.filtros-footer .btn-limpiar-filtros:hover {
+  background: #f1f5f9;
+  color: #075b35;
+}
+
+/* =========================================
+   CATEGORÍAS
+========================================= */
+
 .categoria-section {
   width: 100%;
-  max-width: 1200px;
-  margin: 40px auto;
+  margin: 22px 0 24px;
 }
 
 .categoria-titulo {
-  margin-bottom: 20px;
-  padding-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 
-  color: var(--color-black);
-  border-bottom: 3px solid var(--color-primary);
+  margin: 0 0 12px;
+  padding: 0 0 10px;
+
+  color: #17334a;
+  border-bottom: 1px solid #dfe7ef;
 
   text-align: left;
-  font-size: 24px;
+  font-size: 17px;
+  font-weight: 700;
 }
 
-/* Distribución de tarjetas */
+/* =========================================
+   GRILLA DE MATERIALES
+========================================= */
+
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 25px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
 
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
+  margin: 0;
 
   justify-items: stretch;
 }
 
-/* Tarjeta individual */
+/* =========================================
+   TARJETAS
+========================================= */
+
 .card {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
   width: 100%;
-  max-width: 330px;
-  margin: 0 auto 20px;
-  padding: 20px;
+  max-width: none;
+  min-width: 0;
+  min-height: 150px;
 
-  background: var(--color-white);
-  border-radius: var(--radius-large);
+  margin: 0;
+  padding: 14px;
 
-  overflow: hidden;
-  text-align: center;
+  background: #ffffff;
+  border: 1px solid #dce5ed;
+  border-radius: 13px;
+
+  box-shadow: 0 2px 5px rgba(20, 45, 65, 0.04);
+
+  box-sizing: border-box;
+  text-align: left;
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(20, 45, 65, 0.08);
+}
+
+/* TÍTULO DEL MATERIAL */
+.card > h3 {
+  margin: 0 0 5px;
+
+  color: #17334a;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+}
+
+/* CONTENEDOR INTERNO DE CARD */
+.card > .card-body {
+  width: 100%;
+  padding: 0;
+
+  text-align: left;
   box-sizing: border-box;
 }
 
-/* Cuando solo existe una tarjeta */
-.card-grid .card:only-child {
+/* CONTENIDO INTERNO */
+.card-body > .card-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0 12px;
+
+  width: 100%;
+  padding: 0;
+
+  text-align: left;
+  box-sizing: border-box;
+}
+
+/* DESCRIPCIÓN */
+.card-body .card-text:first-child {
   grid-column: 1 / -1;
-  justify-self: center;
+
+  margin: 0 0 12px;
+
+  color: #536b83;
+  font-size: 11px;
 }
 
-/* Contenido de las tarjetas */
-.card-body {
-  width: 100%;
-  padding: 10px;
+/* BLOQUES DE STOCK */
+.card-body .card-text:nth-child(2),
+.card-body .card-text:nth-child(3) {
+  margin: 0;
+  padding: 10px 8px;
 
-  text-align: center;
+  background: #f5f8fb;
+  border: 1px solid #e2eaf1;
+
+  color: #17334a;
+  font-size: 11px;
   box-sizing: border-box;
 }
 
-/* Textos de los materiales */
-.card-body .card-text {
-  margin: 8px 0;
-  color: var(--color-text);
+.card-body .card-text:nth-child(2) {
+  border-radius: 9px 0 0 9px;
 }
 
-/* Botones de las tarjetas */
-.card-body button {
-  display: block;
-  margin: 15px auto 0;
-  padding: 10px 25px;
+.card-body .card-text:nth-child(3) {
+  border-radius: 0 9px 9px 0;
+}
 
-  background: var(--color-primary);
-  color: var(--color-black);
+/* ETIQUETAS DE STOCK */
+.card-body .card-text:nth-child(2) strong,
+.card-body .card-text:nth-child(3) strong {
+  display: block;
+  margin-bottom: 3px;
+
+  color: #536b83;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+/* ALERTAS DE STOCK */
+.card-body .card-text:nth-child(4) {
+  grid-column: 1 / -1;
+  margin: 8px 0 0;
+
+  color: #a35b12;
+  font-size: 11px;
+}
+
+/* =========================================
+   BOTONES EDITAR Y SOLICITAR
+========================================= */
+
+.card-body > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: auto;
+  margin: 10px 0 0;
+  padding: 6px 13px;
 
   border: none;
   border-radius: 20px;
 
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 650;
+
   cursor: pointer;
-  font-weight: bold;
-  transition: opacity 0.3s ease;
+  transition: background 0.2s ease;
 }
 
-.card-body button:hover {
-  opacity: 0.8;
+/* SOLICITAR */
+.card-body > button.btn-primary {
+  grid-column: 2;
+  grid-row: 3;
+
+  justify-self: end;
+
+  background: #075b35;
+  color: #ffffff;
 }
 
-/* Botón registrar material */
-.btn-registrar-material {
-  display: block;
-  width: 220px;
-  margin: 25px auto 30px;
-  padding: 12px 20px;
+.card-body > button.btn-primary:hover {
+  background: #064329;
+}
 
-  background: var(--color-primary);
-  color: var(--color-black);
+.card-body > button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
 
-  border: none;
-  border-radius: 20px;
+/* EDITAR */
+.card-body > button.btn-editar {
+  grid-column: 1;
+  grid-row: 3;
 
-  font-size: 15px;
-  font-weight: bold;
-  cursor: pointer;
+  justify-self: end;
+  margin-right: 4px;
+
+  background: #ffffff;
+  color: #17334a;
+
+  border: 1px solid #dce5ed;
+}
+
+.card-body > button.btn-editar:hover {
+  background: #edf5f0;
+}
+
+/* =========================================
+   MENSAJE SIN RESULTADOS
+========================================= */
+
+.catalogo-sin-resultados {
+  padding: 25px;
+
+  background: #ffffff;
+  border: 1px solid #dce5ed;
+  border-radius: 12px;
+
+  color: #64748b;
   text-align: center;
+  font-size: 13px;
 }
 
-/* Botón editar material */
-.card-body .btn-editar {
-  background: rgb(255, 153, 0);
-  color: var(--color-black);
+/* =========================================
+   FORMULARIOS Y SOLICITUDES
+========================================= */
+
+.solicitud-box {
+  width: 100%;
+  max-width: 650px;
+  margin: 15px auto;
+  padding: 22px;
+
+  background: #ffffff;
+  border: 1px solid #dce5ed;
+  border-radius: 13px;
+
+  box-shadow: 0 3px 10px rgba(20, 45, 65, 0.06);
+  box-sizing: border-box;
 }
 
-.card-body .btn-editar:hover {
-  opacity: 0.8;
+.solicitud-box h2 {
+  margin-top: 0;
+  color: #17334a;
+  font-size: 19px;
 }
 
-/* Contenedor de acciones superiores del catálogo */
-.acciones-catalogo {
-  display: flex; /* Alinea los botones en fila. */
-  flex-wrap: wrap; /* Permite que bajen limpiamente en pantallas pequeñas. */
-  align-items: center; /* Centra verticalmente los botones. */
-  gap: 12px; /* Separación entre botones. */
-  margin-bottom: 16px; /* Separa de la barra de filtros. */
+.solicitud-box label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+
+  margin: 12px 0;
+
+  color: #40536b;
+  font-size: 12px;
+  font-weight: 600;
 }
 
-/* Botón de exportar a Excel */
-.btn-exportar-excel {
-  padding: 10px 18px; /* Espaciado interno cómodo. */
-  background: #0A4D25; /* Verde institucional coherente con Stockia. */
-  color: #ffffff; /* Texto blanco de alto contraste. */
-  border: none; /* Sin borde extra. */
-  border-radius: 20px; /* Bordes redondeados. */
-  font-weight: 600; /* Seminegrita. */
-  cursor: pointer; /* Cursor de mano. */
+.solicitud-box input,
+.solicitud-box select {
+  width: 100%;
+  min-height: 38px;
+  padding: 9px 12px;
+
+  background: #ffffff;
+  border: 1px solid #d5dee8;
+  border-radius: 7px;
+
+  box-sizing: border-box;
 }
 
-.btn-exportar-excel:hover {
-  background: #005729; /* Oscurece ligeramente al pasar el cursor. */
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1000px) {
+  .barra-filtros {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 650px) {
+  .products-section {
+    padding: 18px 14px 35px;
+  }
+
+  .barra-filtros {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .acciones-catalogo {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 420px) {
+  .barra-filtros {
+    grid-template-columns: 1fr;
+  }
+
+  .acciones-catalogo {
+    justify-content: flex-start;
+  }
+
+  .filtros-footer {
+    gap: 8px;
+  }
+
+  .filtros-footer .resultado-filtros {
+    font-size: 10px;
+  }
+
+  .filtros-footer .btn-limpiar-filtros {
+    font-size: 10px;
+  }
 }

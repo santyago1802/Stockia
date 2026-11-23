@@ -1,20 +1,26 @@
 const express = require("express");
 
-const verificarToken = require("../middleware/auth.middleware");
 const verificarRol = require("../middleware/rol.middleware");
 
 const {
   obtenerUsuarios,
+  crearUsuario,
 } = require("../controllers/usuario.controller");
 
 const router = express.Router();
 
-// GET /api/usuarios
+// Consultar usuarios: solo Coordinador
 router.get(
   "/",
-  verificarToken,
   verificarRol("Coordinador"),
   obtenerUsuarios
+);
+
+// Crear usuarios: solo Coordinador
+router.post(
+  "/",
+  verificarRol("Coordinador"),
+  crearUsuario
 );
 
 module.exports = router;

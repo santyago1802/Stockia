@@ -6,6 +6,7 @@ import Usuarios from "../pages/Usuarios";
 import Productos from "../pages/Productos";
 import Homepages from "../pages/Homepages";
 import ProtectedRoute from "./ProtectedRoute";
+import Movimientos from "../pages/Movimientos";
 
 function AppRoutes() {
   return (
@@ -46,6 +47,15 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <Productos />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/movimientos"
+          element={
+            <ProtectedRoute rolPermitido="Coordinador">
+              <Movimientos />
             </ProtectedRoute>
           }
         />

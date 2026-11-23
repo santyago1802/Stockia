@@ -1,60 +1,388 @@
 
-/* =================================
-   STOCKIA - MÓDULO DE USUARIOS
-================================= */
+/* =========================================
+   STOCKIA - GESTIÓN DE USUARIOS
+   Diseño moderno institucional
+========================================= */
 
-/* Contenedor principal */
+/* CONTENEDOR PRINCIPAL */
 .users-section {
   width: 100%;
-  padding: 40px;
+  max-width: none;
+  min-height: calc(100vh - 62px);
+  margin: 0;
+  padding: 22px 26px 35px;
 
-  text-align: center;
-  color: var(--color-black);
+  background: linear-gradient(115deg, #f3f6f8, #eeedff);
+  color: #263746;
+
+  box-sizing: border-box;
 }
 
-/* Título */
+/* TEXTO SUPERIOR */
+.users-section::before {
+  content: "Usuarios registrados";
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: #1f2329;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* TÍTULO PRINCIPAL */
 .users-section h1 {
-  margin-bottom: 30px;
-  color: var(--color-black);
-  position: relative;
-  top: -25px;
+  margin: 0;
+
+  color: #102f40;
+  font-size: 25px;
+  font-weight: 750;
+  text-align: left;
 }
 
-/* Tabla */
-.users-section table {
-  width: 80%;
-  max-width: 900px;
-  margin: 0 auto;
+/* =========================================
+   BOTÓN REGISTRAR USUARIO
+========================================= */
 
-  border-collapse: collapse;
-  background: var(--color-white);
+.users-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 
-  border-radius: 15px;
+  margin: -30px 0 22px;
+}
+
+.btn-registrar-usuario {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  padding: 10px 17px;
+
+  background: #075b35;
+  color: #ffffff;
+
+  border: none;
+  border-radius: 22px;
+
+  font-size: 12px;
+  font-weight: 650;
+
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.btn-registrar-usuario:hover {
+  background: #064329;
+  transform: translateY(-1px);
+}
+
+/* =========================================
+   FORMULARIO DE REGISTRO
+========================================= */
+
+.users-form-section {
+  width: 100%;
+  margin: 20px 0 28px;
+  padding: 22px;
+
+  background: #ffffff;
+  border: 1px solid #dce5ed;
+  border-radius: 13px;
+
+  box-shadow: 0 3px 10px rgba(20, 45, 65, 0.06);
+  box-sizing: border-box;
+}
+
+.users-form-section h2 {
+  margin: 0 0 20px;
+
+  color: #102f40;
+  font-size: 19px;
+  text-align: left;
+}
+
+.users-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 17px;
+}
+
+.users-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.users-form-group label {
+  color: #40536b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.users-form-group input,
+.users-form-group select {
+  width: 100%;
+  min-height: 40px;
+  padding: 10px 12px;
+
+  background: #ffffff;
+  color: #263746;
+
+  border: 1px solid #d5dee8;
+  border-radius: 7px;
+
+  font-family: inherit;
+  font-size: 13px;
+
+  box-sizing: border-box;
+  outline: none;
+}
+
+.users-form-group input:focus,
+.users-form-group select:focus {
+  border-color: #087b49;
+  box-shadow: 0 0 0 3px rgba(8, 123, 73, 0.10);
+}
+
+.users-form-buttons {
+  grid-column: 1 / -1;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-top: 5px;
+}
+
+.users-form-buttons button {
+  padding: 10px 18px;
+
+  background: #075b35;
+  color: #ffffff;
+
+  border: none;
+  border-radius: 20px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.users-form-buttons button:hover {
+  background: #064329;
+}
+
+.users-form-buttons .btn-cancelar-usuario {
+  background: #edf0f5;
+  color: #40536b;
+}
+
+.users-form-buttons .btn-cancelar-usuario:hover {
+  background: #dfe5ed;
+}
+
+.users-form-buttons button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =========================================
+   MENSAJES
+========================================= */
+
+.mensaje-usuario {
+  padding: 12px 15px;
+  margin: 12px 0;
+
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.mensaje-usuario.exito {
+  background: #dcfce7;
+  color: #126b40;
+}
+
+.mensaje-usuario.error {
+  background: #fee2e2;
+  color: #a32020;
+}
+
+/* =========================================
+   TABLAS DE USUARIOS
+========================================= */
+
+.users-table-section {
+  width: 100%;
+  margin-top: 15px;
+}
+
+/* Ocultar título general duplicado */
+.users-table-section > h2 {
+  display: none;
+}
+
+/* GRUPOS: COORDINADORES E INSTRUCTORES */
+.grupo-usuarios {
+  width: 100%;
+  margin: 18px 0 25px;
+
+  overflow-x: auto;
+}
+
+/* TÍTULO DE CADA GRUPO */
+.grupo-usuarios h3 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  margin: 0 0 12px;
+  padding: 0;
+
+  color: #102f40;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: left;
+}
+
+/* TABLAS */
+.grupo-usuarios table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+
+  background: #ffffff;
+  border: 1px solid #dce5ed;
+  border-radius: 11px;
+
   overflow: hidden;
-
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 2px 7px rgba(20, 45, 65, 0.035);
 }
 
-/* Celdas */
-.users-section th,
-.users-section td {
-  padding: 15px 20px;
-  border-bottom: 1px solid #ddd;
+/* ENCABEZADOS */
+.grupo-usuarios table thead {
+  background: #f1f5f9;
 }
 
-/* Encabezados */
-.users-section th {
-  background: var(--color-primary);
-  color: var(--color-black);
-  font-weight: bold;
+.grupo-usuarios table th {
+  padding: 11px 15px;
+
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 650;
+  text-align: left;
+
+  border-bottom: 1px solid #e5eaf0;
 }
 
-/* Última fila */
-.users-section tr:last-child td {
+/* CELDAS */
+.grupo-usuarios table td {
+  padding: 10px 15px;
+
+  color: #263746;
+  font-size: 12px;
+  font-weight: 400;
+  text-align: left;
+
+  border-bottom: 1px solid #edf0f4;
+  white-space: nowrap;
+}
+
+/* FILAS */
+.grupo-usuarios table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.grupo-usuarios table tbody tr:hover {
+  background: #f5faf7;
+}
+
+/* ÚLTIMA FILA */
+.grupo-usuarios table tbody tr:last-child td {
   border-bottom: none;
 }
 
-/* Efecto al pasar el cursor */
-.users-section tbody tr:hover {
-  background: #f2f2f2;
+/* NOMBRE DEL USUARIO */
+.grupo-usuarios table td:first-child {
+  color: #173b32;
+  font-weight: 650;
+}
+
+/* DOCUMENTO */
+.grupo-usuarios table td:nth-child(3) {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* CORREO */
+.grupo-usuarios table td:nth-child(4) {
+  color: #53647c;
+}
+
+/* =========================================
+   ETIQUETAS DE ROLES
+========================================= */
+
+/* COORDINADOR */
+.grupo-usuarios:first-of-type table td:last-child {
+  color: #087b49;
+  font-weight: 600;
+}
+
+/* INSTRUCTOR */
+.grupo-usuarios:last-of-type table td:last-child {
+  color: #53647c;
+  font-weight: 600;
+}
+
+/* MENSAJES DE TABLA VACÍA */
+.grupo-usuarios table td[colspan] {
+  padding: 18px;
+  color: #64748b;
+  text-align: center;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 850px) {
+  .users-section {
+    padding: 20px 16px 30px;
+  }
+
+  .users-actions {
+    margin-top: 15px;
+  }
+
+  .grupo-usuarios table {
+    min-width: 650px;
+  }
+}
+
+@media (max-width: 600px) {
+  .users-section h1 {
+    font-size: 22px;
+  }
+
+  .users-form {
+    grid-template-columns: 1fr;
+  }
+
+  .users-form-buttons {
+    grid-column: 1;
+    flex-wrap: wrap;
+  }
+
+  .users-form-section {
+    padding: 16px;
+  }
+
+  .btn-registrar-usuario {
+    padding: 10px 14px;
+  }
 }

@@ -1,121 +1,123 @@
+
 import { useEffect, useState } from "react"; // Hooks de React para efectos secundarios y manejo de estado.
 import Card from "../components/ui/Card"; // Componente de tarjeta reutilizable para cada material.
 import Navbar from "../components/layout/Navbar"; // Barra de navegación superior.
+import Footer from "../components/layout/Footer"; // Pie de página reutilizable.
 import { exportarAExcel } from "../utils/exportacion_excel"; // Utilidad reutilizable para generar archivos .xlsx.
 import "../styles/catalogo.css"; // Estilos del catálogo, filtros y grilla de materiales.
 import "../styles/formularios.css"; // Estilos de formularios de registro, edición y solicitud.
 import "../styles/modales.css"; // Estilos de modales de confirmación y mensajes.
 
-interface Material { // Interfaz que describe la estructura de cada material devuelto por la API.
-  id_material: number; // Identificador único del material.
-  nombre_material: string; // Nombre del material.
-  descripcion_material: string; // Descripción del material.
-  id_categoria: number; // ID de la categoría asociada.
-  nombre_categoria: string; // Nombre de la categoría asociada.
-  stock_actual: number; // Unidades disponibles actualmente.
-  stock_minimo: number; // Umbral mínimo de stock permitido.
+interface Material {
+  id_material: number;
+  nombre_material: string;
+  descripcion_material: string;
+  id_categoria: number;
+  nombre_categoria: string;
+  stock_actual: number;
+  stock_minimo: number;
 }
 
-interface Categoria { // Interfaz para las categorías del catálogo.
-  id_categoria: number; // ID de la categoría.
-  nombre_categoria: string; // Nombre de la categoría.
+interface Categoria {
+  id_categoria: number;
+  nombre_categoria: string;
 }
 
-interface Proveedor { // Interfaz para los proveedores de materiales.
-  id_proveedor: number; // ID del proveedor.
-  nombre_proveedor: string; // Nombre del proveedor.
+interface Proveedor {
+  id_proveedor: number;
+  nombre_proveedor: string;
 }
 
-function Productos() { // Componente principal del catálogo y gestión de materiales.
+function Productos() {
   // ==========================================
   // 1. ESTADOS
   // ==========================================
 
-  const [materiales, setMateriales] = useState<Material[]>([]); // Lista completa de materiales cargados desde el backend.
-  const [cargando, setCargando] = useState(true); // Indica si se están consultando los materiales inicialmente.
+  const [materiales, setMateriales] = useState<Material[]>([]);
+  const [cargando, setCargando] = useState(true);
 
   // Filtros
-  const [busqueda, setBusqueda] = useState(""); // Texto de búsqueda por nombre de material.
-  const [categoriaSeleccionada, setCategoriaSeleccionada] = // Filtro por ID de categoría o "todas".
+  const [busqueda, setBusqueda] = useState("");
+  const [categoriaSeleccionada, setCategoriaSeleccionada] =
     useState<number | "todas">("todas");
-  const [disponibilidad, setDisponibilidad] = useState("todas"); // Filtro por disponibilidad ("todas", "disponible", "agotado").
-  const [estadoStock, setEstadoStock] = useState("todos"); // Filtro por nivel de stock ("todos", "bajo", "normal", "agotado").
-  const [ordenamiento, setOrdenamiento] = useState("az"); // Criterio de ordenamiento ("az", "za", "mayor", "menor").
+  const [disponibilidad, setDisponibilidad] = useState("todas");
+  const [estadoStock, setEstadoStock] = useState("todos");
+  const [ordenamiento, setOrdenamiento] = useState("az");
 
   // Préstamos
-  const [cantidad, setCantidad] = useState(1); // Cantidad de unidades solicitadas en préstamo.
-  const [materialSeleccionado, setMaterialSeleccionado] = // Material elegido para solicitar préstamo.
+  const [cantidad, setCantidad] = useState(1);
+  const [materialSeleccionado, setMaterialSeleccionado] =
     useState<Material | null>(null);
-  const [confirmarPrestamo, setConfirmarPrestamo] = useState(false); // Controla el modal de confirmación de préstamo.
+  const [confirmarPrestamo, setConfirmarPrestamo] = useState(false);
 
   // Mensajes
-  const [mensaje, setMensaje] = useState(""); // Texto del modal de resultado (éxito o error).
-  const [tipoMensaje, setTipoMensaje] = // Estilo del modal de mensaje ("exito" o "error").
+  const [mensaje, setMensaje] = useState("");
+  const [tipoMensaje, setTipoMensaje] =
     useState<"exito" | "error">("exito");
 
   // Registro y edición
-  const [mostrarRegistro, setMostrarRegistro] = useState(false); // Muestra u oculta el formulario de nuevo material.
-  const [materialEditando, setMaterialEditando] = // Guarda el material en edición o null si no se está editando.
+  const [mostrarRegistro, setMostrarRegistro] = useState(false);
+  const [materialEditando, setMaterialEditando] =
     useState<Material | null>(null);
 
   // Categorías y proveedores
-  const [categorias, setCategorias] = useState<Categoria[]>([]); // Catálogo de categorías para selects y filtros.
-  const [proveedores, setProveedores] = useState<Proveedor[]>([]); // Catálogo de proveedores para registro.
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [proveedores, setProveedores] = useState<Proveedor[]>([]);
 
   // Formulario de nuevo material
-  const [nuevoMaterial, setNuevoMaterial] = useState({ // Estado controlado del formulario de registro.
-    nombre_material: "", // Nombre inicial vacío.
-    descripcion_material: "", // Descripción inicial vacía.
-    id_categoria: "", // Categoría seleccionada como string hasta convertir a Number.
-    id_proveedor: "", // Proveedor seleccionado como string hasta convertir a Number.
-    stock_minimo: 0, // Stock mínimo inicial.
-    cantidad: 0, // Stock inicial.
+  const [nuevoMaterial, setNuevoMaterial] = useState({
+    nombre_material: "",
+    descripcion_material: "",
+    id_categoria: "",
+    id_proveedor: "",
+    stock_minimo: 0,
+    cantidad: 0,
   });
 
   // ==========================================
   // 2. OBTENER MATERIALES
   // ==========================================
 
-  useEffect(() => { // Carga los materiales al montar el componente.
-    const obtenerMateriales = async () => { // Función asíncrona para consultar /api/materiales.
+  useEffect(() => {
+    const obtenerMateriales = async () => {
       try {
-        const token = localStorage.getItem("token"); // Recupera el token JWT guardado.
+        const token = localStorage.getItem("token");
 
-        const respuesta = await fetch( // Petición GET protegida por token.
+        const respuesta = await fetch(
           "http://localhost:3000/api/materiales",
           {
             headers: {
-              Authorization: `Bearer ${token}`, // Envía autorización Bearer.
+              Authorization: `Bearer ${token}`,
             },
           }
         );
 
-        if (!respuesta.ok) { // Verifica respuesta exitosa.
+        if (!respuesta.ok) {
           throw new Error("No se pudieron obtener los materiales");
         }
 
-        const datos = await respuesta.json(); // Parsea el arreglo de materiales.
-        setMateriales(datos); // Guarda los materiales en estado.
+        const datos = await respuesta.json();
+        setMateriales(datos);
       } catch (error) {
-        console.error("Error al obtener materiales:", error); // Registra error en consola.
+        console.error("Error al obtener materiales:", error);
       } finally {
-        setCargando(false); // Finaliza el estado de carga.
+        setCargando(false);
       }
     };
 
-    obtenerMateriales(); // Ejecuta la consulta inicial.
-  }, []); // Solo al montar.
+    obtenerMateriales();
+  }, []);
 
   // ==========================================
   // 3. OBTENER CATEGORÍAS Y PROVEEDORES
   // ==========================================
 
-  useEffect(() => { // Carga categorías y proveedores al montar.
-    const obtenerDatosFormulario = async () => { // Consulta ambos catálogos en paralelo lógico.
+  useEffect(() => {
+    const obtenerDatosFormulario = async () => {
       try {
-        const token = localStorage.getItem("token"); // Token JWT.
+        const token = localStorage.getItem("token");
 
-        const respuestaCategorias = await fetch( // Consulta /api/categorias.
+        const respuestaCategorias = await fetch(
           "http://localhost:3000/api/categorias",
           {
             headers: {
@@ -128,10 +130,10 @@ function Productos() { // Componente principal del catálogo y gestión de mater
           throw new Error("No se pudieron obtener las categorías");
         }
 
-        const datosCategorias = await respuestaCategorias.json(); // Parsea categorías.
-        setCategorias(datosCategorias); // Guarda categorías.
+        const datosCategorias = await respuestaCategorias.json();
+        setCategorias(datosCategorias);
 
-        const respuestaProveedores = await fetch( // Consulta /api/proveedores.
+        const respuestaProveedores = await fetch(
           "http://localhost:3000/api/proveedores",
           {
             headers: {
@@ -144,8 +146,8 @@ function Productos() { // Componente principal del catálogo y gestión de mater
           throw new Error("No se pudieron obtener los proveedores");
         }
 
-        const datosProveedores = await respuestaProveedores.json(); // Parsea proveedores.
-        setProveedores(datosProveedores); // Guarda proveedores.
+        const datosProveedores = await respuestaProveedores.json();
+        setProveedores(datosProveedores);
       } catch (error) {
         console.error(
           "Error al obtener categorías y proveedores:",
@@ -154,29 +156,29 @@ function Productos() { // Componente principal del catálogo y gestión de mater
       }
     };
 
-    obtenerDatosFormulario(); // Ejecuta carga de catálogos.
-  }, []); // Solo al montar.
+    obtenerDatosFormulario();
+  }, []);
 
   // ==========================================
   // 4. SOLICITAR MATERIAL
   // ==========================================
 
-  const solicitarMaterial = async () => { // Registra un préstamo del material seleccionado.
-    if (!materialSeleccionado) return; // Evita ejecutar si no hay material seleccionado.
+  const solicitarMaterial = async () => {
+    if (!materialSeleccionado) return;
 
-    const usuarioGuardado = localStorage.getItem("usuario"); // Lee usuario de localStorage.
+    const usuarioGuardado = localStorage.getItem("usuario");
 
-    if (!usuarioGuardado) { // Si no hay sesión activa...
-      setMensaje("Debes iniciar sesión"); // ...muestra aviso.
+    if (!usuarioGuardado) {
+      setMensaje("Debes iniciar sesión");
       setTipoMensaje("error");
       return;
     }
 
     try {
-      const usuario = JSON.parse(usuarioGuardado); // Parsea datos del usuario.
-      const token = localStorage.getItem("token"); // Token JWT.
+      const usuario = JSON.parse(usuarioGuardado);
+      const token = localStorage.getItem("token");
 
-      const respuesta = await fetch( // Envía POST a /api/prestamos.
+      const respuesta = await fetch(
         "http://localhost:3000/api/prestamos",
         {
           method: "POST",
@@ -185,14 +187,14 @@ function Productos() { // Componente principal del catálogo y gestión de mater
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            id_usuario: usuario.id_usuario, // ID del usuario que solicita.
-            id_material: materialSeleccionado.id_material, // ID del material.
-            cantidad: cantidad, // Cantidad solicitada.
+            id_usuario: usuario.id_usuario,
+            id_material: materialSeleccionado.id_material,
+            cantidad: cantidad,
           }),
         }
       );
 
-      const datos = await respuesta.json(); // Lee respuesta del backend.
+      const datos = await respuesta.json();
 
       if (!respuesta.ok) {
         setMensaje(datos.mensaje || "No se pudo registrar el préstamo");
@@ -200,13 +202,13 @@ function Productos() { // Componente principal del catálogo y gestión de mater
         return;
       }
 
-      setMensaje("Préstamo registrado correctamente"); // Confirma préstamo.
+      setMensaje("Préstamo registrado correctamente");
       setTipoMensaje("exito");
-      setMaterialSeleccionado(null); // Cierra caja de solicitud.
-      setCantidad(1); // Reinicia cantidad.
+      setMaterialSeleccionado(null);
+      setCantidad(1);
 
       // Actualizar materiales
-      const respuestaMateriales = await fetch( // Refresca el stock actual mostrado en pantalla.
+      const respuestaMateriales = await fetch(
         "http://localhost:3000/api/materiales",
         {
           headers: {
@@ -230,11 +232,11 @@ function Productos() { // Componente principal del catálogo y gestión de mater
   // 5. REGISTRAR MATERIAL
   // ==========================================
 
-  const registrarMaterial = async () => { // Crea un nuevo material en el backend.
+  const registrarMaterial = async () => {
     try {
-      const token = localStorage.getItem("token"); // Token JWT.
+      const token = localStorage.getItem("token");
 
-      const respuesta = await fetch( // Envía POST a /api/materiales.
+      const respuesta = await fetch(
         "http://localhost:3000/api/materiales",
         {
           method: "POST",
@@ -253,7 +255,7 @@ function Productos() { // Componente principal del catálogo y gestión de mater
         }
       );
 
-      const datos = await respuesta.json(); // Lee respuesta.
+      const datos = await respuesta.json();
 
       if (!respuesta.ok) {
         setMensaje(datos.mensaje || "No se pudo registrar el material");
@@ -263,9 +265,9 @@ function Productos() { // Componente principal del catálogo y gestión de mater
 
       setMensaje("Material registrado correctamente");
       setTipoMensaje("exito");
-      setMostrarRegistro(false); // Cierra formulario de registro.
+      setMostrarRegistro(false);
 
-      setNuevoMaterial({ // Limpia campos del formulario.
+      setNuevoMaterial({
         nombre_material: "",
         descripcion_material: "",
         id_categoria: "",
@@ -275,7 +277,7 @@ function Productos() { // Componente principal del catálogo y gestión de mater
       });
 
       // Actualizar catálogo
-      const respuestaMateriales = await fetch( // Recarga catálogo actualizado.
+      const respuestaMateriales = await fetch(
         "http://localhost:3000/api/materiales",
         {
           headers: {
@@ -301,13 +303,13 @@ function Productos() { // Componente principal del catálogo y gestión de mater
   // 6. EDITAR MATERIAL
   // ==========================================
 
-  const editarMaterial = async () => { // Actualiza un material existente.
-    if (!materialEditando) return; // Sale si no hay material en edición.
+  const editarMaterial = async () => {
+    if (!materialEditando) return;
 
     try {
-      const token = localStorage.getItem("token"); // Token JWT.
+      const token = localStorage.getItem("token");
 
-      const respuesta = await fetch( // Envía PUT a /api/materiales/:id.
+      const respuesta = await fetch(
         `http://localhost:3000/api/materiales/${materialEditando.id_material}`,
         {
           method: "PUT",
@@ -324,7 +326,7 @@ function Productos() { // Componente principal del catálogo y gestión de mater
         }
       );
 
-      const datos = await respuesta.json(); // Lee respuesta.
+      const datos = await respuesta.json();
 
       if (!respuesta.ok) {
         setMensaje(datos.mensaje || "No se pudo actualizar el material");
@@ -334,10 +336,10 @@ function Productos() { // Componente principal del catálogo y gestión de mater
 
       setMensaje("Material actualizado correctamente");
       setTipoMensaje("exito");
-      setMaterialEditando(null); // Cierra formulario de edición.
+      setMaterialEditando(null);
 
       // Actualizar catálogo
-      const respuestaMateriales = await fetch( // Recarga catálogo.
+      const respuestaMateriales = await fetch(
         "http://localhost:3000/api/materiales",
         {
           headers: {
@@ -363,12 +365,12 @@ function Productos() { // Componente principal del catálogo y gestión de mater
   // 7. CARGA Y FILTROS
   // ==========================================
 
-  if (cargando) { // Muestra estado de carga inicial.
+  if (cargando) {
     return <p>Cargando materiales...</p>;
   }
 
   // Aplicar todos los filtros
-  const materialesFiltrados = materiales // Filtra y ordena los materiales según los controles activos.
+  const materialesFiltrados = materiales
     .filter((material) => {
       const coincideBusqueda = material.nombre_material
         .toLowerCase()
@@ -402,7 +404,7 @@ function Productos() { // Componente principal del catálogo y gestión de mater
         coincideStock
       );
     })
-    .sort((a, b) => { // Ordena los resultados filtrados según ordenamiento.
+    .sort((a, b) => {
       switch (ordenamiento) {
         case "az":
           return a.nombre_material.localeCompare(b.nombre_material);
@@ -422,15 +424,16 @@ function Productos() { // Componente principal del catálogo y gestión de mater
     });
 
   // Exportar materiales filtrados/consultados a Excel
-  const handleExportarExcel = () => { // Prepara los datos consultados y dispara la descarga .xlsx.
-    if (materialesFiltrados.length === 0) { // Si no hay materiales que coincidan con los filtros...
-      setMensaje("No hay materiales para exportar con los filtros actuales."); // ...avisa al usuario.
+  const handleExportarExcel = () => {
+    if (materialesFiltrados.length === 0) {
+      setMensaje("No hay materiales para exportar con los filtros actuales.");
       setTipoMensaje("error");
       return;
     }
 
-    const filasExcel = materialesFiltrados.map((material) => { // Formatea cada material con columnas legibles.
+    const filasExcel = materialesFiltrados.map((material) => {
       let estado = "Stock normal";
+
       if (material.stock_actual === 0) {
         estado = "Agotado";
       } else if (material.stock_actual <= material.stock_minimo) {
@@ -448,11 +451,11 @@ function Productos() { // Componente principal del catálogo y gestión de mater
       };
     });
 
-    exportarAExcel(filasExcel, "stockia_materiales", "Materiales"); // Genera y descarga stockia_materiales.xlsx.
+    exportarAExcel(filasExcel, "stockia_materiales", "Materiales");
   };
 
   // Agrupar materiales por categoría
-  const materialesPorCategoria = materialesFiltrados.reduce( // Agrupa los materiales filtrados por nombre_categoria.
+  const materialesPorCategoria = materialesFiltrados.reduce(
     (resultado, material) => {
       if (!resultado[material.nombre_categoria]) {
         resultado[material.nombre_categoria] = [];
@@ -465,9 +468,9 @@ function Productos() { // Componente principal del catálogo y gestión de mater
   );
 
   // Identificar al Coordinador
-  const usuarioGuardado = localStorage.getItem("usuario"); // Obtiene usuario guardado para verificar rol.
+  const usuarioGuardado = localStorage.getItem("usuario");
 
-  const esCoordinador = usuarioGuardado // Determina si el usuario actual tiene rol Coordinador.
+  const esCoordinador = usuarioGuardado
     ? JSON.parse(usuarioGuardado).rol === "Coordinador"
     : false;
 
@@ -476,10 +479,10 @@ function Productos() { // Componente principal del catálogo y gestión de mater
   // ==========================================
 
   return (
-    <div>
-      <Navbar /> {/* Barra de navegación superior. */}
+    <div className="pagina-con-footer">
+      <Navbar />
 
-      <div className="products-section"> {/* Contenedor principal de la sección. */}
+      <div className="products-section">
 
         {/* Confirmación del préstamo */}
         {confirmarPrestamo && (
@@ -538,7 +541,7 @@ function Productos() { // Componente principal del catálogo y gestión de mater
         )}
 
         {/* Acciones superiores: registrar material y exportar a Excel */}
-        <div className="acciones-catalogo"> {/* Contenedor de botones superiores. */}
+        <div className="acciones-catalogo">
           {esCoordinador && (
             <button
               className="btn btn-primary btn-registrar-material"
@@ -862,26 +865,30 @@ function Productos() { // Componente principal del catálogo y gestión de mater
             </select>
           </div>
 
-          <button
-            type="button"
-            className="btn-limpiar-filtros"
-            onClick={() => {
-              setBusqueda("");
-              setCategoriaSeleccionada("todas");
-              setDisponibilidad("todas");
-              setEstadoStock("todos");
-              setOrdenamiento("az");
-            }}
-          >
-            Limpiar filtros
-          </button>
+          {/* Contador y botón dentro del mismo recuadro */}
+          <div className="filtros-footer">
+
+            <div className="resultado-filtros">
+              Se encontraron {materialesFiltrados.length} materiales
+            </div>
+
+            <button
+              type="button"
+              className="btn-limpiar-filtros"
+              onClick={() => {
+                setBusqueda("");
+                setCategoriaSeleccionada("todas");
+                setDisponibilidad("todas");
+                setEstadoStock("todos");
+                setOrdenamiento("az");
+              }}
+            >
+              Limpiar filtros
+            </button>
+
+          </div>
 
         </div>
-
-        {/* Cantidad de resultados */}
-        <p className="resultado-filtros">
-          Se encontraron {materialesFiltrados.length} materiales
-        </p>
 
         {/* Solicitar material */}
         {materialSeleccionado && (
@@ -1026,6 +1033,9 @@ function Productos() { // Componente principal del catálogo y gestión de mater
           )}
         </div>
       </div>
+
+      {/* PIE DE PÁGINA STOCKIA */}
+      <Footer />
     </div>
   );
 }

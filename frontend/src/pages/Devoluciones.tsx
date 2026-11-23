@@ -1,178 +1,192 @@
-import { useEffect, useState } from "react"; // Importa hooks de React para efectos secundarios y manejo de estado.
-import Navbar from "../components/layout/Navbar"; // Importa la barra de navegación superior.
-import { exportarAExcel } from "../utils/exportacion_excel"; // Importa la utilidad reutilizable para generar archivos .xlsx.
-import "../styles/prestamos.css"; // Importa los estilos de la grilla y tarjetas de préstamos.
-import "../styles/modales.css"; // Importa los estilos de los modales de confirmación y mensajes.
 
-export type EstadoPrestamo = "pendiente" | "devuelto"; // Tipo unión que restringe los estados válidos a "pendiente" o "devuelto".
+import { useEffect, useState } from "react";
+import Navbar from "../components/layout/Navbar";
+import Footer from "../components/layout/Footer";
+import { exportarAExcel } from "../utils/exportacion_excel";
+import "../styles/prestamos.css";
+import "../styles/modales.css";
 
-interface Prestamo { // Interfaz TypeScript que define la forma de cada objeto préstamo recibido de la API.
-  id_prestamo: number; // Identificador numérico único del préstamo.
-  id_usuario: number; // Identificador del usuario que realizó el préstamo.
-  nombre_usuario: string; // Nombre del usuario asociado al préstamo.
-  fecha_prestamo: string; // Fecha en que se registró el préstamo.
-  estado: EstadoPrestamo | string; // Estado del préstamo (tipado para "pendiente" | "devuelto" con respaldo string).
-  id_material: number; // Identificador del material prestado.
-  nombre_material: string; // Nombre del material prestado.
-  cantidad: number; // Cantidad de unidades prestadas.
+export type EstadoPrestamo = "pendiente" | "devuelto";
+
+interface Prestamo {
+  id_prestamo: number;
+  id_usuario: number;
+  nombre_usuario: string;
+  fecha_prestamo: string;
+  estado: EstadoPrestamo | string;
+  id_material: number;
+  nombre_material: string;
+  cantidad: number;
 }
 
-interface UsuarioLocal { // Interfaz TypeScript para tipar el objeto usuario guardado en localStorage.
-  id_usuario: number; // ID del usuario autenticado para filtrar solo sus préstamos.
+interface UsuarioLocal {
+  id_usuario: number;
 }
 
-function Devoluciones() { // Declara el componente funcional Devoluciones.
-  const [prestamos, setPrestamos] = useState<Prestamo[]>([]); // Guarda todos los préstamos del usuario actual (pendientes y devueltos).
-  const [vistaEstado, setVistaEstado] = useState<EstadoPrestamo>("pendiente"); // Controla qué grupo se consulta: "pendiente" o "devuelto".
-  const [cargando, setCargando] = useState(true); // Indica si se están cargando los préstamos desde el backend.
-  const [mensaje, setMensaje] = useState(""); // Guarda el texto del modal de resultado (éxito o error).
-  const [tipoMensaje, setTipoMensaje] = useState<"exito" | "error">("exito"); // Tipa el estilo del modal como "exito" o "error".
-  const [prestamoADevolver, setPrestamoADevolver] = useState<number | null>( // Guarda el id del préstamo a confirmar devolución o null si no hay modal abierto.
-    null // Valor inicial nulo.
-  );
+function Devoluciones() {
+  const [prestamos, setPrestamos] = useState<Prestamo[]>([]);
+  const [vistaEstado, setVistaEstado] =
+    useState<EstadoPrestamo>("pendiente");
+  const [cargando, setCargando] = useState(true);
+  const [mensaje, setMensaje] = useState("");
+  const [tipoMensaje, setTipoMensaje] =
+    useState<"exito" | "error">("exito");
+  const [prestamoADevolver, setPrestamoADevolver] =
+    useState<number | null>(null);
 
-  const obtenerPrestamos = async () => { // Función asíncrona que consulta los préstamos en la API.
-    try { // Intenta realizar la petición y filtrar los registros.
-      const token = localStorage.getItem("token"); // Obtiene el token JWT guardado en localStorage.
+  const obtenerPrestamos = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-      const respuesta = await fetch( // Llama al endpoint GET de préstamos.
-        "http://localhost:3000/api/prestamos", // URL del backend para listar préstamos.
-        { // Opciones de configuración de fetch.
-          headers: { // Encabezados HTTP de la petición.
-            Authorization: `Bearer ${token}`, // Envía el token de autenticación en formato Bearer.
+      const respuesta = await fetch(
+        "http://localhost:3000/api/prestamos",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
-      const datos: Prestamo[] = await respuesta.json(); // Parsea la respuesta JSON y la tipa como arreglo de Prestamo.
-
-      const usuarioGuardado = localStorage.getItem("usuario"); // Lee los datos del usuario autenticado desde localStorage.
-
-      if (!usuarioGuardado) { // Si no hay usuario guardado en localStorage...
-        return; // ...detiene la ejecución para evitar errores al parsear.
+      if (!respuesta.ok) {
+        throw new Error("No se pudieron obtener los préstamos");
       }
 
-      const usuario: UsuarioLocal = JSON.parse(usuarioGuardado); // Convierte el JSON del usuario y lo tipa con UsuarioLocal.
+      const datos: Prestamo[] = await respuesta.json();
 
-      const misPrestamos = datos.filter( // Filtra la lista completa para quedarse solo con los préstamos del usuario actual.
-        (prestamo: Prestamo) => prestamo.id_usuario === usuario.id_usuario // Compara el id_usuario del préstamo con el del usuario logueado.
+      const usuarioGuardado = localStorage.getItem("usuario");
+
+      if (!usuarioGuardado) {
+        return;
+      }
+
+      const usuario: UsuarioLocal = JSON.parse(usuarioGuardado);
+
+      const misPrestamos = datos.filter(
+        (prestamo) =>
+          prestamo.id_usuario === usuario.id_usuario
       );
 
-      setPrestamos(misPrestamos); // Guarda pendientes y devueltos del usuario para poder separarlos en la vista.
-    } catch (error) { // Captura errores de red o de parseo.
-      console.error("Error al obtener préstamos:", error); // Registra el error en la consola del navegador.
-    } finally { // Se ejecuta siempre al finalizar el try/catch.
-      setCargando(false); // Finaliza el estado de carga.
+      setPrestamos(misPrestamos);
+    } catch (error) {
+      console.error("Error al obtener préstamos:", error);
+    } finally {
+      setCargando(false);
     }
   };
 
-  useEffect(() => { // Hook de efecto que se ejecuta al montar el componente.
-    obtenerPrestamos(); // Carga los préstamos al entrar a la vista.
-  }, []); // Arreglo de dependencias vacío: corre una sola vez al montar.
+  useEffect(() => {
+    obtenerPrestamos();
+  }, []);
 
-  const devolverPrestamo = async (idPrestamo: number) => { // Función asíncrona que marca un préstamo como devuelto en el backend.
-    try { // Intenta ejecutar la devolución.
-      const token = localStorage.getItem("token"); // Recupera el token de sesión.
+  const devolverPrestamo = async (idPrestamo: number) => {
+    try {
+      const token = localStorage.getItem("token");
 
-      const respuesta = await fetch( // Envía petición PUT al endpoint de devolución del préstamo.
-        `http://localhost:3000/api/prestamos/${idPrestamo}/devolver`, // Ruta dinámica con el id del préstamo.
-        { // Configuración de la petición PUT.
-          method: "PUT", // Método HTTP PUT para actualizar el estado del préstamo.
-          headers: { // Encabezados HTTP.
-            Authorization: `Bearer ${token}`, // Envía el token de autorización.
+      const respuesta = await fetch(
+        `http://localhost:3000/api/prestamos/${idPrestamo}/devolver`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
-      const datos = await respuesta.json(); // Lee la respuesta JSON del servidor.
+      const datos = await respuesta.json();
 
-      if (!respuesta.ok) { // Si la respuesta HTTP no es exitosa (2xx)...
-        setMensaje(datos.mensaje); // ...muestra el mensaje de error enviado por el backend.
-        setTipoMensaje("error"); // Marca el modal como error.
-        return; // Sale de la función sin refrescar como éxito.
+      if (!respuesta.ok) {
+        setMensaje(datos.mensaje || "No se pudo registrar la devolución");
+        setTipoMensaje("error");
+        return;
       }
 
-      setMensaje("Préstamo devuelto correctamente"); // Define el mensaje de confirmación exitosa.
-      setTipoMensaje("exito"); // Marca el modal como éxito.
+      setMensaje("Préstamo devuelto correctamente");
+      setTipoMensaje("exito");
 
-      obtenerPrestamos(); // Vuelve a consultar los préstamos para que el ítem pase de "pendiente" a "devuelto".
-    } catch (error) { // Captura fallos de conexión o excepciones.
-      console.error("Error al devolver préstamo:", error); // Muestra el error en consola.
-      setMensaje("No se pudo devolver el préstamo"); // Muestra mensaje amigable al usuario.
-      setTipoMensaje("error"); // Marca el modal como error.
+      await obtenerPrestamos();
+    } catch (error) {
+      console.error("Error al devolver préstamo:", error);
+      setMensaje("No se pudo devolver el préstamo");
+      setTipoMensaje("error");
     }
   };
 
-  const prestamosPendientes = prestamos.filter( // Filtra del estado general solo los préstamos con estado "pendiente".
-    (prestamo) => prestamo.estado === "pendiente" // Condición de filtrado para pendientes.
+  const prestamosPendientes = prestamos.filter(
+    (prestamo) => prestamo.estado === "pendiente"
   );
 
-  const prestamosDevueltos = prestamos.filter( // Filtra del estado general solo los préstamos con estado "devuelto".
-    (prestamo) => prestamo.estado === "devuelto" // Condición de filtrado para devueltos.
+  const prestamosDevueltos = prestamos.filter(
+    (prestamo) => prestamo.estado === "devuelto"
   );
 
-  const prestamosMostrados = // Selecciona qué grupo mostrar según la vista elegida ("pendiente" o "devuelto").
-    vistaEstado === "pendiente" ? prestamosPendientes : prestamosDevueltos; // Operador ternario para alternar entre ambos grupos.
+  const prestamosMostrados =
+    vistaEstado === "pendiente"
+      ? prestamosPendientes
+      : prestamosDevueltos;
 
-  const handleExportarExcel = () => { // Exporta únicamente los préstamos de la pestaña activa (pendientes o devueltos).
-    if (prestamosMostrados.length === 0) { // Si no hay registros en la pestaña actual...
-      setMensaje( // ...muestra un modal informativo de error.
+  const handleExportarExcel = () => {
+    if (prestamosMostrados.length === 0) {
+      setMensaje(
         vistaEstado === "pendiente"
           ? "No hay préstamos pendientes para exportar."
           : "No hay préstamos devueltos para exportar."
       );
-      setTipoMensaje("error"); // Marca el modal como error.
-      return; // Detiene la exportación.
+      setTipoMensaje("error");
+      return;
     }
 
-    const filasExcel = prestamosMostrados.map((prestamo) => ({ // Formatea cada préstamo con encabezados legibles en español.
-      ID: prestamo.id_prestamo, // Identificador del préstamo.
-      Material: prestamo.nombre_material, // Nombre del material prestado.
-      Cantidad: prestamo.cantidad, // Unidades prestadas.
-      Estado: prestamo.estado, // Estado actual ("pendiente" o "devuelto").
-      "Fecha préstamo": prestamo.fecha_prestamo, // Fecha de registro del préstamo.
-      Usuario: prestamo.nombre_usuario, // Nombre del usuario asociado.
+    const filasExcel = prestamosMostrados.map((prestamo) => ({
+      ID: prestamo.id_prestamo,
+      Material: prestamo.nombre_material,
+      Cantidad: prestamo.cantidad,
+      Estado: prestamo.estado,
+      "Fecha préstamo": prestamo.fecha_prestamo,
+      Usuario: prestamo.nombre_usuario,
     }));
 
-    const etiquetaEstado = vistaEstado === "pendiente" ? "pendientes" : "devueltos"; // Etiqueta para diferenciar el archivo descargado.
-    exportarAExcel( // Llama a la utilidad genérica de exportación.
-      filasExcel, // Datos formateados del grupo consultado.
-      `stockia_prestamos_${etiquetaEstado}`, // Nombre del archivo .xlsx según la pestaña activa.
-      vistaEstado === "pendiente" ? "Préstamos pendientes" : "Préstamos devueltos" // Nombre de la hoja dentro del libro.
+    const etiquetaEstado =
+      vistaEstado === "pendiente" ? "pendientes" : "devueltos";
+
+    exportarAExcel(
+      filasExcel,
+      `stockia_prestamos_${etiquetaEstado}`,
+      vistaEstado === "pendiente"
+        ? "Préstamos pendientes"
+        : "Préstamos devueltos"
     );
   };
 
-  if (cargando) { // Mientras cargando sea true...
-    return <p>Cargando devoluciones...</p>; // ...muestra un mensaje provisional de carga.
+  if (cargando) {
+    return <p>Cargando devoluciones...</p>;
   }
 
-  return ( // Retorna el JSX completo de la página.
-    <div> {/* Contenedor raíz de la vista. */}
-      <Navbar /> {/* Renderiza la barra de navegación fija. */}
+  return (
+    <div className="pagina-con-footer">
+      <Navbar />
 
-      {prestamoADevolver !== null && ( // Renderiza el modal de confirmación solo si hay un id seleccionado.
-        <div className="mensaje-overlay"> {/* Fondo oscuro del modal. */}
-          <div className="mensaje-box"> {/* Caja del modal de confirmación. */}
-            <h2>Confirmar devolución</h2> {/* Título del modal. */}
+      {prestamoADevolver !== null && (
+        <div className="mensaje-overlay">
+          <div className="mensaje-box">
+            <h2>Confirmar devolución</h2>
 
-            <p> {/* Texto de confirmación. */}
+            <p>
               ¿Estás seguro de que quieres devolver este préstamo?
             </p>
 
-            <div className="botones-confirmacion"> {/* Contenedor de botones de confirmar/cancelar. */}
-              <button // Botón para confirmar la devolución.
-                className="btn-confirmar" // Clase de estilo confirmar.
-                onClick={() => { // Al hacer clic...
-                  devolverPrestamo(prestamoADevolver); // ...llama a devolverPrestamo con el id seleccionado...
-                  setPrestamoADevolver(null); // ...y cierra el modal de confirmación.
+            <div className="botones-confirmacion">
+              <button
+                className="btn-confirmar"
+                onClick={() => {
+                  devolverPrestamo(prestamoADevolver);
+                  setPrestamoADevolver(null);
                 }}
               >
                 Confirmar
               </button>
 
-              <button // Botón para cancelar y cerrar el modal.
-                className="btn-cancelar" // Clase de estilo cancelar.
-                onClick={() => setPrestamoADevolver(null)} // Limpia prestamoADevolver para cerrar el modal.
+              <button
+                className="btn-cancelar"
+                onClick={() => setPrestamoADevolver(null)}
               >
                 Cancelar
               </button>
@@ -181,18 +195,18 @@ function Devoluciones() { // Declara el componente funcional Devoluciones.
         </div>
       )}
 
-      {mensaje && ( // Renderiza el modal de alerta cuando existe un mensaje.
-        <div className="mensaje-overlay"> {/* Fondo del modal de mensaje. */}
-          <div className={`mensaje-box ${tipoMensaje}`}> {/* Aplica clase "exito" o "error" dinámicamente. */}
-            <h2> {/* Encabezado según el tipo de mensaje. */}
+      {mensaje && (
+        <div className="mensaje-overlay">
+          <div className={`mensaje-box ${tipoMensaje}`}>
+            <h2>
               {tipoMensaje === "exito" ? "✓ ¡Listo!" : "⚠️ Error"}
             </h2>
 
-            <p>{mensaje}</p> {/* Muestra el texto del mensaje. */}
+            <p>{mensaje}</p>
 
-            <button // Botón para cerrar el modal de mensaje.
-              onClick={() => setMensaje("")} // Limpia mensaje para ocultar el modal.
-              className="btn-mensaje" // Clase de estilo del botón aceptar.
+            <button
+              onClick={() => setMensaje("")}
+              className="btn-mensaje"
             >
               Aceptar
             </button>
@@ -200,61 +214,65 @@ function Devoluciones() { // Declara el componente funcional Devoluciones.
         </div>
       )}
 
-      <main className="products-section"> {/* Contenido principal de la página. */}
-        <div className="prestamos-encabezado"> {/* Contenedor de título y botón de exportar. */}
-          <h1>Mis devoluciones</h1> {/* Título principal de la sección. */}
+      <main className="products-section">
+        <div className="prestamos-encabezado">
+          <h1>Mis devoluciones</h1>
 
-          <button // Botón para exportar los préstamos de la pestaña actual a Excel.
-            type="button" // Evita envío accidental de formulario.
-            className="btn-exportar-prestamos" // Clase de estilo para el botón de Excel.
-            onClick={handleExportarExcel} // Dispara la exportación de prestamosMostrados.
+          <button
+            type="button"
+            className="btn-exportar-prestamos"
+            onClick={handleExportarExcel}
           >
             Exportar a Excel
           </button>
         </div>
 
-        <div className="prestamos-tabs" role="tablist" aria-label="Separación de préstamos"> {/* Contenedor de pestañas para separar préstamos. */}
-          <button // Botón para ver únicamente préstamos pendientes.
-            type="button" // Evita envío accidental de formulario.
-            role="tab" // Rol semántico de pestaña.
-            aria-selected={vistaEstado === "pendiente"} // Indica accesibilidad si está activa la pestaña pendiente.
-            className={ // Clase dinámica para resaltar la pestaña activa.
+        <div
+          className="prestamos-tabs"
+          role="tablist"
+          aria-label="Separación de préstamos"
+        >
+          <button
+            type="button"
+            role="tab"
+            aria-selected={vistaEstado === "pendiente"}
+            className={
               vistaEstado === "pendiente"
                 ? "prestamo-tab activa"
                 : "prestamo-tab"
             }
-            onClick={() => setVistaEstado("pendiente")} // Cambia la vista a préstamos pendientes.
+            onClick={() => setVistaEstado("pendiente")}
           >
             Pendientes ({prestamosPendientes.length})
           </button>
 
-          <button // Botón para ver únicamente préstamos devueltos.
-            type="button" // Evita envío accidental de formulario.
-            role="tab" // Rol semántico de pestaña.
-            aria-selected={vistaEstado === "devuelto"} // Indica accesibilidad si está activa la pestaña devuelto.
-            className={ // Clase dinámica para resaltar la pestaña activa.
+          <button
+            type="button"
+            role="tab"
+            aria-selected={vistaEstado === "devuelto"}
+            className={
               vistaEstado === "devuelto"
                 ? "prestamo-tab activa"
                 : "prestamo-tab"
             }
-            onClick={() => setVistaEstado("devuelto")} // Cambia la vista a préstamos devueltos.
+            onClick={() => setVistaEstado("devuelto")}
           >
             Devueltos ({prestamosDevueltos.length})
           </button>
         </div>
 
-        {prestamosMostrados.length === 0 ? ( // Si el grupo seleccionado ("pendiente" o "devuelto") no tiene registros...
+        {prestamosMostrados.length === 0 ? (
           <p className="prestamos-vacio">
             {vistaEstado === "pendiente"
               ? "No tienes préstamos pendientes."
               : "No tienes préstamos devueltos."}
           </p>
-        ) : ( // Si sí hay préstamos en el grupo seleccionado...
-          <div className="prestamos-grid"> {/* Grilla de tarjetas de préstamos. */}
-            {prestamosMostrados.map((prestamo) => ( // Recorre únicamente los préstamos del grupo activo.
-              <div // Tarjeta individual de préstamo.
-                key={prestamo.id_prestamo} // Identificador único para React.
-                className="prestamo-item" // Clase de estilo de tarjeta.
+        ) : (
+          <div className="prestamos-grid">
+            {prestamosMostrados.map((prestamo) => (
+              <div
+                key={prestamo.id_prestamo}
+                className="prestamo-item"
               >
                 <p>
                   <strong>Material:</strong>{" "}
@@ -271,11 +289,11 @@ function Devoluciones() { // Declara el componente funcional Devoluciones.
                   {prestamo.estado}
                 </p>
 
-                {prestamo.estado === "pendiente" && ( // Solo muestra el botón "Devolver" si el préstamo sigue pendiente.
-                  <button // Botón para iniciar el proceso de devolución.
-                    className="btn btn-primary" // Estilo principal del botón.
+                {prestamo.estado === "pendiente" && (
+                  <button
+                    className="btn btn-primary"
                     onClick={() =>
-                      setPrestamoADevolver(prestamo.id_prestamo) // Abre el modal de confirmación para este préstamo.
+                      setPrestamoADevolver(prestamo.id_prestamo)
                     }
                   >
                     Devolver
@@ -286,8 +304,10 @@ function Devoluciones() { // Declara el componente funcional Devoluciones.
           </div>
         )}
       </main>
+
+      <Footer />
     </div>
   );
 }
 
-export default Devoluciones; // Exporta el componente Devoluciones.
+export default Devoluciones;

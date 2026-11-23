@@ -1,40 +1,57 @@
 
-/* =================================
+/* =========================================
    STOCKIA - PRÉSTAMOS
-================================= */
+   Tarjetas, estados y pestañas
+========================================= */
 
 /* Distribución de préstamos */
 .prestamos-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
 
-  width: 80%;
-  margin-top: 20px;
+  width: 100%;
+  margin: 18px 0 25px;
 }
 
 /* Tarjeta de préstamo */
 .prestamo-item {
   width: 100%;
-  padding: 20px;
+  min-width: 0;
+  padding: 18px;
 
-  border: 2px solid #948e8e;
-  border-radius: 15px;
+  border: 1px solid #dce5ed;
+  border-radius: 13px;
 
-  background: var(--color-white);
+  background: #ffffff;
+  box-shadow: 0 3px 10px rgba(20, 45, 65, 0.06);
+
   box-sizing: border-box;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.prestamo-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(20, 45, 65, 0.10);
 }
 
 /* Cuando existe un solo préstamo */
 .prestamo-item:only-child {
-  grid-column: 1 / -1;
-  justify-self: center;
-  max-width: 440px;
+  grid-column: auto;
+  justify-self: stretch;
+  max-width: none;
 }
 
 /* Separación de textos */
 .prestamo-item p {
-  margin: 8px 0;
+  margin: 9px 0;
+  color: #263746;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.prestamo-item strong {
+  color: #102d3b;
 }
 
 /* Botones dentro de préstamos */
@@ -44,73 +61,141 @@
 
 /* Botón de acción principal */
 .prestamo-item .btn-primary {
-  display: block;
-  margin: 10px auto 0;
-  padding: 10px 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-  background: var(--color-primary);
-  color: var(--color-black);
+  margin: 10px 0 0;
+  padding: 9px 17px;
+
+  background: #075b35;
+  color: #ffffff;
 
   border: none;
   border-radius: 20px;
 
   cursor: pointer;
-  font-weight: bold;
+  font-size: 13px;
+  font-weight: 600;
+
+  transition: background 0.2s ease;
 }
 
-/* Contenedor de pestañas para separar préstamos pendientes y devueltos */
+.prestamo-item .btn-primary:hover {
+  background: #06472b;
+}
+
+/* Contenedor de pestañas */
 .prestamos-tabs {
-  display: flex; /* Alinea los botones en fila horizontal. */
-  gap: 12px; /* Separación entre el botón de Pendientes y el de Devueltos. */
-  margin-top: 15px; /* Separa las pestañas del título de la sección. */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
 }
 
-/* Botón base de cada estado de préstamo */
+/* Botón base de cada estado */
 .prestamo-tab {
-  padding: 10px 18px; /* Espaciado interno cómodo para hacer clic. */
-  border: 2px solid var(--color-primary); /* Borde usando el color principal de Stockia. */
-  border-radius: 20px; /* Bordes redondeados coherentes con tus botones. */
-  background: var(--color-white); /* Fondo blanco cuando la pestaña no está seleccionada. */
-  color: var(--color-black); /* Texto negro para buena legibilidad. */
-  font-weight: bold; /* Negrita para destacar la opción. */
-  cursor: pointer; /* Cambia el cursor a manito. */
+  padding: 10px 18px;
+
+  border: 1px solid #d5e0e7;
+  border-radius: 20px;
+
+  background: #ffffff;
+  color: #234052;
+
+  font-weight: 600;
+  cursor: pointer;
+
+  transition: all 0.2s ease;
 }
 
-/* Pestaña activa actualmente */
+/* Pestaña activa */
 .prestamo-tab.activa {
-  background: var(--color-primary); /* Rellena con el color principal al estar activa. */
-  color: var(--color-black); /* Mantiene el texto en negro sobre el color principal. */
+  background: #075b35;
+  color: #ffffff;
+  border-color: #075b35;
 }
 
-/* Mensaje cuando no hay préstamos en el estado seleccionado */
+/* Efecto hover */
+.prestamo-tab:hover {
+  border-color: #087b49;
+}
+
+/* Mensaje cuando no hay préstamos */
 .prestamos-vacio {
-  margin-top: 28px; /* Separa el mensaje hacia abajo respecto a los botones de Pendientes y Devueltos. */
-  font-size: 20px; /* Agranda el texto (puedes subirlo a 22px o 24px si lo quieres aún más grande). */
-  font-weight: 600; /* Le da un poco más de peso visual para que se lea claro. */
-  color: var(--color-black); /* Mantiene buen contraste sobre el fondo de la página. */
+  margin-top: 28px;
+  padding: 25px;
+
+  font-size: 16px;
+  font-weight: 500;
+  color: #64748b;
+
+  text-align: center;
+  background: #ffffff;
+  border: 1px solid #dce5ed;
+  border-radius: 12px;
 }
 
-/* Encabezado con título y acción de exportar */
+/* Encabezado con título y acción */
 .prestamos-encabezado {
-  display: flex; /* Coloca título y botón en fila. */
-  flex-wrap: wrap; /* Permite acomodo en pantallas estrechas. */
-  align-items: center; /* Centra verticalmente. */
-  justify-content: space-between; /* Separa título a la izquierda y botón a la derecha. */
-  gap: 12px; /* Espacio entre elementos. */
-  margin-bottom: 14px; /* Separación inferior. */
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+  margin-bottom: 18px;
 }
 
-/* Botón de exportar préstamos a Excel */
+/* Botón exportar */
 .btn-exportar-prestamos {
-  padding: 10px 18px; /* Espaciado interno cómodo. */
-  background: #0A4D25; /* Verde institucional de Stockia. */
-  color: #ffffff; /* Texto blanco de alto contraste. */
-  border: none; /* Sin borde extra. */
-  border-radius: 20px; /* Bordes redondeados. */
-  font-weight: 600; /* Peso seminegrita. */
-  cursor: pointer; /* Cursor de mano. */
+  padding: 10px 18px;
+
+  background: #075b35;
+  color: #ffffff;
+
+  border: none;
+  border-radius: 20px;
+
+  font-weight: 600;
+  cursor: pointer;
+
+  transition: background 0.2s ease;
 }
 
 .btn-exportar-prestamos:hover {
-  background: #005729; /* Oscurece al pasar el cursor. */
+  background: #06472b;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1000px) {
+  .prestamos-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .prestamos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .prestamo-item {
+    padding: 16px;
+  }
+
+  .prestamos-encabezado {
+    align-items: flex-start;
+  }
+
+  .prestamos-tabs {
+    gap: 8px;
+  }
+
+  .prestamo-tab {
+    flex: 1;
+    padding: 10px;
+  }
 }

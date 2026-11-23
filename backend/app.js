@@ -1,3 +1,4 @@
+
 require("dotenv").config();
 
 const express = require("express");
@@ -12,6 +13,7 @@ const usuarioRoutes = require("./routes/usuario.routes");
 const authRoutes = require("./routes/auth.routes");
 const categoriaRoutes = require("./routes/categoria.routes");
 const proveedorRoutes = require("./routes/proveedor.routes");
+const movimientoRoutes = require("./routes/movimiento.routes");
 
 const app = express();
 
@@ -62,8 +64,12 @@ app.use("/api/prestamos", verificarToken, prestamoRoutes);
 app.use("/api/categorias", verificarToken, categoriaRoutes);
 app.use("/api/proveedores", verificarToken, proveedorRoutes);
 
+// Movimientos: autenticación y autorización dentro de movimiento.routes.js
+app.use("/api/movimientos", movimientoRoutes);
+
 // Iniciar servidor
 const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
   console.log(`Backend activo en http://localhost:${PORT}`);
 });
