@@ -1,8 +1,9 @@
 
 import { useEffect, useState } from "react";
+
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
-import { exportarAExcel } from "../utils/exportacion_excel";
+
 import "../styles/prestamos.css";
 import "../styles/modales.css";
 
@@ -25,15 +26,21 @@ interface UsuarioLocal {
 
 function Devoluciones() {
   const [prestamos, setPrestamos] = useState<Prestamo[]>([]);
+
   const [vistaEstado, setVistaEstado] =
     useState<EstadoPrestamo>("pendiente");
+
+  const [busqueda, setBusqueda] = useState("");
   const [cargando, setCargando] = useState(true);
+
   const [mensaje, setMensaje] = useState("");
   const [tipoMensaje, setTipoMensaje] =
     useState<"exito" | "error">("exito");
+
   const [prestamoADevolver, setPrestamoADevolver] =
     useState<number | null>(null);
 
+  // Obtener préstamos del instructor
   const obtenerPrestamos = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -69,6 +76,9 @@ function Devoluciones() {
       setPrestamos(misPrestamos);
     } catch (error) {
       console.error("Error al obtener préstamos:", error);
+
+      setMensaje("No se pudieron cargar tus devoluciones.");
+      setTipoMensaje("error");
     } finally {
       setCargando(false);
     }
@@ -78,6 +88,7 @@ function Devoluciones() {
     obtenerPrestamos();
   }, []);
 
+  // Registrar devolución
   const devolverPrestamo = async (idPrestamo: number) => {
     try {
       const token = localStorage.getItem("token");
@@ -95,7 +106,9 @@ function Devoluciones() {
       const datos = await respuesta.json();
 
       if (!respuesta.ok) {
-        setMensaje(datos.mensaje || "No se pudo registrar la devolución");
+        setMensaje(
+          datos.mensaje || "No se pudo registrar la devolución"
+        );
         setTipoMensaje("error");
         return;
       }
@@ -106,11 +119,13 @@ function Devoluciones() {
       await obtenerPrestamos();
     } catch (error) {
       console.error("Error al devolver préstamo:", error);
+
       setMensaje("No se pudo devolver el préstamo");
       setTipoMensaje("error");
     }
   };
 
+  // Separar préstamos por estado
   const prestamosPendientes = prestamos.filter(
     (prestamo) => prestamo.estado === "pendiente"
   );
@@ -124,182 +139,248 @@ function Devoluciones() {
       ? prestamosPendientes
       : prestamosDevueltos;
 
-  const handleExportarExcel = () => {
-    if (prestamosMostrados.length === 0) {
-      setMensaje(
-        vistaEstado === "pendiente"
-          ? "No hay préstamos pendientes para exportar."
-          : "No hay préstamos devueltos para exportar."
+  // Buscar por material o identificador
+  const prestamosFiltrados = prestamosMostrados.filter(
+    (prestamo) => {
+      const termino = busqueda.toLowerCase().trim();
+
+      if (!termino) return true;
+
+      return (
+        prestamo.nombre_material.toLowerCase().includes(termino) ||
+        String(prestamo.id_prestamo).includes(termino) ||
+        String(prestamo.id_material).includes(termino)
       );
-      setTipoMensaje("error");
-      return;
+    }
+  );
+
+  // Formatear fecha
+  const formatearFecha = (fecha: string) => {
+    if (!fecha) return "No disponible";
+
+    const fechaLocal = new Date(fecha);
+
+    if (isNaN(fechaLocal.getTime())) {
+      return fecha;
     }
 
-    const filasExcel = prestamosMostrados.map((prestamo) => ({
-      ID: prestamo.id_prestamo,
-      Material: prestamo.nombre_material,
-      Cantidad: prestamo.cantidad,
-      Estado: prestamo.estado,
-      "Fecha préstamo": prestamo.fecha_prestamo,
-      Usuario: prestamo.nombre_usuario,
-    }));
-
-    const etiquetaEstado =
-      vistaEstado === "pendiente" ? "pendientes" : "devueltos";
-
-    exportarAExcel(
-      filasExcel,
-      `stockia_prestamos_${etiquetaEstado}`,
-      vistaEstado === "pendiente"
-        ? "Préstamos pendientes"
-        : "Préstamos devueltos"
-    );
+    return fechaLocal.toLocaleDateString("es-CO", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      timeZone: "UTC",
+    });
   };
 
-  if (cargando) {
-    return <p>Cargando devoluciones...</p>;
-  }
-
   return (
-    <div className="pagina-con-footer">
+    <div className="pagina-con-footer devoluciones-page">
       <Navbar />
 
-      {prestamoADevolver !== null && (
-        <div className="mensaje-overlay">
-          <div className="mensaje-box">
-            <h2>Confirmar devolución</h2>
+      <main className="products-section devoluciones-contenido">
 
-            <p>
-              ¿Estás seguro de que quieres devolver este préstamo?
-            </p>
+        {/* MODAL DE CONFIRMACIÓN */}
+        {prestamoADevolver !== null && (
+          <div className="mensaje-overlay">
+            <div className="mensaje-box">
+              <h2>Confirmar devolución</h2>
 
-            <div className="botones-confirmacion">
+              <p>
+                ¿Estás seguro de que quieres devolver este préstamo?
+              </p>
+
+              <div className="botones-confirmacion">
+                <button
+                  className="btn-confirmar"
+                  onClick={() => {
+                    const id = prestamoADevolver;
+                    setPrestamoADevolver(null);
+                    devolverPrestamo(id);
+                  }}
+                >
+                  Confirmar
+                </button>
+
+                <button
+                  className="btn-cancelar"
+                  onClick={() => setPrestamoADevolver(null)}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* MENSAJES */}
+        {mensaje && (
+          <div className="mensaje-overlay">
+            <div className={`mensaje-box ${tipoMensaje}`}>
+              <h2>
+                {tipoMensaje === "exito" ? "✓ ¡Listo!" : "⚠ Error"}
+              </h2>
+
+              <p>{mensaje}</p>
+
               <button
-                className="btn-confirmar"
-                onClick={() => {
-                  devolverPrestamo(prestamoADevolver);
-                  setPrestamoADevolver(null);
-                }}
+                onClick={() => setMensaje("")}
+                className="btn-mensaje"
               >
-                Confirmar
-              </button>
-
-              <button
-                className="btn-cancelar"
-                onClick={() => setPrestamoADevolver(null)}
-              >
-                Cancelar
+                Aceptar
               </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {mensaje && (
-        <div className="mensaje-overlay">
-          <div className={`mensaje-box ${tipoMensaje}`}>
-            <h2>
-              {tipoMensaje === "exito" ? "✓ ¡Listo!" : "⚠️ Error"}
-            </h2>
+        {/* ENCABEZADO */}
+        <div className="devoluciones-encabezado">
+          <div>
+            <h1>Mis devoluciones</h1>
 
-            <p>{mensaje}</p>
-
-            <button
-              onClick={() => setMensaje("")}
-              className="btn-mensaje"
-            >
-              Aceptar
-            </button>
+            <p>
+              Gestiona los materiales asignados y registra su
+              reintegro al almacén.
+            </p>
           </div>
         </div>
-      )}
 
-      <main className="products-section">
-        <div className="prestamos-encabezado">
-          <h1>Mis devoluciones</h1>
+        {/* CONTROLES */}
+        <div className="devoluciones-controles">
 
-          <button
-            type="button"
-            className="btn-exportar-prestamos"
-            onClick={handleExportarExcel}
+          <div
+            className="prestamos-tabs"
+            role="tablist"
+            aria-label="Separación de préstamos"
           >
-            Exportar a Excel
-          </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={vistaEstado === "pendiente"}
+              className={
+                vistaEstado === "pendiente"
+                  ? "prestamo-tab activa"
+                  : "prestamo-tab"
+              }
+              onClick={() => setVistaEstado("pendiente")}
+            >
+              Pendientes ({prestamosPendientes.length})
+            </button>
+
+            <button
+              type="button"
+              role="tab"
+              aria-selected={vistaEstado === "devuelto"}
+              className={
+                vistaEstado === "devuelto"
+                  ? "prestamo-tab activa"
+                  : "prestamo-tab"
+              }
+              onClick={() => setVistaEstado("devuelto")}
+            >
+              Devueltos ({prestamosDevueltos.length})
+            </button>
+          </div>
+
+          {/* BUSCADOR */}
+          <div className="devoluciones-buscador">
+            <span className="buscador-icono">⌕</span>
+
+            <input
+              type="text"
+              placeholder="Buscar material o código..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              aria-label="Buscar material o identificador"
+            />
+          </div>
         </div>
 
-        <div
-          className="prestamos-tabs"
-          role="tablist"
-          aria-label="Separación de préstamos"
-        >
-          <button
-            type="button"
-            role="tab"
-            aria-selected={vistaEstado === "pendiente"}
-            className={
-              vistaEstado === "pendiente"
-                ? "prestamo-tab activa"
-                : "prestamo-tab"
-            }
-            onClick={() => setVistaEstado("pendiente")}
-          >
-            Pendientes ({prestamosPendientes.length})
-          </button>
-
-          <button
-            type="button"
-            role="tab"
-            aria-selected={vistaEstado === "devuelto"}
-            className={
-              vistaEstado === "devuelto"
-                ? "prestamo-tab activa"
-                : "prestamo-tab"
-            }
-            onClick={() => setVistaEstado("devuelto")}
-          >
-            Devueltos ({prestamosDevueltos.length})
-          </button>
-        </div>
-
-        {prestamosMostrados.length === 0 ? (
+        {/* CONTENIDO */}
+        {cargando ? (
           <p className="prestamos-vacio">
-            {vistaEstado === "pendiente"
-              ? "No tienes préstamos pendientes."
-              : "No tienes préstamos devueltos."}
+            Cargando devoluciones...
+          </p>
+        ) : prestamosFiltrados.length === 0 ? (
+          <p className="prestamos-vacio">
+            {busqueda
+              ? "No se encontraron préstamos con esa búsqueda."
+              : vistaEstado === "pendiente"
+                ? "No tienes préstamos pendientes."
+                : "No tienes préstamos devueltos."}
           </p>
         ) : (
           <div className="prestamos-grid">
-            {prestamosMostrados.map((prestamo) => (
-              <div
+            {prestamosFiltrados.map((prestamo) => (
+              <article
                 key={prestamo.id_prestamo}
                 className="prestamo-item"
               >
-                <p>
-                  <strong>Material:</strong>{" "}
-                  {prestamo.nombre_material}
-                </p>
+                <div className="prestamo-card-encabezado">
+                  <span className="prestamo-identificador">
+                    PRÉSTAMO #{prestamo.id_prestamo}
+                  </span>
 
-                <p>
-                  <strong>Cantidad:</strong>{" "}
-                  {prestamo.cantidad}
-                </p>
-
-                <p>
-                  <strong>Estado:</strong>{" "}
-                  {prestamo.estado}
-                </p>
-
-                {prestamo.estado === "pendiente" && (
-                  <button
-                    className="btn btn-primary"
-                    onClick={() =>
-                      setPrestamoADevolver(prestamo.id_prestamo)
-                    }
+                  <span
+                    className={`prestamo-badge ${
+                      prestamo.estado === "devuelto"
+                        ? "badge-devuelto"
+                        : "badge-pendiente"
+                    }`}
                   >
-                    Devolver
-                  </button>
-                )}
-              </div>
+                    <span className="badge-punto"></span>
+
+                    {prestamo.estado === "devuelto"
+                      ? "Devuelto"
+                      : "Pendiente"}
+                  </span>
+                </div>
+
+                <h3 className="prestamo-material-nombre">
+                  {prestamo.nombre_material}
+                </h3>
+
+                <div className="prestamo-card-detalles">
+                  <div>
+                    <span className="detalle-label">
+                      Cantidad
+                    </span>
+
+                    <strong>
+                      {prestamo.cantidad}{" "}
+                      {prestamo.cantidad === 1
+                        ? "unidad"
+                        : "unidades"}
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span className="detalle-label">
+                      Préstamo
+                    </span>
+
+                    <strong>
+                      {formatearFecha(prestamo.fecha_prestamo)}
+                    </strong>
+                  </div>
+                </div>
+
+                <div className="prestamo-card-footer">
+                  {prestamo.estado === "pendiente" ? (
+                    <button
+                      type="button"
+                      className="btn-devolver-card"
+                      onClick={() =>
+                        setPrestamoADevolver(prestamo.id_prestamo)
+                      }
+                    >
+                      <span>↪</span> Devolver
+                    </button>
+                  ) : (
+                    <span className="prestamo-devuelto-texto">
+                      Devolución registrada
+                    </span>
+                  )}
+                </div>
+              </article>
             ))}
           </div>
         )}

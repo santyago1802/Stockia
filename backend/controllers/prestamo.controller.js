@@ -1,11 +1,15 @@
+
 const prestamoService = require("../services/prestamo.service");
 
-// Registrar préstamo
+// ==========================================
+// REGISTRAR PRÉSTAMO
+// ==========================================
+
 const crearPrestamo = async (req, res) => {
   try {
     const { id_material, cantidad } = req.body;
 
-    // El usuario se obtiene del JWT, no del frontend
+    // El usuario se obtiene del JWT
     const id_usuario = req.usuario.id_usuario;
 
     // Validar material
@@ -28,35 +32,72 @@ const crearPrestamo = async (req, res) => {
       Number(cantidad)
     );
 
-    res.status(201).json({
+    return res.status(201).json({
       mensaje: "Préstamo registrado correctamente",
       id_prestamo,
     });
   } catch (error) {
     console.error("Error al registrar préstamo:", error);
 
-    res.status(error.status || 500).json({
+    return res.status(error.status || 500).json({
       mensaje: error.message || "No se pudo registrar el préstamo",
     });
   }
 };
 
-// Consultar préstamos
+// ==========================================
+// CONSULTAR PRÉSTAMOS
+// ==========================================
+
 const obtenerPrestamos = async (req, res) => {
   try {
-    const prestamos = await prestamoService.obtenerPrestamos();
+    const id_usuario = req.usuario.id_usuario;
+    const rol = req.usuario.rol;
 
-    res.json(prestamos);
+    const prestamos = await prestamoService.obtenerPrestamos(
+      id_usuario,
+      rol
+    );
+
+    return res.json(prestamos);
   } catch (error) {
     console.error("Error al obtener préstamos:", error);
 
-    res.status(error.status || 500).json({
+    return res.status(error.status || 500).json({
       mensaje: error.message || "No se pudieron consultar los préstamos",
     });
   }
 };
 
-// Devolver préstamo
+// ==========================================
+// CONSULTAR HISTORIAL PARA MI PERFIL
+// ==========================================
+
+const obtenerHistorialPorUsuario = async (req, res) => {
+  try {
+    const id_usuario = req.usuario.id_usuario;
+
+    const historial = await prestamoService.obtenerHistorialPorUsuario(
+      id_usuario
+    );
+
+    return res.json({
+      mensaje: "Historial consultado correctamente",
+      historial,
+    });
+  } catch (error) {
+    console.error("Error al consultar historial:", error);
+
+    return res.status(error.status || 500).json({
+      mensaje: error.message || "No se pudo consultar el historial",
+    });
+  }
+};
+
+// ==========================================
+// DEVOLVER PRÉSTAMO
+// ==========================================
+
 const devolverPrestamo = async (req, res) => {
   try {
     const { id } = req.params;
@@ -74,13 +115,13 @@ const devolverPrestamo = async (req, res) => {
       id_usuario
     );
 
-    res.json({
+    return res.json({
       mensaje: "Préstamo devuelto correctamente",
     });
   } catch (error) {
     console.error("Error al devolver préstamo:", error);
 
-    res.status(error.status || 500).json({
+    return res.status(error.status || 500).json({
       mensaje: error.message || "Error al devolver el préstamo",
     });
   }
@@ -89,5 +130,6 @@ const devolverPrestamo = async (req, res) => {
 module.exports = {
   crearPrestamo,
   obtenerPrestamos,
+  obtenerHistorialPorUsuario,
   devolverPrestamo,
 };

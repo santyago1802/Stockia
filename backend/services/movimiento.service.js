@@ -1,23 +1,47 @@
 
 const movimientoModel = require("../models/movimiento.model");
 
-// Consultar historial de movimientos
+// ==========================================
+// CONSULTAR MOVIMIENTOS
+// ==========================================
+
 const obtenerMovimientos = async (filtros) => {
   return await movimientoModel.obtenerMovimientos(filtros);
 };
 
-// Consultar resumen de movimientos
+// ==========================================
+// CONSULTAR RESUMEN DE MOVIMIENTOS
+// ==========================================
+
 const obtenerResumenMovimientos = async (filtros) => {
   return await movimientoModel.obtenerResumenMovimientos(filtros);
 };
 
-// Registrar entrada de inventario
+// ==========================================
+// REGISTRAR ENTRADA DE INVENTARIO
+// ==========================================
+
 const registrarEntrada = async (datos) => {
   return await movimientoModel.registrarEntrada(datos);
 };
+
+// ==========================================
+// MOVIMIENTOS RECIENTES PARA MI PERFIL
+// ==========================================
+
+const obtenerMovimientosPorUsuario = async (id_usuario) => {
+  return await movimientoModel.obtenerMovimientosPorUsuario(
+    id_usuario
+  );
+};
+
+// ==========================================
+// EXPORTAR FUNCIONES
+// ==========================================
 
 module.exports = {
   obtenerMovimientos,
   obtenerResumenMovimientos,
   registrarEntrada,
+  obtenerMovimientosPorUsuario,
 };

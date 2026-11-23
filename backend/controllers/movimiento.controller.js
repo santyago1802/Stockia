@@ -1,7 +1,10 @@
 
 const movimientoService = require("../services/movimiento.service");
 
-// Consultar movimientos y resumen
+// ==========================================
+// CONSULTAR MOVIMIENTOS Y RESUMEN
+// ==========================================
+
 const obtenerMovimientos = async (req, res) => {
   try {
     const { mes, anio, tipo } = req.query;
@@ -60,7 +63,10 @@ const obtenerMovimientos = async (req, res) => {
   }
 };
 
-// Registrar entrada de inventario
+// ==========================================
+// REGISTRAR ENTRADA DE INVENTARIO
+// ==========================================
+
 const registrarEntrada = async (req, res) => {
   try {
     const { id_material, cantidad, observacion } = req.body;
@@ -123,7 +129,42 @@ const registrarEntrada = async (req, res) => {
   }
 };
 
+// ==========================================
+// MOVIMIENTOS RECIENTES PARA MI PERFIL
+// ==========================================
+
+const obtenerMovimientosPorUsuario = async (req, res) => {
+  try {
+    const id_usuario = Number(req.usuario.id_usuario);
+
+    if (!Number.isInteger(id_usuario) || id_usuario <= 0) {
+      return res.status(401).json({
+        mensaje: "No se pudo identificar al usuario de la sesión",
+      });
+    }
+
+    const movimientos =
+      await movimientoService.obtenerMovimientosPorUsuario(id_usuario);
+
+    return res.json({
+      mensaje: "Movimientos recientes consultados correctamente",
+      movimientos,
+    });
+  } catch (error) {
+    console.error("Error al consultar movimientos recientes:", error);
+
+    return res.status(500).json({
+      mensaje: "No se pudieron consultar los movimientos recientes",
+    });
+  }
+};
+
+// ==========================================
+// EXPORTAR FUNCIONES
+// ==========================================
+
 module.exports = {
   obtenerMovimientos,
   registrarEntrada,
+  obtenerMovimientosPorUsuario,
 };

@@ -5,7 +5,10 @@ const movimientoController = require("../controllers/movimiento.controller");
 
 const router = express.Router();
 
-// Verificar que el usuario tenga rol de Coordinador
+// ==========================================
+// VERIFICAR ROL DE COORDINADOR
+// ==========================================
+
 const verificarCoordinador = (req, res, next) => {
   if (!req.usuario || req.usuario.rol !== "Coordinador") {
     return res.status(403).json({
@@ -16,8 +19,11 @@ const verificarCoordinador = (req, res, next) => {
   next();
 };
 
-// GET /api/movimientos
-// Consultar movimientos
+// ==========================================
+// MOVIMIENTOS GENERALES
+// ==========================================
+
+// Consultar movimientos: solo Coordinador
 router.get(
   "/",
   verificarToken,
@@ -25,13 +31,24 @@ router.get(
   movimientoController.obtenerMovimientos
 );
 
-// POST /api/movimientos/entrada
-// Registrar una entrada de inventario
+// Registrar entrada: solo Coordinador
 router.post(
   "/entrada",
   verificarToken,
   verificarCoordinador,
   movimientoController.registrarEntrada
+);
+
+// ==========================================
+// MI PERFIL
+// ==========================================
+
+// Consultar movimientos recientes del usuario autenticado
+// Disponible para Coordinador e Instructor
+router.get(
+  "/perfil",
+  verificarToken,
+  movimientoController.obtenerMovimientosPorUsuario
 );
 
 module.exports = router;

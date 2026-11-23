@@ -1,170 +1,394 @@
 
 /* =========================================
-   STOCKIA - PRÉSTAMOS
-   Tarjetas, estados y pestañas
+   STOCKIA - PRÉSTAMOS Y DEVOLUCIONES
+   Diseño de tarjetas moderno
 ========================================= */
 
-/* Distribución de préstamos */
-.prestamos-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+/* CONTENEDOR PRINCIPAL */
+
+.devoluciones-page {
+  background: #f5f8f3;
+}
+
+.devoluciones-contenido {
+  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* =========================================
+   ENCABEZADO
+========================================= */
+
+.devoluciones-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
   gap: 16px;
 
-  width: 100%;
-  margin: 18px 0 25px;
+  margin-bottom: 25px;
 }
 
-/* Tarjeta de préstamo */
-.prestamo-item {
-  width: 100%;
-  min-width: 0;
-  padding: 18px;
+.devoluciones-encabezado h1 {
+  margin: 0 0 5px;
 
-  border: 1px solid #dce5ed;
-  border-radius: 13px;
-
-  background: #ffffff;
-  box-shadow: 0 3px 10px rgba(20, 45, 65, 0.06);
-
-  box-sizing: border-box;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  color: #102d26;
+  font-size: 25px;
+  font-weight: 750;
 }
 
-.prestamo-item:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(20, 45, 65, 0.10);
-}
+.devoluciones-encabezado p {
+  margin: 0;
 
-/* Cuando existe un solo préstamo */
-.prestamo-item:only-child {
-  grid-column: auto;
-  justify-self: stretch;
-  max-width: none;
-}
-
-/* Separación de textos */
-.prestamo-item p {
-  margin: 9px 0;
-  color: #263746;
-  font-size: 14px;
+  color: #718078;
+  font-size: 12px;
   line-height: 1.5;
 }
 
-.prestamo-item strong {
-  color: #102d3b;
-}
+/* =========================================
+   BOTÓN EXPORTAR
+========================================= */
 
-/* Botones dentro de préstamos */
-.prestamo-item button {
-  margin-top: 10px;
-}
-
-/* Botón de acción principal */
-.prestamo-item .btn-primary {
+.btn-exportar-prestamos {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 7px;
 
-  margin: 10px 0 0;
-  padding: 9px 17px;
+  padding: 10px 17px;
 
-  background: #075b35;
+  background: #005b36;
   color: #ffffff;
 
   border: none;
-  border-radius: 20px;
+  border-radius: 22px;
+
+  font-size: 11px;
+  font-weight: 650;
 
   cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-
-  transition: background 0.2s ease;
-}
-
-.prestamo-item .btn-primary:hover {
-  background: #06472b;
-}
-
-/* Contenedor de pestañas */
-.prestamos-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 18px;
-}
-
-/* Botón base de cada estado */
-.prestamo-tab {
-  padding: 10px 18px;
-
-  border: 1px solid #d5e0e7;
-  border-radius: 20px;
-
-  background: #ffffff;
-  color: #234052;
-
-  font-weight: 600;
-  cursor: pointer;
-
-  transition: all 0.2s ease;
-}
-
-/* Pestaña activa */
-.prestamo-tab.activa {
-  background: #075b35;
-  color: #ffffff;
-  border-color: #075b35;
-}
-
-/* Efecto hover */
-.prestamo-tab:hover {
-  border-color: #087b49;
-}
-
-/* Mensaje cuando no hay préstamos */
-.prestamos-vacio {
-  margin-top: 28px;
-  padding: 25px;
-
-  font-size: 16px;
-  font-weight: 500;
-  color: #64748b;
-
-  text-align: center;
-  background: #ffffff;
-  border: 1px solid #dce5ed;
-  border-radius: 12px;
-}
-
-/* Encabezado con título y acción */
-.prestamos-encabezado {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-/* Botón exportar */
-.btn-exportar-prestamos {
-  padding: 10px 18px;
-
-  background: #075b35;
-  color: #ffffff;
-
-  border: none;
-  border-radius: 20px;
-
-  font-weight: 600;
-  cursor: pointer;
-
   transition: background 0.2s ease;
 }
 
 .btn-exportar-prestamos:hover {
   background: #06472b;
+}
+
+/* =========================================
+   CONTROLES Y FILTROS
+========================================= */
+
+.devoluciones-controles {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+
+  margin-bottom: 17px;
+}
+
+/* PESTAÑAS */
+
+.prestamos-tabs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.prestamo-tab {
+  padding: 9px 15px;
+
+  border: 1px solid #d6e0d9;
+  border-radius: 20px;
+
+  background: #ffffff;
+  color: #365247;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.prestamo-tab.activa {
+  background: #005b36;
+  color: #ffffff;
+  border-color: #005b36;
+}
+
+.prestamo-tab:hover {
+  border-color: #087b49;
+}
+
+/* BUSCADOR */
+
+.devoluciones-buscador {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  width: 260px;
+  height: 36px;
+  padding: 0 12px;
+
+  background: #ffffff;
+  border: 1px solid #d8e1db;
+  border-radius: 22px;
+
+  box-sizing: border-box;
+}
+
+.buscador-icono {
+  color: #73857b;
+  font-size: 17px;
+  line-height: 1;
+}
+
+.devoluciones-buscador input {
+  width: 100%;
+  min-width: 0;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+  color: #294237;
+
+  font-family: inherit;
+  font-size: 11px;
+}
+
+.devoluciones-buscador input::placeholder {
+  color: #9aa79f;
+}
+
+/* =========================================
+   DISTRIBUCIÓN DE TARJETAS
+========================================= */
+
+.prestamos-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+
+  width: 100%;
+  margin: 0 0 25px;
+}
+
+/* =========================================
+   TARJETA DE PRÉSTAMO
+========================================= */
+
+.prestamo-item {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 124px;
+  padding: 15px;
+
+  background: #ffffff;
+  border: 1px solid #dce5de;
+  border-radius: 12px;
+
+  box-shadow: 0 2px 5px rgba(20, 45, 35, 0.035);
+
+  box-sizing: border-box;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.prestamo-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 13px rgba(20, 45, 35, 0.08);
+}
+
+/* IDENTIFICADOR Y ESTADO */
+
+.prestamo-card-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  margin-bottom: 5px;
+}
+
+.prestamo-identificador {
+  color: #78877e;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+/* ESTADOS */
+
+
+/* ESTADOS DE LOS PRÉSTAMOS */
+
+.prestamo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  padding: 4px 8px;
+
+  border-radius: 15px;
+  background: #eef2f7;
+  color: #28506d;
+
+  font-size: 9px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* PUNTO DE ESTADO */
+
+.badge-punto {
+  width: 5px;
+  height: 5px;
+  min-width: 5px;
+
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* PENDIENTE: PUNTO NARANJA */
+
+.badge-pendiente .badge-punto {
+  background: #d97706;
+}
+
+/* DEVUELTO: PUNTO VERDE */
+
+.badge-devuelto .badge-punto {
+  background: #16a765;
+}
+
+
+.badge-punto {
+  width: 5px;
+  height: 5px;
+  min-width: 5px;
+
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* NOMBRE DEL MATERIAL */
+
+.prestamo-material-nombre {
+  margin: 0 0 10px;
+
+  color: #102d3b;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+/* =========================================
+   INFORMACIÓN DE LA TARJETA
+========================================= */
+
+.prestamo-card-detalles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+
+  padding-top: 9px;
+
+  border-top: 1px solid #edf0ed;
+}
+
+.prestamo-card-detalles > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  min-width: 0;
+}
+
+.detalle-label {
+  color: #829087;
+  font-size: 9px;
+}
+
+.prestamo-card-detalles strong {
+  color: #263b31;
+  font-size: 10px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+/* =========================================
+   PIE DE TARJETA Y BOTÓN DEVOLVER
+========================================= */
+
+.prestamo-card-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  margin-top: 10px;
+}
+
+.btn-devolver-card {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  padding: 7px 13px;
+
+  background: #005b36;
+  color: #ffffff;
+
+  border: none;
+  border-radius: 20px;
+
+  font-size: 10px;
+  font-weight: 650;
+
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-devolver-card:hover {
+  background: #06472b;
+}
+
+.btn-devolver-card span {
+  font-size: 12px;
+}
+
+.prestamo-devuelto-texto {
+  color: #087443;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* =========================================
+   SIN RESULTADOS
+========================================= */
+
+.prestamos-vacio {
+  margin: 20px 0;
+  padding: 28px 18px;
+
+  color: #718078;
+  font-size: 12px;
+  text-align: center;
+
+  background: #ffffff;
+  border: 1px solid #dce5de;
+  border-radius: 12px;
 }
 
 /* =========================================
@@ -177,25 +401,79 @@
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 650px) {
+  .devoluciones-encabezado {
+    align-items: flex-start;
+  }
+
+  .devoluciones-encabezado h1 {
+    font-size: 22px;
+  }
+
+  .devoluciones-controles {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .devoluciones-buscador {
+    width: 100%;
+  }
+
   .prestamos-grid {
     grid-template-columns: 1fr;
   }
 
   .prestamo-item {
-    padding: 16px;
+    padding: 15px;
+  }
+}
+
+@media (max-width: 420px) {
+  .devoluciones-encabezado {
+    flex-direction: column;
   }
 
-  .prestamos-encabezado {
-    align-items: flex-start;
+  .btn-exportar-prestamos {
+    align-self: flex-start;
   }
 
   .prestamos-tabs {
-    gap: 8px;
+    width: 100%;
   }
 
   .prestamo-tab {
     flex: 1;
-    padding: 10px;
+    padding: 9px 8px;
   }
+}
+
+
+/* BUSCADOR - ESTADO NORMAL Y AL SELECCIONAR */
+
+.devoluciones-buscador {
+  background: #ffffff;
+  border: 1px solid #d8e1db;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Cuando se hace clic en el buscador */
+
+.devoluciones-buscador:focus-within {
+  background: #ffffff;
+  border-color: #087b49;
+  box-shadow: 0 0 0 3px rgba(8, 123, 73, 0.10);
+}
+
+/* Campo de texto */
+
+.devoluciones-buscador input {
+  background: transparent;
+  outline: none;
+  box-shadow: none;
+}
+
+.devoluciones-buscador input:focus {
+  background: transparent;
+  outline: none;
+  box-shadow: none;
 }

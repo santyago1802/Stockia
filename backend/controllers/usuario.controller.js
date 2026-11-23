@@ -1,13 +1,15 @@
+
 const usuarioService = require("../services/usuario.service");
 
-// Obtener usuarios
+// Obtener todos los usuarios
 const obtenerUsuarios = async (req, res) => {
   try {
     const usuarios = await usuarioService.obtenerUsuarios();
-    res.json(usuarios);
+    return res.json(usuarios);
   } catch (error) {
     console.error("Error al obtener usuarios:", error);
-    res.status(500).json({
+
+    return res.status(500).json({
       mensaje: "No se pudieron consultar los usuarios",
     });
   }
@@ -71,7 +73,82 @@ const crearUsuario = async (req, res) => {
   }
 };
 
+// Consultar perfil del usuario autenticado
+const obtenerPerfil = async (req, res) => {
+  try {
+    const id_usuario = req.usuario.id_usuario;
+
+    const usuario = await usuarioService.obtenerPerfil(id_usuario);
+
+    return res.json({
+      mensaje: "Perfil consultado correctamente",
+      usuario,
+    });
+  } catch (error) {
+    console.error("Error al consultar perfil:", error);
+
+    return res.status(error.status || 500).json({
+      mensaje: error.message || "No se pudo consultar el perfil",
+    });
+  }
+};
+
+// Actualizar datos personales
+const actualizarPerfil = async (req, res) => {
+  try {
+    const id_usuario = req.usuario.id_usuario;
+
+    const usuario = await usuarioService.actualizarPerfil(
+      id_usuario,
+      req.body
+    );
+
+    return res.json({
+      mensaje: "Perfil actualizado correctamente",
+      usuario,
+    });
+  } catch (error) {
+    console.error("Error al actualizar perfil:", error);
+
+    if (error.code === "23505") {
+      return res.status(409).json({
+        mensaje: "El correo electrónico ya está registrado",
+      });
+    }
+
+    return res.status(error.status || 500).json({
+      mensaje: error.message || "No se pudo actualizar el perfil",
+    });
+  }
+};
+
+// Cambiar contraseña
+const cambiarContrasena = async (req, res) => {
+  try {
+    const id_usuario = req.usuario.id_usuario;
+
+    const { contrasenaActual, nuevaContrasena } = req.body;
+
+    const resultado = await usuarioService.cambiarContrasena(
+      id_usuario,
+      contrasenaActual,
+      nuevaContrasena
+    );
+
+    return res.json(resultado);
+  } catch (error) {
+    console.error("Error al cambiar contraseña:", error);
+
+    return res.status(error.status || 500).json({
+      mensaje: error.message || "No se pudo cambiar la contraseña",
+    });
+  }
+};
+
 module.exports = {
   obtenerUsuarios,
   crearUsuario,
+  obtenerPerfil,
+  actualizarPerfil,
+  cambiarContrasena,
 };

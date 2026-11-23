@@ -1,7 +1,10 @@
 
 const pool = require("../db/pool");
 
-// Consultar movimientos con filtros opcionales
+// ==========================================
+// CONSULTAR MOVIMIENTOS CON FILTROS
+// ==========================================
+
 const obtenerMovimientos = async ({ mes, anio, tipo }) => {
   let consulta = `
     SELECT
@@ -52,7 +55,10 @@ const obtenerMovimientos = async ({ mes, anio, tipo }) => {
   return resultado.rows;
 };
 
-// Obtener resumen de movimientos según los filtros
+// ==========================================
+// OBTENER RESUMEN DE MOVIMIENTOS
+// ==========================================
+
 const obtenerResumenMovimientos = async ({ mes, anio, tipo }) => {
   let consulta = `
     SELECT
@@ -106,8 +112,10 @@ const obtenerResumenMovimientos = async ({ mes, anio, tipo }) => {
   return resultado.rows[0];
 };
 
-// Registrar una entrada de inventario
-// El trigger de PostgreSQL se encarga de aumentar el stock.
+// ==========================================
+// REGISTRAR ENTRADA DE INVENTARIO
+// ==========================================
+
 const registrarEntrada = async ({
   id_material,
   cantidad,
@@ -160,8 +168,49 @@ const registrarEntrada = async ({
   return resultado.rows[0];
 };
 
+// ==========================================
+// MOVIMIENTOS RECIENTES PARA MI PERFIL
+// ==========================================
+
+const obtenerMovimientosPorUsuario = async (id_usuario) => {
+  const resultado = await pool.query(
+    `
+    SELECT
+      m.id_movimiento,
+      m.id_prestamo,
+      m.cantidad,
+      m.observacion,
+      m.fecha_movimiento,
+      ma.id_material,
+      ma.nombre_material,
+      tm.tipo_movimiento,
+      c.nombre_categoria
+    FROM movimiento m
+    INNER JOIN material ma
+      ON m.id_material = ma.id_material
+    INNER JOIN tipo_movimiento tm
+      ON m.id_tipo_movimiento = tm.id_tipo_movimiento
+    INNER JOIN categoria c
+      ON ma.id_categoria = c.id_categoria
+    WHERE m.id_usuario = $1
+    ORDER BY
+      m.fecha_movimiento DESC,
+      m.id_movimiento DESC
+    LIMIT 10
+    `,
+    [id_usuario]
+  );
+
+  return resultado.rows;
+};
+
+// ==========================================
+// EXPORTAR FUNCIONES
+// ==========================================
+
 module.exports = {
   obtenerMovimientos,
   obtenerResumenMovimientos,
   registrarEntrada,
+  obtenerMovimientosPorUsuario,
 };

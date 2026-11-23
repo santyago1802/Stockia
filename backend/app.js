@@ -68,10 +68,6 @@ app.use("/api/proveedores", verificarToken, proveedorRoutes);
 app.use("/api/movimientos", movimientoRoutes);
 
 // Iniciar servidor
-const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log(`Backend activo en http://localhost:${PORT}`);
-});
 
 module.exports = app;

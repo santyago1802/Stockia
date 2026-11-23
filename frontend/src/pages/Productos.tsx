@@ -8,24 +8,24 @@ import "../styles/catalogo.css"; // Estilos del catálogo, filtros y grilla de m
 import "../styles/formularios.css"; // Estilos de formularios de registro, edición y solicitud.
 import "../styles/modales.css"; // Estilos de modales de confirmación y mensajes.
 
-interface Material {
-  id_material: number;
-  nombre_material: string;
-  descripcion_material: string;
-  id_categoria: number;
-  nombre_categoria: string;
-  stock_actual: number;
-  stock_minimo: number;
+interface Material { // Interfaz que describe la estructura de cada material devuelto por la API.
+  id_material: number; // Identificador único del material.
+  nombre_material: string; // Nombre del material.
+  descripcion_material: string; // Descripción del material.
+  id_categoria: number; // ID de la categoría asociada.
+  nombre_categoria: string; // Nombre de la categoría asociada.
+  stock_actual: number; // Unidades disponibles actualmente.
+  stock_minimo: number; // Umbral mínimo de stock permitido.
 }
 
-interface Categoria {
-  id_categoria: number;
-  nombre_categoria: string;
+interface Categoria { // Interfaz para las categorías del catálogo.
+  id_categoria: number; // ID de la categoría.
+  nombre_categoria: string; // Nombre de la categoría.
 }
 
-interface Proveedor {
-  id_proveedor: number;
-  nombre_proveedor: string;
+interface Proveedor { // Interfaz para los proveedores de materiales.
+  id_proveedor: number; // ID del proveedor.
+  nombre_proveedor: string; // Nombre del proveedor.
 }
 
 function Productos() {
@@ -540,24 +540,26 @@ function Productos() {
           </div>
         )}
 
-        {/* Acciones superiores: registrar material y exportar a Excel */}
+        {/* Acciones superiores: solo disponibles para el Coordinador */}
         <div className="acciones-catalogo">
           {esCoordinador && (
-            <button
-              className="btn btn-primary btn-registrar-material"
-              onClick={() => setMostrarRegistro(true)}
-            >
-              + Registrar material
-            </button>
-          )}
+            <>
+              <button
+                className="btn btn-primary btn-registrar-material"
+                onClick={() => setMostrarRegistro(true)}
+              >
+                + Registrar material
+              </button>
 
-          <button
-            type="button"
-            className="btn btn-exportar-excel"
-            onClick={handleExportarExcel}
-          >
-            Exportar a Excel
-          </button>
+              <button
+                type="button"
+                className="btn btn-exportar-excel"
+                onClick={handleExportarExcel}
+              >
+                Exportar a Excel
+              </button>
+            </>
+          )}
         </div>
 
         {/* Formulario para registrar material */}
@@ -1034,7 +1036,6 @@ function Productos() {
         </div>
       </div>
 
-      {/* PIE DE PÁGINA STOCKIA */}
       <Footer />
     </div>
   );

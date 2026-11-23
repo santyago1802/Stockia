@@ -1,6 +1,10 @@
+
 const pool = require("../db/pool");
 
-// Registrar un préstamo
+// ==========================================
+// REGISTRAR UN PRÉSTAMO
+// ==========================================
+
 const crearPrestamo = async (
   id_usuario,
   id_material,
@@ -43,15 +47,10 @@ const crearPrestamo = async (
       )
       VALUES ($1, $2, $3)
       `,
-      [
-        idPrestamo,
-        id_material,
-        cantidad,
-      ]
+      [idPrestamo, id_material, cantidad]
     );
 
-    // Registrar salida.
-    // El trigger de PostgreSQL actualizará el stock.
+    // Registrar salida. El trigger actualiza el stock.
     await cliente.query(
       `
       INSERT INTO movimiento (
@@ -85,11 +84,11 @@ const crearPrestamo = async (
   }
 };
 
-// Consultar préstamos
-const obtenerPrestamos = async (
-  id_usuario,
-  rol
-) => {
+// ==========================================
+// CONSULTAR PRÉSTAMOS
+// ==========================================
+
+const obtenerPrestamos = async (id_usuario, rol) => {
   let consulta = `
     SELECT
       p.id_prestamo,
@@ -112,7 +111,7 @@ const obtenerPrestamos = async (
 
   const parametros = [];
 
-  // Los instructores solo pueden consultar sus propios préstamos
+  // Los instructores solo consultan sus propios préstamos
   if (rol === "Instructor") {
     consulta += `
       WHERE p.id_usuario = $1
@@ -125,25 +124,22 @@ const obtenerPrestamos = async (
     ORDER BY p.id_prestamo DESC
   `;
 
-  const resultado = await pool.query(
-    consulta,
-    parametros
-  );
+  const resultado = await pool.query(consulta, parametros);
 
   return resultado.rows;
 };
 
-// Devolver un préstamo
-const devolverPrestamo = async (
-  id,
-  id_usuario
-) => {
+// ==========================================
+// DEVOLVER UN PRÉSTAMO
+// ==========================================
+
+const devolverPrestamo = async (id, id_usuario) => {
   const cliente = await pool.connect();
 
   try {
     await cliente.query("BEGIN");
 
-    // Buscar y bloquear el préstamo durante la transacción
+    // Buscar y bloquear el préstamo
     const prestamo = await cliente.query(
       `
       SELECT
@@ -162,10 +158,9 @@ const devolverPrestamo = async (
       throw error;
     }
 
-    // Verificar que el préstamo pertenezca al usuario autenticado
+    // Verificar propietario
     if (
-      Number(prestamo.rows[0].id_usuario) !==
-      Number(id_usuario)
+      Number(prestamo.rows[0].id_usuario) !== Number(id_usuario)
     ) {
       const error = new Error(
         "No tienes permisos para devolver este préstamo"
@@ -174,16 +169,14 @@ const devolverPrestamo = async (
       throw error;
     }
 
-    // Verificar que no esté devuelto
+    // Verificar estado
     if (prestamo.rows[0].estado === "devuelto") {
-      const error = new Error(
-        "Este préstamo ya fue devuelto"
-      );
+      const error = new Error("Este préstamo ya fue devuelto");
       error.status = 400;
       throw error;
     }
 
-    // Obtener materiales del préstamo
+    // Obtener materiales
     const detalle = await cliente.query(
       `
       SELECT
@@ -228,7 +221,7 @@ const devolverPrestamo = async (
       );
     }
 
-    // Cambiar estado del préstamo
+    // Actualizar estado del préstamo
     await cliente.query(
       `
       UPDATE prestamo
@@ -249,8 +242,42 @@ const devolverPrestamo = async (
   }
 };
 
+// ==========================================
+// HISTORIAL DE PRÉSTAMOS PARA MI PERFIL
+// ==========================================
+
+const obtenerHistorialPorUsuario = async (id_usuario) => {
+  const resultado = await pool.query(
+    `
+    SELECT
+      p.id_prestamo,
+      p.fecha_prestamo,
+      p.fecha_devolucion,
+      p.estado,
+      dp.id_material,
+      m.nombre_material,
+      dp.cantidad
+    FROM prestamo p
+    INNER JOIN detalle_prestamo dp
+      ON p.id_prestamo = dp.id_prestamo
+    INNER JOIN material m
+      ON dp.id_material = m.id_material
+    WHERE p.id_usuario = $1
+    ORDER BY p.fecha_prestamo DESC
+    `,
+    [id_usuario]
+  );
+
+  return resultado.rows;
+};
+
+// ==========================================
+// EXPORTAR FUNCIONES
+// ==========================================
+
 module.exports = {
   crearPrestamo,
   obtenerPrestamos,
   devolverPrestamo,
+  obtenerHistorialPorUsuario,
 };
