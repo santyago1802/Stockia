@@ -2,6 +2,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Login from "../pages/Login";
+import NuevaContraseña from "../pages/NuevaContraseña";
 import Devoluciones from "../pages/Devoluciones";
 import Usuarios from "../pages/Usuarios";
 import Productos from "../pages/Productos";
@@ -17,6 +18,12 @@ function AppRoutes() {
 
         {/* Inicio de sesión */}
         <Route path="/" element={<Login />} />
+
+        {/* Recuperación de contraseña: ruta pública */}
+        <Route
+          path="/reset-password"
+          element={<NuevaContraseña />}
+        />
 
         {/* Dashboard: solo Coordinador */}
         <Route
@@ -76,6 +83,12 @@ function AppRoutes() {
               <Perfil />
             </ProtectedRoute>
           }
+        />
+
+        {/* Página no encontrada */}
+        <Route
+          path="*"
+          element={<h1>Página no encontrada</h1>}
         />
 
       </Routes>

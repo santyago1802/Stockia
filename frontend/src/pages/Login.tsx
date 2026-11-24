@@ -1,5 +1,7 @@
+
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
+
 import logoStockia from "../assets/Stockia Logo.png";
 
 import "@fontsource/inter/400.css";
@@ -9,19 +11,48 @@ import "@fontsource/inter/700.css";
 
 import "../styles/login.css";
 
-interface RespuestaRecuperacion {
+// ==========================================
+// CONFIGURACIÓN DE API
+// ==========================================
+
+const API_URL = (
+  import.meta.env.VITE_API_URL || "http://localhost:3000"
+).replace(/\/$/, "");
+
+// ==========================================
+// INTERFACES
+// ==========================================
+
+interface RespuestaServidor {
   mensaje?: string;
+  token?: string;
+  usuario?: {
+    id_usuario: number;
+    nombre: string;
+    apellido: string;
+    rol: string;
+  };
 }
+
+// ==========================================
+// COMPONENTE LOGIN
+// ==========================================
 
 function Login() {
   const navigate = useNavigate();
+
   const [mostrarContrasena, setMostrarContrasena] = useState(false);
 
+  // Estados para recuperar contraseña
   const [modalRecuperarAbierto, setModalRecuperarAbierto] = useState(false);
-  const [docRecuperar, setDocRecuperar] = useState("");
-  const [nuevaContrasena, setNuevaContrasena] = useState("");
-  const [confirmarContrasena, setConfirmarContrasena] = useState("");
+  const [correoRecuperar, setCorreoRecuperar] = useState("");
   const [enviandoRecuperacion, setEnviandoRecuperacion] = useState(false);
+  const [mensajeRecuperacion, setMensajeRecuperacion] = useState("");
+  const [tipoMensaje, setTipoMensaje] = useState<"error" | "exito" | "">("");
+
+  // ==========================================
+  // INICIAR SESIÓN
+  // ==========================================
 
   const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -30,14 +61,14 @@ function Login() {
 
     const documento = (
       formulario.elements.namedItem("documento") as HTMLInputElement
-    ).value;
+    ).value.trim();
 
     const contrasena = (
       formulario.elements.namedItem("contrasena") as HTMLInputElement
     ).value;
 
     try {
-      const respuesta = await fetch("http://localhost:3000/api/login", {
+      const respuesta = await fetch(`${API_URL}/api/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -48,10 +79,17 @@ function Login() {
         }),
       });
 
-      const datos = await respuesta.json();
+      const datos: RespuestaServidor = await respuesta
+        .json()
+        .catch(() => ({}));
 
       if (!respuesta.ok) {
-        alert(datos.mensaje);
+        alert(datos.mensaje || "No se pudo iniciar sesión.");
+        return;
+      }
+
+      if (!datos.token || !datos.usuario) {
+        alert("El servidor no devolvió los datos de autenticación.");
         return;
       }
 
@@ -60,81 +98,121 @@ function Login() {
 
       if (datos.usuario.rol === "Coordinador") {
         navigate("/dashboard");
-      } else {
+      } else if (datos.usuario.rol === "Instructor") {
         navigate("/productos");
+      } else {
+        localStorage.removeItem("token");
+        localStorage.removeItem("usuario");
+
+        alert("El rol del usuario no está autorizado.");
       }
     } catch (error) {
-      console.error(error);
-      alert("No se pudo conectar con el servidor");
+      console.error("Error al iniciar sesión:", error);
+      alert("No se pudo conectar con el servidor.");
     }
   };
 
+  // ==========================================
+  // ABRIR MODAL DE RECUPERACIÓN
+  // ==========================================
+
   const abrirModalRecuperacion = () => {
-    setDocRecuperar("");
-    setNuevaContrasena("");
-    setConfirmarContrasena("");
+    setCorreoRecuperar("");
+    setMensajeRecuperacion("");
+    setTipoMensaje("");
     setModalRecuperarAbierto(true);
   };
+
+  // ==========================================
+  // CERRAR MODAL
+  // ==========================================
 
   const cerrarModalRecuperacion = () => {
     if (!enviandoRecuperacion) {
       setModalRecuperarAbierto(false);
+      setMensajeRecuperacion("");
+      setTipoMensaje("");
     }
   };
 
-  const handleRecuperarContrasena = async (event: FormEvent<HTMLFormElement>) => {
+  // ==========================================
+  // SOLICITAR RECUPERACIÓN POR CORREO
+  // ==========================================
+
+  const handleRecuperarContrasena = async (
+    event: FormEvent<HTMLFormElement>
+  ) => {
     event.preventDefault();
 
-    if (nuevaContrasena.length < 6) {
-      alert("La nueva contraseña debe tener al menos 6 caracteres.");
-      return;
-    }
+    if (enviandoRecuperacion) return;
 
-    if (nuevaContrasena !== confirmarContrasena) {
-      alert("Las contraseñas no coinciden.");
+    setMensajeRecuperacion("");
+    setTipoMensaje("");
+
+    const correo = correoRecuperar.trim();
+
+    if (!correo) {
+      setMensajeRecuperacion("Ingresa tu correo electrónico.");
+      setTipoMensaje("error");
       return;
     }
 
     setEnviandoRecuperacion(true);
+
     try {
       const respuesta = await fetch(
-        "http://localhost:3000/api/login/recuperar-password",
+        `${API_URL}/api/login/forgot-password`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            documento: docRecuperar.trim(),
-            nuevaContrasena,
+            correo,
           }),
         }
       );
 
-      const datos: RespuestaRecuperacion = await respuesta.json();
+      const datos: RespuestaServidor = await respuesta
+        .json()
+        .catch(() => ({}));
 
       if (!respuesta.ok) {
-        alert(datos.mensaje || "No se pudo recuperar la contraseña.");
+        setMensajeRecuperacion(
+          datos.mensaje || "No se pudo procesar la solicitud."
+        );
+
+        setTipoMensaje("error");
         return;
       }
 
-      alert(
+      setMensajeRecuperacion(
         datos.mensaje ||
-          "Contraseña actualizada correctamente. Ya puedes iniciar sesión."
+          "Si el correo está registrado, recibirás un enlace para recuperar tu contraseña."
       );
-      setModalRecuperarAbierto(false);
+
+      setTipoMensaje("exito");
     } catch (error) {
-      console.error(error);
-      alert(
-        "No se pudo conectar con el servidor para recuperar la contraseña."
+      console.error("Error al solicitar recuperación:", error);
+
+      setMensajeRecuperacion(
+        "No se pudo conectar con el servidor. Inténtalo nuevamente."
       );
+
+      setTipoMensaje("error");
     } finally {
       setEnviandoRecuperacion(false);
     }
   };
 
+  // ==========================================
+  // RENDERIZADO
+  // ==========================================
+
   return (
     <div className="login-page">
+
+      {/* ENCABEZADO */}
       <header className="login-header">
         <div className="login-location">
           <span className="location-dot"></span>
@@ -142,8 +220,11 @@ function Login() {
         </div>
       </header>
 
+      {/* CONTENIDO PRINCIPAL */}
       <main className="login-main">
         <div className="login-card">
+
+          {/* LOGO */}
           <div className="login-badge">
             <img
               src={logoStockia}
@@ -153,16 +234,25 @@ function Login() {
           </div>
 
           <h1>Inicio de sesión</h1>
+
           <p className="login-subtitle">
             Gestión de Inventario y Préstamos de Materiales
           </p>
 
+          {/* FORMULARIO DE LOGIN */}
           <form onSubmit={handleLogin}>
+
+            {/* TIPO DE DOCUMENTO */}
             <div className="login-field">
               <label htmlFor="tipo-doc">Tipo de documento</label>
 
               <div className="login-input-wrapper">
-                <select id="tipo-doc" name="tipo-doc" required defaultValue="">
+                <select
+                  id="tipo-doc"
+                  name="tipo-doc"
+                  required
+                  defaultValue=""
+                >
                   <option value="" disabled>
                     Tipo de documento
                   </option>
@@ -175,6 +265,7 @@ function Login() {
               </div>
             </div>
 
+            {/* DOCUMENTO */}
             <div className="login-field">
               <label htmlFor="documento">Número de documento</label>
 
@@ -186,10 +277,12 @@ function Login() {
                   placeholder="Número de documento"
                   required
                 />
+
                 <i className="bx bx-user"></i>
               </div>
             </div>
 
+            {/* CONTRASEÑA */}
             <div className="login-field">
               <label htmlFor="contrasena">Contraseña</label>
 
@@ -225,6 +318,7 @@ function Login() {
               </div>
             </div>
 
+            {/* RECUPERAR CONTRASEÑA */}
             <div className="forgot">
               <button
                 type="button"
@@ -242,6 +336,7 @@ function Login() {
         </div>
       </main>
 
+      {/* MODAL DE RECUPERACIÓN */}
       {modalRecuperarAbierto && (
         <div
           className="recuperar-overlay"
@@ -250,63 +345,63 @@ function Login() {
           aria-labelledby="titulo-recuperar"
         >
           <div className="recuperar-modal">
-            <h2 id="titulo-recuperar">Recuperar contraseña</h2>
+
+            <h2 id="titulo-recuperar">
+              Recuperar contraseña
+            </h2>
+
             <p className="recuperar-desc">
-              Ingresa tu número de documento y define tu nueva contraseña.
+              Ingresa el correo electrónico asociado a tu cuenta de Stockia.
+              Te enviaremos un enlace para crear una nueva contraseña.
             </p>
 
             <form onSubmit={handleRecuperarContrasena}>
+
               <div className="login-field">
-                <label htmlFor="doc-recuperar">Número de documento</label>
+                <label htmlFor="correo-recuperar">
+                  Correo electrónico
+                </label>
+
                 <div className="login-input-wrapper">
                   <input
-                    id="doc-recuperar"
-                    type="text"
-                    value={docRecuperar}
-                    onChange={(e) => setDocRecuperar(e.target.value)}
-                    placeholder="Tu número de documento"
+                    id="correo-recuperar"
+                    type="email"
+                    value={correoRecuperar}
+                    onChange={(e) =>
+                      setCorreoRecuperar(e.target.value)
+                    }
+                    placeholder="usuario@correo.com"
+                    autoComplete="email"
                     required
+                    disabled={enviandoRecuperacion}
                   />
+
+                  <i className="bx bx-envelope"></i>
                 </div>
               </div>
 
-              <div className="login-field">
-                <label htmlFor="nueva-contrasena">Nueva contraseña</label>
-                <div className="login-input-wrapper">
-                  <input
-                    id="nueva-contrasena"
-                    type="password"
-                    value={nuevaContrasena}
-                    onChange={(e) => setNuevaContrasena(e.target.value)}
-                    placeholder="Mínimo 6 caracteres"
-                    required
-                  />
-                </div>
-              </div>
+              {/* MENSAJES */}
+              {mensajeRecuperacion && (
+                <p
+                  className={`mensaje-recuperacion ${tipoMensaje}`}
+                  role="status"
+                  aria-live="polite"
+                >
+                  {mensajeRecuperacion}
+                </p>
+              )}
 
-              <div className="login-field">
-                <label htmlFor="confirmar-contrasena">Confirmar contraseña</label>
-                <div className="login-input-wrapper">
-                  <input
-                    id="confirmar-contrasena"
-                    type="password"
-                    value={confirmarContrasena}
-                    onChange={(e) => setConfirmarContrasena(e.target.value)}
-                    placeholder="Repite la nueva contraseña"
-                    required
-                  />
-                </div>
-              </div>
-
+              {/* ACCIONES */}
               <div className="recuperar-acciones">
+
                 <button
                   type="submit"
                   className="login-submit"
                   disabled={enviandoRecuperacion}
                 >
                   {enviandoRecuperacion
-                    ? "Guardando..."
-                    : "Actualizar contraseña"}
+                    ? "Enviando..."
+                    : "Enviar enlace de recuperación"}
                 </button>
 
                 <button
@@ -315,18 +410,21 @@ function Login() {
                   onClick={cerrarModalRecuperacion}
                   disabled={enviandoRecuperacion}
                 >
-                  Cancelar
+                  Volver al inicio de sesión
                 </button>
+
               </div>
             </form>
           </div>
         </div>
       )}
 
+      {/* PIE DE PÁGINA */}
       <footer className="login-footer">
         <span>Stockia · Sistema de Almacén Técnico SENA</span>
         <span>Acceso autorizado para administrativo e instructores</span>
       </footer>
+
     </div>
   );
 }

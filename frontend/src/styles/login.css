@@ -466,3 +466,31 @@
   -webkit-text-fill-color: #26352c;
   transition: background-color 5000s ease-in-out 0s;
 }
+
+
+/* Mensajes de recuperación de contraseña */
+.mensaje-recuperacion {
+  padding: 12px;
+  margin: 12px 0 18px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.mensaje-recuperacion.error {
+  color: #a32121;
+  background: #fff0f0;
+  border: 1px solid #f2caca;
+}
+
+.mensaje-recuperacion.exito {
+  color: #08783b;
+  background: #eaf6ee;
+  border: 1px solid #b9dfc6;
+}
+
+.password-toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
