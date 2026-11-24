@@ -17,27 +17,46 @@ const movimientoRoutes = require("./routes/movimiento.routes");
 
 const app = express();
 
-app.use(cors());
+// ==========================================
+// CONFIGURACIÓN GENERAL
+// ==========================================
+
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+  })
+);
+
 app.use(express.json());
 
-// Middleware de autenticación (BUG-004)
+// ==========================================
+// MIDDLEWARE DE AUTENTICACIÓN
+// ==========================================
+
 function verificarToken(req, res, next) {
   const encabezado = req.headers.authorization || "";
   const [tipo, token] = encabezado.split(" ");
 
   if (tipo !== "Bearer" || !token) {
-    return res.status(401).json({ mensaje: "Token requerido" });
+    return res.status(401).json({
+      mensaje: "Token requerido",
+    });
   }
 
   try {
     req.usuario = jwt.verify(token, process.env.JWT_SECRET);
     next();
   } catch (_error) {
-    return res.status(401).json({ mensaje: "Token inválido o expirado" });
+    return res.status(401).json({
+      mensaje: "Token inválido o expirado",
+    });
   }
 }
 
-// Comprobar conexión con PostgreSQL (pública)
+// ==========================================
+// COMPROBAR CONEXIÓN CON POSTGRESQL
+// ==========================================
+
 app.get("/api/health", async (_req, res) => {
   try {
     await pool.query("SELECT 1");
@@ -46,7 +65,7 @@ app.get("/api/health", async (_req, res) => {
       mensaje: "Backend y PostgreSQL conectados",
     });
   } catch (error) {
-    console.error(error);
+    console.error("Error de conexión PostgreSQL:", error);
 
     res.status(500).json({
       mensaje: "Error al conectar PostgreSQL",
@@ -54,20 +73,44 @@ app.get("/api/health", async (_req, res) => {
   }
 });
 
-// Rutas públicas
+// ==========================================
+// RUTAS PÚBLICAS
+// ==========================================
+
 app.use("/api/login", authRoutes);
 
-// Rutas protegidas con token
+// ==========================================
+// RUTAS PROTEGIDAS
+// ==========================================
+
 app.use("/api/usuarios", verificarToken, usuarioRoutes);
 app.use("/api/materiales", verificarToken, materialRoutes);
 app.use("/api/prestamos", verificarToken, prestamoRoutes);
 app.use("/api/categorias", verificarToken, categoriaRoutes);
 app.use("/api/proveedores", verificarToken, proveedorRoutes);
 
-// Movimientos: autenticación y autorización dentro de movimiento.routes.js
+// ==========================================
+// MOVIMIENTOS
+// ==========================================
+
 app.use("/api/movimientos", movimientoRoutes);
 
-// Iniciar servidor
+// ==========================================
+// MANEJO DE JSON INVÁLIDO
+// ==========================================
 
+app.use((error, req, res, next) => {
+  if (error instanceof SyntaxError && error.status === 400 && "body" in error) {
+    return res.status(400).json({
+      mensaje: "El formato del JSON enviado no es válido",
+    });
+  }
+
+  next(error);
+});
+
+// ==========================================
+// EXPORTAR APLICACIÓN
+// ==========================================
 
 module.exports = app;
