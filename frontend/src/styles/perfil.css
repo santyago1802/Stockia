@@ -2,7 +2,7 @@
 .perfil-page {
   min-height: 100vh;
   padding: 35px 5%;
-  background: #f5f8f6;
+  background: #f3f5f6;
   color: #26352d;
 }
 
@@ -675,3 +675,5 @@
     font-size: 9px;
   }
 }
+
+

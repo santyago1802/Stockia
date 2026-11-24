@@ -1,31 +1,30 @@
+import { useEffect, useState } from "react";
+import Card from "../components/ui/Card";
+import Navbar from "../components/layout/Navbar";
+import Footer from "../components/layout/Footer";
+import { exportarAExcel } from "../utils/exportacion_excel";
+import "../styles/catalogo.css";
+import "../styles/formularios.css";
+import "../styles/modales.css";
 
-import { useEffect, useState } from "react"; // Hooks de React para efectos secundarios y manejo de estado.
-import Card from "../components/ui/Card"; // Componente de tarjeta reutilizable para cada material.
-import Navbar from "../components/layout/Navbar"; // Barra de navegación superior.
-import Footer from "../components/layout/Footer"; // Pie de página reutilizable.
-import { exportarAExcel } from "../utils/exportacion_excel"; // Utilidad reutilizable para generar archivos .xlsx.
-import "../styles/catalogo.css"; // Estilos del catálogo, filtros y grilla de materiales.
-import "../styles/formularios.css"; // Estilos de formularios de registro, edición y solicitud.
-import "../styles/modales.css"; // Estilos de modales de confirmación y mensajes.
-
-interface Material { // Interfaz que describe la estructura de cada material devuelto por la API.
-  id_material: number; // Identificador único del material.
-  nombre_material: string; // Nombre del material.
-  descripcion_material: string; // Descripción del material.
-  id_categoria: number; // ID de la categoría asociada.
-  nombre_categoria: string; // Nombre de la categoría asociada.
-  stock_actual: number; // Unidades disponibles actualmente.
-  stock_minimo: number; // Umbral mínimo de stock permitido.
+interface Material {
+  id_material: number;
+  nombre_material: string;
+  descripcion_material: string;
+  id_categoria: number;
+  nombre_categoria: string;
+  stock_actual: number;
+  stock_minimo: number;
 }
 
-interface Categoria { // Interfaz para las categorías del catálogo.
-  id_categoria: number; // ID de la categoría.
-  nombre_categoria: string; // Nombre de la categoría.
+interface Categoria {
+  id_categoria: number;
+  nombre_categoria: string;
 }
 
-interface Proveedor { // Interfaz para los proveedores de materiales.
-  id_proveedor: number; // ID del proveedor.
-  nombre_proveedor: string; // Nombre del proveedor.
+interface Proveedor {
+  id_proveedor: number;
+  nombre_proveedor: string;
 }
 
 function Productos() {
@@ -204,8 +203,6 @@ function Productos() {
 
       setMensaje("Préstamo registrado correctamente");
       setTipoMensaje("exito");
-      setMaterialSeleccionado(null);
-      setCantidad(1);
 
       // Actualizar materiales
       const respuestaMateriales = await fetch(
@@ -369,7 +366,6 @@ function Productos() {
     return <p>Cargando materiales...</p>;
   }
 
-  // Aplicar todos los filtros
   const materialesFiltrados = materiales
     .filter((material) => {
       const coincideBusqueda = material.nombre_material
@@ -423,7 +419,7 @@ function Productos() {
       }
     });
 
-  // Exportar materiales filtrados/consultados a Excel
+  // Exportar materiales filtrados a Excel
   const handleExportarExcel = () => {
     if (materialesFiltrados.length === 0) {
       setMensaje("No hay materiales para exportar con los filtros actuales.");
@@ -485,35 +481,67 @@ function Productos() {
       <div className="products-section">
 
         {/* Confirmación del préstamo */}
-        {confirmarPrestamo && (
-          <div className="mensaje-overlay">
-            <div className="mensaje-box">
-              <h2>Confirmar préstamo</h2>
+        {confirmarPrestamo && materialSeleccionado && (
+          <div className="confirmacion-overlay">
+            <div
+              className="confirmacion-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="titulo-confirmacion"
+            >
+              <button
+                type="button"
+                className="confirmacion-cerrar"
+                onClick={() => setConfirmarPrestamo(false)}
+                aria-label="Cerrar ventana"
+              >
+                ×
+              </button>
 
-              <p>
+              <div className="confirmacion-encabezado">
+                <span>Materiales de mantenimiento</span>
+                <h2 id="titulo-confirmacion">Confirmar préstamo</h2>
+              </div>
+
+              <p className="confirmacion-pregunta">
                 ¿Estás seguro de que quieres solicitar{" "}
-                <strong>{cantidad}</strong> unidad(es) de{" "}
-                <strong>
-                  {materialSeleccionado?.nombre_material}
-                </strong>?
+                <strong>{cantidad}</strong>{" "}
+                {cantidad === 1 ? "unidad" : "unidades"} de{" "}
+                <strong>{materialSeleccionado.nombre_material}</strong>?
               </p>
 
-              <div className="botones-confirmacion">
-                <button
-                  className="btn-confirmar"
-                  onClick={() => {
-                    setConfirmarPrestamo(false);
-                    solicitarMaterial();
-                  }}
-                >
-                  Confirmar
-                </button>
+              <div className="confirmacion-resumen">
+                <div>
+                  <span>Material</span>
+                  <strong>{materialSeleccionado.nombre_material}</strong>
+                </div>
 
+                <div>
+                  <span>Cantidad</span>
+                  <strong>
+                    {cantidad} {cantidad === 1 ? "unidad" : "unidades"}
+                  </strong>
+                </div>
+              </div>
+
+              <div className="confirmacion-acciones">
                 <button
-                  className="btn-cancelar"
+                  type="button"
+                  className="confirmacion-btn-cancelar"
                   onClick={() => setConfirmarPrestamo(false)}
                 >
                   Cancelar
+                </button>
+
+                <button
+                  type="button"
+                  className="confirmacion-btn-confirmar"
+                  onClick={async () => {
+                    setConfirmarPrestamo(false);
+                    await solicitarMaterial();
+                  }}
+                >
+                  Confirmar
                 </button>
               </div>
             </div>
@@ -524,14 +552,40 @@ function Productos() {
         {mensaje && (
           <div className="mensaje-overlay">
             <div className={`mensaje-box ${tipoMensaje}`}>
+              <div className="mensaje-icono">
+                {tipoMensaje === "exito" ? "✓" : "!"}
+              </div>
+
               <h2>
-                {tipoMensaje === "exito" ? "✓ ¡Listo!" : "⚠️ Error"}
+                {tipoMensaje === "exito" ? "¡Listo!" : "Ocurrió un error"}
               </h2>
 
               <p>{mensaje}</p>
 
+              {tipoMensaje === "exito" &&
+                mensaje === "Préstamo registrado correctamente" &&
+                materialSeleccionado && (
+                  <div className="mensaje-resumen">
+                    <div>
+                      <span>Material solicitado</span>
+                      <strong>
+                        {materialSeleccionado.nombre_material}
+                      </strong>
+                    </div>
+
+                    <span className="mensaje-cantidad">
+                      {cantidad}{" "}
+                      {cantidad === 1 ? "unidad" : "unidades"}
+                    </span>
+                  </div>
+                )}
+
               <button
-                onClick={() => setMensaje("")}
+                onClick={() => {
+                  setMensaje("");
+                  setMaterialSeleccionado(null);
+                  setCantidad(1);
+                }}
                 className="btn-mensaje"
               >
                 Aceptar
@@ -540,7 +594,7 @@ function Productos() {
           </div>
         )}
 
-        {/* Acciones superiores: solo disponibles para el Coordinador */}
+        {/* Acciones superiores */}
         <div className="acciones-catalogo">
           {esCoordinador && (
             <>
@@ -562,218 +616,290 @@ function Productos() {
           )}
         </div>
 
-        {/* Formulario para registrar material */}
+        {/* ==========================================
+            MODAL PARA REGISTRAR MATERIAL
+        ========================================== */}
+
         {mostrarRegistro && (
-          <div className="solicitud-box">
-            <h2>Registrar material</h2>
-
-            <label>
-              Nombre:
-              <input
-                type="text"
-                value={nuevoMaterial.nombre_material}
-                onChange={(event) =>
-                  setNuevoMaterial({
-                    ...nuevoMaterial,
-                    nombre_material: event.target.value,
-                  })
-                }
-              />
-            </label>
-
-            <label>
-              Descripción:
-              <input
-                type="text"
-                value={nuevoMaterial.descripcion_material}
-                onChange={(event) =>
-                  setNuevoMaterial({
-                    ...nuevoMaterial,
-                    descripcion_material: event.target.value,
-                  })
-                }
-              />
-            </label>
-
-            <label>
-              Categoría:
-              <select
-                value={nuevoMaterial.id_categoria}
-                onChange={(event) =>
-                  setNuevoMaterial({
-                    ...nuevoMaterial,
-                    id_categoria: event.target.value,
-                  })
-                }
-              >
-                <option value="">Seleccionar categoría</option>
-
-                {categorias.map((categoria) => (
-                  <option
-                    key={categoria.id_categoria}
-                    value={categoria.id_categoria}
-                  >
-                    {categoria.nombre_categoria}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label>
-              Proveedor:
-              <select
-                value={nuevoMaterial.id_proveedor}
-                onChange={(event) =>
-                  setNuevoMaterial({
-                    ...nuevoMaterial,
-                    id_proveedor: event.target.value,
-                  })
-                }
-              >
-                <option value="">Seleccionar proveedor</option>
-
-                {proveedores.map((proveedor) => (
-                  <option
-                    key={proveedor.id_proveedor}
-                    value={proveedor.id_proveedor}
-                  >
-                    {proveedor.nombre_proveedor}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label>
-              Stock inicial:
-              <input
-                type="number"
-                min="0"
-                value={nuevoMaterial.cantidad}
-                onChange={(event) =>
-                  setNuevoMaterial({
-                    ...nuevoMaterial,
-                    cantidad: Number(event.target.value),
-                  })
-                }
-              />
-            </label>
-
-            <label>
-              Stock mínimo:
-              <input
-                type="number"
-                min="0"
-                value={nuevoMaterial.stock_minimo}
-                onChange={(event) =>
-                  setNuevoMaterial({
-                    ...nuevoMaterial,
-                    stock_minimo: Number(event.target.value),
-                  })
-                }
-              />
-            </label>
-
-            <button
-              className="btn btn-primary"
-              onClick={registrarMaterial}
+          <div className="editar-material-overlay">
+            <div
+              className="editar-material-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="titulo-registrar-material"
             >
-              Registrar
-            </button>
+              <button
+                type="button"
+                className="editar-material-cerrar"
+                onClick={() => setMostrarRegistro(false)}
+                aria-label="Cerrar ventana"
+              >
+                ×
+              </button>
 
-            <button
-              className="btn btn-cancelar"
-              onClick={() => setMostrarRegistro(false)}
-            >
-              Cancelar
-            </button>
+              <div className="editar-material-encabezado">
+                <span>Materiales de mantenimiento</span>
+                <h2 id="titulo-registrar-material">
+                  Registrar material
+                </h2>
+              </div>
+
+              <div className="editar-material-campo">
+                <label htmlFor="registrar-nombre">Nombre</label>
+                <input
+                  id="registrar-nombre"
+                  type="text"
+                  value={nuevoMaterial.nombre_material}
+                  onChange={(event) =>
+                    setNuevoMaterial({
+                      ...nuevoMaterial,
+                      nombre_material: event.target.value,
+                    })
+                  }
+                />
+              </div>
+
+              <div className="editar-material-campo">
+                <label htmlFor="registrar-descripcion">
+                  Descripción
+                </label>
+                <input
+                  id="registrar-descripcion"
+                  type="text"
+                  value={nuevoMaterial.descripcion_material}
+                  onChange={(event) =>
+                    setNuevoMaterial({
+                      ...nuevoMaterial,
+                      descripcion_material: event.target.value,
+                    })
+                  }
+                />
+              </div>
+
+              <div className="editar-material-campo">
+                <label htmlFor="registrar-categoria">Categoría</label>
+                <select
+                  id="registrar-categoria"
+                  value={nuevoMaterial.id_categoria}
+                  onChange={(event) =>
+                    setNuevoMaterial({
+                      ...nuevoMaterial,
+                      id_categoria: event.target.value,
+                    })
+                  }
+                >
+                  <option value="">Seleccionar categoría</option>
+
+                  {categorias.map((categoria) => (
+                    <option
+                      key={categoria.id_categoria}
+                      value={categoria.id_categoria}
+                    >
+                      {categoria.nombre_categoria}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="editar-material-campo">
+                <label htmlFor="registrar-proveedor">Proveedor</label>
+                <select
+                  id="registrar-proveedor"
+                  value={nuevoMaterial.id_proveedor}
+                  onChange={(event) =>
+                    setNuevoMaterial({
+                      ...nuevoMaterial,
+                      id_proveedor: event.target.value,
+                    })
+                  }
+                >
+                  <option value="">Seleccionar proveedor</option>
+
+                  {proveedores.map((proveedor) => (
+                    <option
+                      key={proveedor.id_proveedor}
+                      value={proveedor.id_proveedor}
+                    >
+                      {proveedor.nombre_proveedor}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="editar-material-campo">
+                <label htmlFor="registrar-stock-inicial">
+                  Stock inicial
+                </label>
+                <input
+                  id="registrar-stock-inicial"
+                  type="number"
+                  min="0"
+                  value={nuevoMaterial.cantidad}
+                  onChange={(event) =>
+                    setNuevoMaterial({
+                      ...nuevoMaterial,
+                      cantidad: Number(event.target.value),
+                    })
+                  }
+                />
+              </div>
+
+              <div className="editar-material-campo">
+                <label htmlFor="registrar-stock-minimo">
+                  Stock mínimo
+                </label>
+                <input
+                  id="registrar-stock-minimo"
+                  type="number"
+                  min="0"
+                  value={nuevoMaterial.stock_minimo}
+                  onChange={(event) =>
+                    setNuevoMaterial({
+                      ...nuevoMaterial,
+                      stock_minimo: Number(event.target.value),
+                    })
+                  }
+                />
+                <small>Umbral de alerta para reposición</small>
+              </div>
+
+              <div className="editar-material-acciones">
+                <button
+                  type="button"
+                  className="editar-material-btn-guardar"
+                  onClick={registrarMaterial}
+                >
+                  Registrar material
+                </button>
+
+                <button
+                  type="button"
+                  className="editar-material-btn-cancelar"
+                  onClick={() => setMostrarRegistro(false)}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
-        {/* Formulario para editar material */}
+        {/* ==========================================
+            MODAL PARA EDITAR MATERIAL
+        ========================================== */}
+
         {materialEditando && (
-          <div className="solicitud-box">
-            <h2>Editar material</h2>
-
-            <label>
-              Nombre:
-              <input
-                type="text"
-                value={materialEditando.nombre_material}
-                onChange={(event) =>
-                  setMaterialEditando({
-                    ...materialEditando,
-                    nombre_material: event.target.value,
-                  })
-                }
-              />
-            </label>
-
-            <label>
-              Descripción:
-              <input
-                type="text"
-                value={materialEditando.descripcion_material}
-                onChange={(event) =>
-                  setMaterialEditando({
-                    ...materialEditando,
-                    descripcion_material: event.target.value,
-                  })
-                }
-              />
-            </label>
-
-            <label>
-              Categoría:
-              <select
-                value={materialEditando.id_categoria}
-                onChange={(event) =>
-                  setMaterialEditando({
-                    ...materialEditando,
-                    id_categoria: Number(event.target.value),
-                  })
-                }
+          <div className="editar-material-overlay">
+            <div
+              className="editar-material-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="titulo-editar-material"
+            >
+              <button
+                type="button"
+                className="editar-material-cerrar"
+                onClick={() => setMaterialEditando(null)}
+                aria-label="Cerrar ventana"
               >
-                <option value="">Seleccionar categoría</option>
+                ×
+              </button>
 
-                {categorias.map((categoria) => (
-                  <option
-                    key={categoria.id_categoria}
-                    value={categoria.id_categoria}
-                  >
-                    {categoria.nombre_categoria}
-                  </option>
-                ))}
-              </select>
-            </label>
+              <div className="editar-material-encabezado">
+                <span>Materiales de mantenimiento</span>
+                <h2 id="titulo-editar-material">Editar material</h2>
+              </div>
 
-            <label>
-              Stock mínimo:
-              <input
-                type="number"
-                min="0"
-                value={materialEditando.stock_minimo}
-                onChange={(event) =>
-                  setMaterialEditando({
-                    ...materialEditando,
-                    stock_minimo: Number(event.target.value),
-                  })
-                }
-              />
-            </label>
+              <div className="editar-material-campo">
+                <label htmlFor="editar-nombre">Nombre</label>
+                <input
+                  id="editar-nombre"
+                  type="text"
+                  value={materialEditando.nombre_material}
+                  onChange={(event) =>
+                    setMaterialEditando({
+                      ...materialEditando,
+                      nombre_material: event.target.value,
+                    })
+                  }
+                />
+              </div>
 
-            <button
-              className="btn btn-primary"
-              onClick={editarMaterial}
-            >
-              Guardar cambios
-            </button>
+              <div className="editar-material-campo">
+                <label htmlFor="editar-descripcion">Descripción</label>
+                <input
+                  id="editar-descripcion"
+                  type="text"
+                  value={materialEditando.descripcion_material}
+                  onChange={(event) =>
+                    setMaterialEditando({
+                      ...materialEditando,
+                      descripcion_material: event.target.value,
+                    })
+                  }
+                />
+              </div>
 
-            <button
-              className="btn btn-cancelar"
-              onClick={() => setMaterialEditando(null)}
-            >
-              Cancelar
-            </button>
+              <div className="editar-material-campo">
+                <label htmlFor="editar-categoria">Categoría</label>
+                <select
+                  id="editar-categoria"
+                  value={materialEditando.id_categoria}
+                  onChange={(event) =>
+                    setMaterialEditando({
+                      ...materialEditando,
+                      id_categoria: Number(event.target.value),
+                    })
+                  }
+                >
+                  <option value="">Seleccionar categoría</option>
+
+                  {categorias.map((categoria) => (
+                    <option
+                      key={categoria.id_categoria}
+                      value={categoria.id_categoria}
+                    >
+                      {categoria.nombre_categoria}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="editar-material-campo">
+                <label htmlFor="editar-stock-minimo">Stock mínimo</label>
+                <input
+                  id="editar-stock-minimo"
+                  type="number"
+                  min="0"
+                  value={materialEditando.stock_minimo}
+                  onChange={(event) =>
+                    setMaterialEditando({
+                      ...materialEditando,
+                      stock_minimo: Number(event.target.value),
+                    })
+                  }
+                />
+                <small>Umbral de alerta para reposición</small>
+              </div>
+
+              <div className="editar-material-acciones">
+                <button
+                  type="button"
+                  className="editar-material-btn-guardar"
+                  onClick={editarMaterial}
+                >
+                  Guardar cambios
+                </button>
+
+                <button
+                  type="button"
+                  className="editar-material-btn-cancelar"
+                  onClick={() => setMaterialEditando(null)}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
@@ -782,7 +908,6 @@ function Productos() {
         ================================== */}
 
         <div className="barra-filtros">
-
           <div className="filtro-grupo">
             <label>Buscar material</label>
 
@@ -867,9 +992,7 @@ function Productos() {
             </select>
           </div>
 
-          {/* Contador y botón dentro del mismo recuadro */}
           <div className="filtros-footer">
-
             <div className="resultado-filtros">
               Se encontraron {materialesFiltrados.length} materiales
             </div>
@@ -887,65 +1010,109 @@ function Productos() {
             >
               Limpiar filtros
             </button>
-
           </div>
-
         </div>
 
-        {/* Solicitar material */}
+        {/* Modal para solicitar material */}
         {materialSeleccionado && (
-          <div className="solicitud-box">
-            <h2>Solicitar</h2>
-
-            <p>
-              <strong>{materialSeleccionado.nombre_material}</strong>
-            </p>
-
-            <p>
-              Stock disponible: {materialSeleccionado.stock_actual}
-            </p>
-
-            <label>
-              Cantidad:
-
-              <input
-                type="number"
-                min="1"
-                max={materialSeleccionado.stock_actual}
-                value={cantidad}
-                onChange={(event) =>
-                  setCantidad(Number(event.target.value))
-                }
-              />
-            </label>
-
-            <button
-              className="btn btn-primary"
-              onClick={() => {
-                if (
-                  cantidad < 1 ||
-                  cantidad > materialSeleccionado.stock_actual
-                ) {
-                  setMensaje("La cantidad solicitada no es válida");
-                  setTipoMensaje("error");
-                  return;
-                }
-
-                setConfirmarPrestamo(true);
-              }}
+          <div className="solicitud-overlay">
+            <div
+              className="solicitud-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="titulo-solicitud"
             >
-              Confirmar préstamo
-            </button>
+              <button
+                type="button"
+                className="solicitud-cerrar"
+                onClick={() => {
+                  setMaterialSeleccionado(null);
+                  setCantidad(1);
+                }}
+                aria-label="Cerrar ventana"
+              >
+                ×
+              </button>
 
-            <button
-              className="btn"
-              onClick={() => {
-                setMaterialSeleccionado(null);
-                setCantidad(1);
-              }}
-            >
-              Cancelar
-            </button>
+              <div className="solicitud-encabezado">
+                <span>Materiales de mantenimiento</span>
+                <h2 id="titulo-solicitud">Solicitar</h2>
+              </div>
+
+              <div className="solicitud-material-info">
+                <div>
+                  <h3>{materialSeleccionado.nombre_material}</h3>
+                  <p>
+                    Stock disponible:{" "}
+                    <strong>{materialSeleccionado.stock_actual}</strong>
+                  </p>
+                </div>
+
+                <span className="solicitud-disponibilidad">
+                  Disponible
+                </span>
+              </div>
+
+              <div className="solicitud-cantidad">
+                <label htmlFor="cantidad-solicitada">
+                  Cantidad
+                </label>
+
+                <input
+                  id="cantidad-solicitada"
+                  type="number"
+                  min="1"
+                  max={materialSeleccionado.stock_actual}
+                  value={cantidad}
+                  onChange={(event) =>
+                    setCantidad(
+                      event.target.value === ""
+                        ? 0
+                        : Number(event.target.value)
+                    )
+                  }
+                />
+
+                <small>
+                  Ingresa la cantidad de unidades a retirar
+                </small>
+              </div>
+
+              <div className="solicitud-acciones">
+                <button
+                  type="button"
+                  className="solicitud-btn-confirmar"
+                  onClick={() => {
+                    if (
+                      !Number.isInteger(cantidad) ||
+                      cantidad < 1 ||
+                      cantidad > materialSeleccionado.stock_actual
+                    ) {
+                      setMensaje(
+                        "La cantidad solicitada no es válida"
+                      );
+                      setTipoMensaje("error");
+                      return;
+                    }
+
+                    setConfirmarPrestamo(true);
+                  }}
+                >
+                  Confirmar préstamo
+                </button>
+
+                <button
+                  type="button"
+                  className="solicitud-btn-cancelar"
+                  onClick={() => {
+                    setMaterialSeleccionado(null);
+                    setCantidad(1);
+                  }}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
@@ -976,7 +1143,6 @@ function Productos() {
                         title={material.nombre_material}
                       >
                         <div className="card-body">
-
                           <p className="card-text">
                             {material.descripcion_material}
                           </p>
@@ -1024,7 +1190,6 @@ function Productos() {
                               Editar
                             </button>
                           )}
-
                         </div>
                       </Card>
                     ))}

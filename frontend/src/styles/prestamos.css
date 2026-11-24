@@ -1,4 +1,3 @@
-
 /* =========================================
    STOCKIA - PRÉSTAMOS Y DEVOLUCIONES
    Diseño de tarjetas moderno
@@ -140,6 +139,7 @@
   border-radius: 22px;
 
   box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .buscador-icono {
@@ -164,6 +164,18 @@
 
 .devoluciones-buscador input::placeholder {
   color: #9aa79f;
+}
+
+.devoluciones-buscador:focus-within {
+  background: #ffffff;
+  border-color: #087b49;
+  box-shadow: 0 0 0 3px rgba(8, 123, 73, 0.10);
+}
+
+.devoluciones-buscador input:focus {
+  background: transparent;
+  outline: none;
+  box-shadow: none;
 }
 
 /* =========================================
@@ -230,9 +242,6 @@
 
 /* ESTADOS */
 
-
-/* ESTADOS DE LOS PRÉSTAMOS */
-
 .prestamo-badge {
   display: inline-flex;
   align-items: center;
@@ -258,28 +267,19 @@
 
   border-radius: 50%;
   display: inline-block;
+  background: currentColor;
 }
 
-/* PENDIENTE: PUNTO NARANJA */
+/* PENDIENTE */
 
 .badge-pendiente .badge-punto {
   background: #d97706;
 }
 
-/* DEVUELTO: PUNTO VERDE */
+/* DEVUELTO */
 
 .badge-devuelto .badge-punto {
   background: #16a765;
-}
-
-
-.badge-punto {
-  width: 5px;
-  height: 5px;
-  min-width: 5px;
-
-  border-radius: 50%;
-  background: currentColor;
 }
 
 /* NOMBRE DEL MATERIAL */
@@ -392,6 +392,217 @@
 }
 
 /* =========================================
+   MODAL DE CONFIRMACIÓN DE DEVOLUCIÓN
+========================================= */
+
+.devolucion-modal-overlay {
+  position: fixed;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 20px;
+  box-sizing: border-box;
+
+  background: rgba(220, 226, 220, 0.82);
+  backdrop-filter: blur(5px);
+
+  z-index: 2500;
+}
+
+.devolucion-modal {
+  position: relative;
+
+  width: 100%;
+  max-width: 440px;
+
+  padding: 30px 20px 20px;
+
+  background: #ffffff;
+  border: 1px solid #e2e8e3;
+  border-radius: 17px;
+
+  box-shadow: 0 20px 45px rgba(20, 45, 30, 0.18);
+
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  box-sizing: border-box;
+
+  animation: aparecerDevolucion 0.2s ease-out;
+}
+
+@keyframes aparecerDevolucion {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Botón cerrar */
+
+.devolucion-modal-cerrar {
+  position: absolute;
+  top: 19px;
+  right: 23px;
+
+  width: 28px;
+  height: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  background: transparent;
+  border: none;
+
+  color: #34443a;
+  font-size: 23px;
+
+  cursor: pointer;
+}
+
+.devolucion-modal-cerrar:hover {
+  color: #168044;
+}
+
+/* Encabezado */
+
+.devolucion-modal-encabezado {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  padding-right: 25px;
+}
+
+.devolucion-modal-encabezado span {
+  color: #718176;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.devolucion-modal-encabezado h2 {
+  margin: 0;
+
+  color: #17251c;
+  font-size: 21px;
+  font-weight: 800;
+}
+
+/* Pregunta */
+
+.devolucion-modal-pregunta {
+  margin: 3px 0 0;
+
+  color: #29372e;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Resumen */
+
+.devolucion-modal-resumen {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+
+  padding: 15px;
+
+  background: #f0f4f1;
+  border: 1px solid #d0dbd2;
+  border-radius: 12px;
+}
+
+.devolucion-modal-resumen div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  min-width: 0;
+}
+
+.devolucion-modal-resumen span {
+  color: #63746a;
+  font-size: 11px;
+}
+
+.devolucion-modal-resumen strong {
+  color: #17251c;
+  font-size: 13px;
+  font-weight: 700;
+
+  overflow-wrap: anywhere;
+}
+
+/* Acciones */
+
+.devolucion-modal-acciones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+
+  margin-top: 1px;
+}
+
+/* Cancelar */
+
+.devolucion-btn-cancelar {
+  min-height: 43px;
+  padding: 10px;
+
+  background: #e9eeea;
+  border: 1px solid #cbd5ce;
+  border-radius: 10px;
+
+  color: #17251c;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.devolucion-btn-cancelar:hover {
+  background: #dce5df;
+}
+
+/* Confirmar */
+
+.devolucion-btn-confirmar {
+  min-height: 43px;
+  padding: 10px;
+
+  background: #00543d;
+  border: none;
+  border-radius: 10px;
+
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.devolucion-btn-confirmar:hover {
+  background: #08734f;
+}
+
+/* =========================================
    RESPONSIVE
 ========================================= */
 
@@ -428,6 +639,25 @@
   }
 }
 
+@media (max-width: 480px) {
+  .devolucion-modal {
+    padding: 27px 17px 18px;
+  }
+
+  .devolucion-modal-encabezado h2 {
+    font-size: 19px;
+  }
+
+  .devolucion-modal-resumen {
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .devolucion-modal-acciones {
+    gap: 7px;
+  }
+}
+
 @media (max-width: 420px) {
   .devoluciones-encabezado {
     flex-direction: column;
@@ -445,35 +675,4 @@
     flex: 1;
     padding: 9px 8px;
   }
-}
-
-
-/* BUSCADOR - ESTADO NORMAL Y AL SELECCIONAR */
-
-.devoluciones-buscador {
-  background: #ffffff;
-  border: 1px solid #d8e1db;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-/* Cuando se hace clic en el buscador */
-
-.devoluciones-buscador:focus-within {
-  background: #ffffff;
-  border-color: #087b49;
-  box-shadow: 0 0 0 3px rgba(8, 123, 73, 0.10);
-}
-
-/* Campo de texto */
-
-.devoluciones-buscador input {
-  background: transparent;
-  outline: none;
-  box-shadow: none;
-}
-
-.devoluciones-buscador input:focus {
-  background: transparent;
-  outline: none;
-  box-shadow: none;
 }

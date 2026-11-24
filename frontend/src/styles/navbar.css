@@ -355,3 +355,36 @@
     right: 0;
   }
 }
+
+
+/* OPCIÓN MI PERFIL */
+.navbar-menu-opcion {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 12px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: #34493b;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.navbar-menu-opcion:hover {
+  background: #edf6f0;
+  color: #087b49;
+  text-decoration: none;
+}
+
+.navbar-menu-opcion span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}

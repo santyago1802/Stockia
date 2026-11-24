@@ -2,11 +2,17 @@
    STOCKIA - VENTANAS MODALES
 ================================= */
 
-/* Fondo oscuro detrás de la ventana */
+/* =================================
+   MODAL DE MENSAJES
+================================= */
+
+/* =================================
+   MODAL DE RESULTADO
+================================= */
+
 .mensaje-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
 
@@ -14,61 +20,413 @@
   justify-content: center;
   align-items: center;
 
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 2000;
+  padding: 20px;
+  box-sizing: border-box;
+
+  background: rgba(220, 226, 220, 0.82);
+  backdrop-filter: blur(5px);
+
+  z-index: 3000;
 }
 
-/* Contenedor del mensaje */
+/* Ventana */
 .mensaje-box {
-  width: 400px;
-  max-width: 90%;
-  padding: 30px;
+  width: 100%;
+  max-width: 440px;
 
-  background: var(--color-white);
-  border-radius: var(--radius-large);
-  box-shadow: var(--shadow-card);
+  padding: 20px;
 
+  background: #ffffff;
+  border: 1px solid #e2e8e3;
+  border-radius: 17px;
+
+  box-shadow: 0 20px 45px rgba(20, 45, 30, 0.18);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+
+  box-sizing: border-box;
   text-align: center;
 }
 
-/* Título del mensaje */
+/* Círculo del icono */
+.mensaje-icono {
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 2px;
+
+  background: #cce9d7;
+  color: #24704c;
+
+  border-radius: 50%;
+
+  font-size: 22px;
+  font-weight: 800;
+}
+
+/* Título */
 .mensaje-box h2 {
-  margin-bottom: 15px;
-  color: var(--color-black);
+  margin: 0;
+
+  color: #17251c;
+  font-size: 21px;
+  font-weight: 800;
 }
 
-/* Texto del mensaje */
+/* Descripción */
 .mensaje-box p {
-  margin-bottom: 20px;
-  color: var(--color-text);
+  margin: 0 0 10px;
+
+  color: #35443b;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
-/* Botón de aceptar */
-.btn-mensaje {
-  padding: 10px 25px;
+/* Resumen del préstamo */
+.mensaje-resumen {
+  width: 100%;
 
-  background: var(--color-primary);
-  color: var(--color-black);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-  border: none;
+  gap: 10px;
+
+  padding: 14px;
+
+  background: #f0f4f1;
+  border: 1px solid #d0dbd2;
+  border-radius: 11px;
+
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.mensaje-resumen div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.mensaje-resumen div span {
+  color: #63746a;
+  font-size: 10px;
+}
+
+.mensaje-resumen div strong {
+  color: #17251c;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.mensaje-cantidad {
+  flex-shrink: 0;
+
+  padding: 6px 10px;
+
+  background: #cce9d7;
+  color: #286c4c;
+
   border-radius: 20px;
 
-  font-weight: bold;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Botón aceptar */
+.btn-mensaje {
+  width: 100%;
+  min-height: 43px;
+
+  margin-top: 10px;
+  padding: 11px 20px;
+
+  background: #00543d;
+  color: #ffffff;
+
+  border: none;
+  border-radius: 10px;
+
+  font-size: 13px;
+  font-weight: 700;
+
   cursor: pointer;
+  transition: background 0.2s ease;
 }
 
 .btn-mensaje:hover {
-  opacity: 0.8;
+  background: #08734f;
 }
 
-/* Contenedor de botones de confirmación */
+/* Error */
+.mensaje-box.error .mensaje-icono {
+  background: #f9dddd;
+  color: #b52d2d;
+}
+
+.mensaje-box.error h2 {
+  color: #b52d2d;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .mensaje-box {
+    padding: 20px 16px;
+  }
+}
+
+/* =================================
+   MODAL DE CONFIRMACIÓN DE PRÉSTAMO
+================================= */
+
+/* Fondo */
+.confirmacion-overlay {
+  position: fixed;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 20px;
+  box-sizing: border-box;
+
+  background: rgba(225, 230, 225, 0.82);
+  backdrop-filter: blur(5px);
+
+  z-index: 2500;
+}
+
+/* Ventana */
+.confirmacion-modal {
+  position: relative;
+
+  width: 100%;
+  max-width: 440px;
+
+  padding: 30px 20px 20px;
+
+  background: #ffffff;
+  border: 1px solid #e2e8e3;
+  border-radius: 17px;
+
+  box-shadow: 0 20px 45px rgba(20, 45, 30, 0.18);
+
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  box-sizing: border-box;
+
+  animation: aparecerConfirmacion 0.2s ease-out;
+}
+
+@keyframes aparecerConfirmacion {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Cerrar */
+.confirmacion-cerrar {
+  position: absolute;
+  top: 19px;
+  right: 23px;
+
+  width: 28px;
+  height: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  background: transparent;
+  border: none;
+
+  color: #34443a;
+  font-size: 23px;
+
+  cursor: pointer;
+}
+
+.confirmacion-cerrar:hover {
+  color: #1b6331;
+}
+
+/* Encabezado */
+.confirmacion-encabezado {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  padding-right: 25px;
+}
+
+.confirmacion-encabezado span {
+  color: #718176;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.confirmacion-encabezado h2 {
+  margin: 0;
+
+  color: #17251c;
+  font-size: 21px;
+  font-weight: 800;
+}
+
+/* Pregunta */
+.confirmacion-pregunta {
+  margin: 3px 0 0;
+
+  color: #29372e;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.confirmacion-pregunta strong {
+  color: #17251c;
+  font-weight: 700;
+}
+
+/* Resumen del material */
+.confirmacion-resumen {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+
+  padding: 15px;
+
+  background: #f0f4f1;
+  border: 1px solid #d0dbd2;
+  border-radius: 12px;
+}
+
+.confirmacion-resumen div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  min-width: 0;
+}
+
+.confirmacion-resumen span {
+  color: #63746a;
+  font-size: 11px;
+}
+
+.confirmacion-resumen strong {
+  color: #17251c;
+  font-size: 13px;
+  font-weight: 700;
+
+  overflow-wrap: anywhere;
+}
+
+/* Acciones */
+.confirmacion-acciones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+
+  margin-top: 1px;
+}
+
+/* Botón cancelar */
+.confirmacion-btn-cancelar {
+  min-height: 43px;
+  padding: 10px;
+
+  background: #e9eeea;
+  border: 1px solid #cbd5ce;
+  border-radius: 10px;
+
+  color: #17251c;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.confirmacion-btn-cancelar:hover {
+  background: #dce5df;
+}
+
+/* Botón confirmar */
+.confirmacion-btn-confirmar {
+  min-height: 43px;
+  padding: 10px;
+
+  background: #00543d;
+  border: none;
+  border-radius: 10px;
+
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.confirmacion-btn-confirmar:hover {
+  background: #08734f;
+}
+
+/* =================================
+   RESPONSIVE
+================================= */
+
+@media (max-width: 480px) {
+  .confirmacion-modal {
+    padding: 27px 17px 18px;
+  }
+
+  .confirmacion-encabezado h2 {
+    font-size: 19px;
+  }
+
+  .confirmacion-resumen {
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .confirmacion-acciones {
+    gap: 7px;
+  }
+}
+
+/* =================================
+   BOTONES DE CONFIRMACIÓN ANTIGUOS
+================================= */
+
 .botones-confirmacion {
   display: flex;
   justify-content: center;
   gap: 15px;
 }
 
-/* Botón confirmar */
 .btn-confirmar {
   padding: 10px 20px;
 
@@ -82,7 +440,6 @@
   cursor: pointer;
 }
 
-/* Botón cancelar del modal */
 .mensaje-box .btn-cancelar {
   padding: 10px 20px;
 
@@ -101,12 +458,11 @@
   opacity: 0.8;
 }
 
-/* Mensaje de error */
+/* Estados */
 .mensaje-box.error h2 {
   color: var(--color-danger);
 }
 
-/* Mensaje de éxito */
 .mensaje-box.exito h2 {
   color: var(--color-success);
 }

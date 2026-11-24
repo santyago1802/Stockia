@@ -52,7 +52,6 @@ function Navbar() {
   return (
     <nav className="navbar">
 
-      {/* LOGO */}
       <Link to={rol === "Coordinador" ? "/dashboard" : "/devoluciones"}>
         <img
           src={logoStockia}
@@ -61,52 +60,36 @@ function Navbar() {
         />
       </Link>
 
-      {/* NAVEGACIÓN */}
       <div className="navbar-links">
 
         {rol === "Coordinador" && (
           <>
-            <Link
-              to="/dashboard"
-              className={enlaceActivo("/dashboard")}
-            >
+            <Link to="/dashboard" className={enlaceActivo("/dashboard")}>
               Resumen
             </Link>
 
-            <Link
-              to="/movimientos"
-              className={enlaceActivo("/movimientos")}
-            >
+            <Link to="/movimientos" className={enlaceActivo("/movimientos")}>
               Movimientos
             </Link>
 
-            <Link
-              to="/usuarios"
-              className={enlaceActivo("/usuarios")}
-            >
+            <Link to="/usuarios" className={enlaceActivo("/usuarios")}>
               Usuarios
             </Link>
           </>
         )}
 
-        <Link
-          to="/productos"
-          className={enlaceActivo("/productos")}
-        >
+        <Link to="/productos" className={enlaceActivo("/productos")}>
           Materiales
         </Link>
 
         {rol === "Instructor" && (
-          <Link
-            to="/devoluciones"
-            className={enlaceActivo("/devoluciones")}
-          >
+          <Link to="/devoluciones" className={enlaceActivo("/devoluciones")}>
             Devoluciones
           </Link>
         )}
+
       </div>
 
-      {/* INFORMACIÓN DE SEDE Y PERFIL */}
       <div className="navbar-right">
 
         <div className="navbar-sede">
@@ -114,7 +97,6 @@ function Navbar() {
           <span>Sede CGMLTI</span>
         </div>
 
-        {/* PERFIL DEL USUARIO */}
         <div className="navbar-perfil">
 
           <button
@@ -127,13 +109,21 @@ function Navbar() {
             {inicialUsuario}
           </button>
 
-          {/* MENÚ DESPLEGABLE */}
           {menuAbierto && (
             <div className="navbar-menu-perfil">
 
               <div className="navbar-menu-usuario">
                 {nombreUsuario || "Usuario"}
               </div>
+
+              <Link
+                to="/perfil"
+                className="navbar-menu-opcion"
+                onClick={() => setMenuAbierto(false)}
+              >
+                <span>👤</span>
+                Mi perfil
+              </Link>
 
               <button
                 type="button"
