@@ -1,95 +1,128 @@
-import { useEffect, useState } from "react"; // Importa hooks de React para efectos y estado.
-import Navbar from "../components/layout/Navbar"; // Importa la barra de navegación superior.
-import { exportarAExcel } from "../utils/exportacion_excel"; // Reutiliza la función genérica para exportar .xlsx.
 
-interface Prestamo { // Estructura de cada préstamo devuelto por /api/prestamos.
-  id_prestamo: number; // ID único del préstamo.
-  id_usuario: number; // ID del usuario que solicitó el préstamo.
-  nombre_usuario: string; // Nombre del usuario asociado.
-  fecha_prestamo: string; // Fecha de registro del préstamo.
-  estado: string; // Estado del préstamo (ej. "pendiente", "devuelto").
-  id_material: number; // ID del material prestado.
-  nombre_material: string; // Nombre del material prestado.
-  cantidad: number; // Cantidad de unidades prestadas.
+import { useEffect, useState } from "react";
+import Navbar from "../components/layout/Navbar";
+import { exportarAExcel } from "../utils/exportacion_excel";
+
+// URL del backend según el entorno
+const API_URL = (
+  import.meta.env.VITE_API_URL || "http://localhost:3000"
+).replace(/\/$/, "");
+
+interface Prestamo {
+  id_prestamo: number;
+  id_usuario: number;
+  nombre_usuario: string;
+  fecha_prestamo: string;
+  estado: string;
+  id_material: number;
+  nombre_material: string;
+  cantidad: number;
 }
 
-interface Material { // Estructura de cada material devuelto por /api/materiales.
-  id_material: number; // ID único del material.
-  nombre_material: string; // Nombre del material.
-  descripcion_material: string; // Descripción del material.
-  stock_actual: number; // Unidades disponibles actualmente.
-  stock_minimo: number; // Stock mínimo requerido.
+interface Material {
+  id_material: number;
+  nombre_material: string;
+  descripcion_material: string;
+  stock_actual: number;
+  stock_minimo: number;
 }
 
-function Dashboard() { // Componente principal del panel / dashboard.
-  const [prestamos, setPrestamos] = useState<Prestamo[]>([]); // Lista de préstamos consultados.
-  const [cargando, setCargando] = useState(true); // Indica si los datos iniciales están cargando.
-  const [materiales, setMateriales] = useState<Material[]>([]); // Lista de materiales consultados.
+function Dashboard() {
+  const [prestamos, setPrestamos] = useState<Prestamo[]>([]);
+  const [cargando, setCargando] = useState(true);
+  const [materiales, setMateriales] = useState<Material[]>([]);
 
-  const obtenerPrestamos = async () => { // Consulta préstamos y materiales desde el backend.
+  // Obtener préstamos y materiales
+  const obtenerPrestamos = async () => {
     try {
-      const respuesta = await fetch( // Petición GET de préstamos.
-        "http://localhost:3000/api/prestamos"
+      const token = localStorage.getItem("token");
+
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
+      const respuesta = await fetch(
+        `${API_URL}/api/prestamos`,
+        { headers }
       );
 
-      const datos = await respuesta.json(); // Parsea préstamos.
-      setPrestamos(datos); // Guarda préstamos en estado.
+      if (!respuesta.ok) {
+        throw new Error("No se pudieron cargar los préstamos");
+      }
 
-      const respuestaMateriales = await fetch( // Petición GET de materiales.
-        "http://localhost:3000/api/materiales"
+      const datos = await respuesta.json();
+      setPrestamos(datos);
+
+      const respuestaMateriales = await fetch(
+        `${API_URL}/api/materiales`,
+        { headers }
       );
-      const datosMateriales = await respuestaMateriales.json(); // Parsea materiales.
-      setMateriales(datosMateriales); // Guarda materiales en estado.
+
+      if (!respuestaMateriales.ok) {
+        throw new Error("No se pudieron cargar los materiales");
+      }
+
+      const datosMateriales = await respuestaMateriales.json();
+      setMateriales(datosMateriales);
     } catch (error) {
-      console.error("Error al obtener préstamos:", error); // Registra error en consola.
+      console.error("Error al obtener préstamos y materiales:", error);
     } finally {
-      setCargando(false); // Finaliza la carga inicial.
+      setCargando(false);
     }
   };
 
-  useEffect(() => { // Ejecuta la carga inicial al montar el componente.
+  useEffect(() => {
     obtenerPrestamos();
   }, []);
 
-  const devolverPrestamo = async (idPrestamo: number) => { // Marca un préstamo como devuelto.
+  // Devolver préstamo
+  const devolverPrestamo = async (idPrestamo: number) => {
     try {
-      const respuesta = await fetch( // Petición PUT para devolver préstamo.
-        `http://localhost:3000/api/prestamos/${idPrestamo}/devolver`,
+      const token = localStorage.getItem("token");
+
+      const respuesta = await fetch(
+        `${API_URL}/api/prestamos/${idPrestamo}/devolver`,
         {
           method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
-      const datos = await respuesta.json(); // Lee respuesta del servidor.
+      const datos = await respuesta.json();
 
       if (!respuesta.ok) {
-        alert(datos.mensaje); // Muestra mensaje de error si falla.
+        alert(datos.mensaje || "No se pudo devolver el préstamo");
         return;
       }
 
-      alert("Préstamo devuelto correctamente"); // Confirma devolución.
-      obtenerPrestamos(); // Refresca préstamos y stock de materiales.
+      alert("Préstamo devuelto correctamente");
+      await obtenerPrestamos();
     } catch (error) {
       console.error("Error al devolver préstamo:", error);
       alert("No se pudo devolver el préstamo");
     }
   };
 
-  const alertasStock = materiales.filter( // Filtra materiales con stock igual o menor al mínimo.
+  // Materiales con stock bajo
+  const alertasStock = materiales.filter(
     (material) => material.stock_actual <= material.stock_minimo
   );
 
-  const prestamosPendientes = prestamos.filter( // Filtra únicamente los préstamos en estado "pendiente".
+  // Préstamos pendientes
+  const prestamosPendientes = prestamos.filter(
     (prestamo) => prestamo.estado === "pendiente"
   );
 
-  const handleExportarAlertasStock = () => { // Exporta las alertas de stock consultadas a Excel.
-    if (alertasStock.length === 0) { // Evita descargar un archivo vacío si no hay alertas.
+  // Exportar alertas de stock
+  const handleExportarAlertasStock = () => {
+    if (alertasStock.length === 0) {
       alert("No hay alertas de stock para exportar.");
       return;
     }
 
-    const filas = alertasStock.map((material) => ({ // Formatea las columnas para la hoja de Excel.
+    const filas = alertasStock.map((material) => ({
       ID: material.id_material,
       Material: material.nombre_material,
       Descripción: material.descripcion_material,
@@ -98,16 +131,17 @@ function Dashboard() { // Componente principal del panel / dashboard.
       Estado: material.stock_actual === 0 ? "Agotado" : "Stock bajo",
     }));
 
-    exportarAExcel(filas, "stockia_alertas_stock", "Alertas de stock"); // Descarga stockia_alertas_stock.xlsx.
+    exportarAExcel(filas, "stockia_alertas_stock", "Alertas de stock");
   };
 
-  const handleExportarPrestamosPendientes = () => { // Exporta los préstamos pendientes consultados a Excel[cite: 3].
-    if (prestamosPendientes.length === 0) { // Evita descargar un archivo vacío si no hay pendientes.
+  // Exportar préstamos pendientes
+  const handleExportarPrestamosPendientes = () => {
+    if (prestamosPendientes.length === 0) {
       alert("No hay préstamos pendientes para exportar.");
       return;
     }
 
-    const filas = prestamosPendientes.map((prestamo) => ({ // Formatea las columnas para el Excel.
+    const filas = prestamosPendientes.map((prestamo) => ({
       ID: prestamo.id_prestamo,
       Usuario: prestamo.nombre_usuario,
       Material: prestamo.nombre_material,
@@ -116,27 +150,27 @@ function Dashboard() { // Componente principal del panel / dashboard.
       "Fecha préstamo": prestamo.fecha_prestamo,
     }));
 
-    exportarAExcel( // Genera y descarga stockia_prestamos_pendientes_dashboard.xlsx.
+    exportarAExcel(
       filas,
       "stockia_prestamos_pendientes_dashboard",
       "Préstamos pendientes"
     );
   };
 
-  if (cargando) { // Muestra mensaje mientras se cargan los datos.
+  if (cargando) {
     return <p>Cargando préstamos...</p>;
   }
 
   return (
     <div>
-      <Navbar /> {/* Barra de navegación superior. */}
+      <Navbar />
 
-      <main className="products-section"> {/* Contenedor principal del panel. */}
-        <h1>Devoluciones</h1> {/* Título principal. */}
+      <main className="products-section">
+        <h1>Devoluciones</h1>
 
-        <h2>⚠️ Alertas de stock</h2> {/* Subtítulo de alertas de stock. */}
+        <h2>⚠️ Alertas de stock</h2>
 
-        <div style={{ marginBottom: "12px" }}> {/* Contenedor para acción de exportar alertas. */}
+        <div style={{ marginBottom: "12px" }}>
           <button
             type="button"
             className="btn btn-primary"
@@ -146,7 +180,7 @@ function Dashboard() { // Componente principal del panel / dashboard.
           </button>
         </div>
 
-        <div className="alertas-grid"> {/* Grilla de materiales con stock bajo o agotado. */}
+        <div className="alertas-grid">
           {alertasStock.length === 0 ? (
             <p>No hay materiales con stock bajo.</p>
           ) : (
@@ -176,9 +210,9 @@ function Dashboard() { // Componente principal del panel / dashboard.
           )}
         </div>
 
-        <h2>Préstamos pendientes</h2> {/* Subtítulo de préstamos pendientes. */}
+        <h2>Préstamos pendientes</h2>
 
-        <div style={{ marginBottom: "12px" }}> {/* Contenedor para acción de exportar préstamos pendientes. */}
+        <div style={{ marginBottom: "12px" }}>
           <button
             type="button"
             className="btn btn-primary"
@@ -191,7 +225,7 @@ function Dashboard() { // Componente principal del panel / dashboard.
         {prestamosPendientes.length === 0 ? (
           <p>No hay préstamos pendientes.</p>
         ) : (
-          <div className="prestamos-grid"> {/* Grilla de préstamos pendientes. */}
+          <div className="prestamos-grid">
             {prestamosPendientes.map((prestamo) => (
               <div
                 key={prestamo.id_prestamo}

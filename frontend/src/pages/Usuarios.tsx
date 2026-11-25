@@ -5,6 +5,11 @@ import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import "../styles/usuarios.css";
 
+// URL del backend según el entorno
+const API_URL = (
+  import.meta.env.VITE_API_URL || "http://localhost:3000"
+).replace(/\/$/, "");
+
 interface Usuario {
   id_usuario: number;
   nombre_usuario: string;
@@ -47,7 +52,7 @@ function Users() {
       const token = localStorage.getItem("token");
 
       const respuesta = await fetch(
-        "http://localhost:3000/api/usuarios",
+        `${API_URL}/api/usuarios`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -124,7 +129,7 @@ function Users() {
       const token = localStorage.getItem("token");
 
       const respuesta = await fetch(
-        "http://localhost:3000/api/usuarios",
+        `${API_URL}/api/usuarios`,
         {
           method: "POST",
           headers: {

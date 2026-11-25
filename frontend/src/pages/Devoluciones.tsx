@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 
 import Navbar from "../components/layout/Navbar";
@@ -5,6 +6,13 @@ import Footer from "../components/layout/Footer";
 
 import "../styles/prestamos.css";
 import "../styles/modales.css";
+
+// URL del backend
+const API_URL = (
+  import.meta.env.VITE_API_URL || "http://localhost:3000"
+).replace(/\/$/, "");
+
+const API = `${API_URL}/api`;
 
 export type EstadoPrestamo = "pendiente" | "devuelto";
 
@@ -58,7 +66,7 @@ function Devoluciones() {
       const token = localStorage.getItem("token");
 
       const respuesta = await fetch(
-        "http://localhost:3000/api/prestamos",
+        `${API}/prestamos`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -109,7 +117,7 @@ function Devoluciones() {
       const token = localStorage.getItem("token");
 
       const respuesta = await fetch(
-        `http://localhost:3000/api/prestamos/${prestamo.id_prestamo}/devolver`,
+        `${API}/prestamos/${prestamo.id_prestamo}/devolver`,
         {
           method: "PUT",
           headers: {

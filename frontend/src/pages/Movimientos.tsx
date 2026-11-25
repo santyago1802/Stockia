@@ -5,6 +5,11 @@ import Footer from "../components/layout/Footer";
 import { exportarAExcel } from "../utils/exportacion_excel";
 import "../styles/movimientos.css";
 
+// URL del backend
+const API_URL = (
+  import.meta.env.VITE_API_URL || "http://localhost:3000"
+).replace(/\/$/, "");
+
 interface Movimiento {
   id_movimiento: number;
   id_prestamo: number | null;
@@ -65,7 +70,7 @@ function Movimientos() {
       if (tipo !== "todos") parametros.append("tipo", tipo);
 
       const respuesta = await fetch(
-        `http://localhost:3000/api/movimientos?${parametros.toString()}`,
+        `${API_URL}/api/movimientos?${parametros.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

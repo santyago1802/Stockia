@@ -38,7 +38,11 @@ interface Movimiento {
 type Pestaña = "resumen" | "historial" | "seguridad";
 
 function Perfil() {
-  const API = "http://localhost:3000/api";
+  const API_URL = (
+    import.meta.env.VITE_API_URL || "http://localhost:3000"
+  ).replace(/\/$/, "");
+
+  const API = `${API_URL}/api`;
   const token = localStorage.getItem("token");
 
   const [pestana, setPestana] = useState<Pestaña>("resumen");

@@ -7,6 +7,10 @@ import "../styles/catalogo.css";
 import "../styles/formularios.css";
 import "../styles/modales.css";
 
+const API_URL = (
+  import.meta.env.VITE_API_URL || "http://localhost:3000"
+).replace(/\/$/, "");
+
 interface Material {
   id_material: number;
   nombre_material: string;
@@ -83,7 +87,7 @@ function Productos() {
         const token = localStorage.getItem("token");
 
         const respuesta = await fetch(
-          "http://localhost:3000/api/materiales",
+          `${API_URL}/api/materiales`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -117,7 +121,7 @@ function Productos() {
         const token = localStorage.getItem("token");
 
         const respuestaCategorias = await fetch(
-          "http://localhost:3000/api/categorias",
+          `${API_URL}/api/categorias`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -133,7 +137,7 @@ function Productos() {
         setCategorias(datosCategorias);
 
         const respuestaProveedores = await fetch(
-          "http://localhost:3000/api/proveedores",
+          `${API_URL}/api/proveedores`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -178,7 +182,7 @@ function Productos() {
       const token = localStorage.getItem("token");
 
       const respuesta = await fetch(
-        "http://localhost:3000/api/prestamos",
+        `${API_URL}/api/prestamos`,
         {
           method: "POST",
           headers: {
@@ -206,7 +210,7 @@ function Productos() {
 
       // Actualizar materiales
       const respuestaMateriales = await fetch(
-        "http://localhost:3000/api/materiales",
+        `${API_URL}/api/materiales`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -234,7 +238,7 @@ function Productos() {
       const token = localStorage.getItem("token");
 
       const respuesta = await fetch(
-        "http://localhost:3000/api/materiales",
+        `${API_URL}/api/materiales`,
         {
           method: "POST",
           headers: {
@@ -275,7 +279,7 @@ function Productos() {
 
       // Actualizar catálogo
       const respuestaMateriales = await fetch(
-        "http://localhost:3000/api/materiales",
+        `${API_URL}/api/materiales`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -307,7 +311,7 @@ function Productos() {
       const token = localStorage.getItem("token");
 
       const respuesta = await fetch(
-        `http://localhost:3000/api/materiales/${materialEditando.id_material}`,
+        `${API_URL}/api/materiales/${materialEditando.id_material}`,
         {
           method: "PUT",
           headers: {
@@ -337,7 +341,7 @@ function Productos() {
 
       // Actualizar catálogo
       const respuestaMateriales = await fetch(
-        "http://localhost:3000/api/materiales",
+        `${API_URL}/api/materiales`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

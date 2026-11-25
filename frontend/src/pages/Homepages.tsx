@@ -5,6 +5,10 @@ import Navbar from "../components/layout/Navbar";
 import "../styles/dashboard.css";
 import "../styles/prestamos.css";
 
+const API_URL = (
+  import.meta.env.VITE_API_URL || "http://localhost:3000"
+).replace(/\/$/, "");
+
 interface Material {
   id_material: number;
   nombre_material: string;
@@ -54,7 +58,7 @@ function Homepages() {
       const token = localStorage.getItem("token");
 
       const respuestaMateriales = await fetch(
-        "http://localhost:3000/api/materiales",
+        `${API_URL}/api/materiales`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -70,7 +74,7 @@ function Homepages() {
       setMateriales(datosMateriales);
 
       const respuestaPrestamos = await fetch(
-        "http://localhost:3000/api/prestamos",
+        `${API_URL}/api/prestamos`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -116,7 +120,7 @@ function Homepages() {
       const token = localStorage.getItem("token");
 
       const respuesta = await fetch(
-        "http://localhost:3000/api/movimientos/entrada",
+        `${API_URL}/api/movimientos/entrada`,
         {
           method: "POST",
           headers: {
