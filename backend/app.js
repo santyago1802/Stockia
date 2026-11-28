@@ -14,6 +14,7 @@ const authRoutes = require("./routes/auth.routes");
 const categoriaRoutes = require("./routes/categoria.routes");
 const proveedorRoutes = require("./routes/proveedor.routes");
 const movimientoRoutes = require("./routes/movimiento.routes");
+const loteRoutes = require("./routes/lote.routes");
 
 const app = express();
 
@@ -95,6 +96,12 @@ app.use("/api/categorias", verificarToken, categoriaRoutes);
 app.use("/api/proveedores", verificarToken, proveedorRoutes);
 
 // ==========================================
+// LOTES
+// ==========================================
+
+app.use("/api/lotes", verificarToken, loteRoutes);
+
+// ==========================================
 // MOVIMIENTOS
 // ==========================================
 
@@ -105,7 +112,11 @@ app.use("/api/movimientos", movimientoRoutes);
 // ==========================================
 
 app.use((error, req, res, next) => {
-  if (error instanceof SyntaxError && error.status === 400 && "body" in error) {
+  if (
+    error instanceof SyntaxError &&
+    error.status === 400 &&
+    "body" in error
+  ) {
     return res.status(400).json({
       mensaje: "El formato del JSON enviado no es válido",
     });
@@ -119,3 +130,4 @@ app.use((error, req, res, next) => {
 // ==========================================
 
 module.exports = app;
+
